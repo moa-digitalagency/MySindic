@@ -71,7 +71,7 @@ def create_app():
         @wraps(f)
         @login_required
         def decorated_function(*args, **kwargs):
-            if not current_user.is_superadmin:
+            if not current_user.is_superadmin():
                 return redirect(url_for('resident_dashboard'))
             return f(*args, **kwargs)
         return decorated_function
@@ -81,7 +81,7 @@ def create_app():
     def index():
         """Page d'accueil"""
         if current_user.is_authenticated:
-            if current_user.is_superadmin:
+            if current_user.is_superadmin():
                 return redirect(url_for('admin_dashboard'))
             else:
                 return redirect(url_for('resident_dashboard'))
@@ -141,7 +141,7 @@ def create_app():
     @login_required
     def resident_dashboard():
         """Dashboard résident"""
-        if current_user.is_superadmin:
+        if current_user.is_superadmin():
             return redirect(url_for('admin_dashboard'))
         return render_template('resident/dashboard.html')
     
