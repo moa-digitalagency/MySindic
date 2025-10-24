@@ -1,0 +1,61 @@
+# MySindic - Fichiers à ignorer par Git
+
+# Environnement Python
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Variables d'environnement et secrets
+.env
+.env.local
+.env.production
+
+# Base de données
+*.db
+*.sqlite
+*.sqlite3
+migrations/
+
+# Logs
+logs/
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Flask
+instance/
+.webassets-cache
+
+# Node (si utilisé pour frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
