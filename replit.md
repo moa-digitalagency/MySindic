@@ -64,3 +64,46 @@ MySindic is built as a PWA with a Python Flask backend and an HTML/CSS frontend 
 - **Gunicorn:** WSGI HTTP server.
 - **Tailwind CSS:** Utility-first CSS framework (via CDN).
 - **Feather Icons:** Open-source icon library.
+
+## Recent Changes
+
+### October 24, 2025 - Project Migration to Replit Environment
+
+- Successfully migrated MySindic application from Replit Agent to Replit environment
+- Installed Python 3.11 and all required dependencies via `uv` package manager
+- Created PostgreSQL database and configured DATABASE_URL environment variable
+- Set up SESSION_SECRET and SECRET_KEY environment variables
+- Configured deployment with gunicorn on port 5000
+- Created workflow "Start application" to run the app with auto-reload
+- Initialized database with sample data using init_db.py
+- Created demo accounts:
+  - Superadmin: admin@mysindic.ma / Admin123!
+  - Resident: resident@mysindic.ma / Resident123!
+- Verified application is fully functional and accessible
+
+## Environment Setup
+
+### Required Environment Variables
+
+- `DATABASE_URL`: PostgreSQL connection string (automatically set by Replit)
+- `SESSION_SECRET`: Secret key for Flask sessions (automatically set)
+- `SECRET_KEY`: Application secret key (uses SESSION_SECRET value)
+- `FLASK_ENV`: Set to 'development' for local development
+
+### Running the Application
+
+The application runs automatically via the configured workflow. To manually start:
+
+```bash
+uv run gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+```
+
+### Database Initialization
+
+To reset and initialize the database with sample data:
+
+```bash
+uv run python init_db.py
+```
+
+This creates sample residences, units, and demo user accounts.
