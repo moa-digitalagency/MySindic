@@ -87,6 +87,26 @@ def create_app():
                 return redirect(url_for('resident_dashboard'))
         return render_template('index.html')
     
+    @app.route('/login')
+    def login_page():
+        """Page de connexion"""
+        if current_user.is_authenticated:
+            if current_user.is_superadmin():
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return redirect(url_for('resident_dashboard'))
+        return render_template('auth/login.html')
+    
+    @app.route('/register')
+    def register_page():
+        """Page d'inscription"""
+        if current_user.is_authenticated:
+            if current_user.is_superadmin():
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return redirect(url_for('resident_dashboard'))
+        return render_template('auth/register.html')
+    
     # Routes Admin (pages HTML)
     @app.route('/admin/dashboard')
     @superadmin_required

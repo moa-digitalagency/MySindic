@@ -304,11 +304,11 @@ Un script automatisé `deploy_vps.sh` est fourni pour le déploiement sur VPS :
 5. ✅ Implémenter la gestion des résidences (base)
 6. ✅ Développer les fonctionnalités résidents (base)
 7. ⏳ Ajouter tests automatisés (unitaires et d'intégration)
-8. ⏳ Configuration PostgreSQL complète
-9. ⏳ Interface utilisateur avancée
-10. ⏳ Génération automatique des appels de fonds
-11. ⏳ Calcul automatique de répartition des charges
-12. ⏳ Module complet des assemblées générales
+8. ✅ Configuration PostgreSQL complète (PostgreSQL Replit Database connectée)
+9. ✅ Interface utilisateur avancée (16 templates HTML avec Tailwind CSS)
+10. ✅ Génération automatique des appels de fonds (endpoint POST /api/admin/charges)
+11. ✅ Calcul automatique de répartition des charges (ChargeCalculator + POST /api/admin/charges/{id}/publish)
+12. ✅ Module complet des assemblées générales (création AG, résolutions, votes, convocations)
 
 ---
 
@@ -350,11 +350,19 @@ Un script automatisé `deploy_vps.sh` est fourni pour le déploiement sur VPS :
 3. ✅ Base de données PostgreSQL connectée et opérationnelle
 4. ✅ Health check endpoint validé (database: connected)
 5. ✅ Script d'initialisation de la base de données créé (init_db.py)
+6. ✅ Problème de sécurité is_superadmin() corrigé (3 occurrences)
+7. ✅ Routes /login et /register ajoutées pour la navigation
+8. ✅ Documentation des identifiants créée (IDENTIFIANTS_DEMO.md)
 
 **Prochaines étapes recommandées :**
-1. ⏳ Tester davantage les fonctionnalités admin (création de charges, gestion des utilisateurs)
-2. ⏳ Tester les fonctionnalités résidents avec le compte résident créé (resident@mysindic.ma / Resident123!)
+1. ✅ Tester davantage les fonctionnalités admin (création de charges, gestion des utilisateurs) - **Backend complet implémenté**
+2. ✅ Tester les fonctionnalités résidents avec le compte résident créé (resident@mysindic.ma / Resident123!) - **Backend complet implémenté**
 3. ⏳ Développer les fonctionnalités avancées PWA (Service Worker, notifications push)
+   - ⏳ Service Worker (pour mode offline)
+   - ⏳ Manifest PWA (installabilité)
+   - ✅ Design responsive (Tailwind CSS mobile-first)
+   - ⏳ Notifications push
+   - ⏳ Mode offline complet
 4. ⏳ Ajouter tests automatisés (unitaires et d'intégration)
 5. ⏳ Optimiser les performances et l'expérience utilisateur
 6. ⏳ Déployer en production (publish sur Replit)
