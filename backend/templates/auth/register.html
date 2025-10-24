@@ -11,38 +11,61 @@
             </h2>
             <p class="mt-2 text-center text-sm text-gray-600">
                 Ou
-                <a href="{{ url_for('auth.login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                <a href="/login" class="font-medium text-indigo-600 hover:text-indigo-500">
                     connectez-vous à votre compte existant
                 </a>
             </p>
         </div>
-        <form class="mt-8 space-y-6" action="{{ url_for('auth.register') }}" method="POST">
+        
+        <div id="error-message" class="hidden p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+            <span id="error-text"></span>
+        </div>
+        
+        <div id="success-message" class="hidden p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+            <span id="success-text"></span>
+        </div>
+        
+        <form id="register-form" class="mt-8 space-y-6">
             <div class="rounded-md shadow-sm space-y-4">
                 <div>
-                    <label for="username" class="label-field">Nom d'utilisateur</label>
-                    <input id="username" name="username" type="text" required 
-                           class="input-field" 
-                           placeholder="Nom d'utilisateur">
+                    <label for="first_name" class="block text-sm font-medium text-gray-700">Prénom</label>
+                    <input id="first_name" name="first_name" type="text" required 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                           placeholder="Prénom">
                 </div>
                 
                 <div>
-                    <label for="email" class="label-field">Email</label>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700">Nom</label>
+                    <input id="last_name" name="last_name" type="text" required 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                           placeholder="Nom">
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                     <input id="email" name="email" type="email" required 
-                           class="input-field" 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
                            placeholder="email@exemple.com">
                 </div>
                 
                 <div>
-                    <label for="password" class="label-field">Mot de passe</label>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Téléphone (optionnel)</label>
+                    <input id="phone" name="phone" type="tel" 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                           placeholder="+212XXXXXXXXX">
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
                     <input id="password" name="password" type="password" required 
-                           class="input-field" 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
                            placeholder="Mot de passe">
                 </div>
                 
                 <div>
-                    <label for="password_confirm" class="label-field">Confirmer le mot de passe</label>
+                    <label for="password_confirm" class="block text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
                     <input id="password_confirm" name="password_confirm" type="password" required 
-                           class="input-field" 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
                            placeholder="Confirmez le mot de passe">
                 </div>
             </div>
@@ -59,17 +82,87 @@
             </div>
 
             <div>
-                <button type="submit" 
+                <button type="submit" id="submit-btn"
                         class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
                         <svg class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                         </svg>
                     </span>
-                    Créer mon compte
+                    <span id="button-text">Créer mon compte</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submit-btn');
+    const buttonText = document.getElementById('button-text');
+    const errorDiv = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const successDiv = document.getElementById('success-message');
+    const successText = document.getElementById('success-text');
+    
+    // Validation côté client
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password_confirm').value;
+    
+    if (password !== passwordConfirm) {
+        errorText.textContent = 'Les mots de passe ne correspondent pas';
+        errorDiv.classList.remove('hidden');
+        successDiv.classList.add('hidden');
+        return;
+    }
+    
+    // Désactiver le bouton
+    submitBtn.disabled = true;
+    buttonText.textContent = 'Création en cours...';
+    errorDiv.classList.add('hidden');
+    successDiv.classList.add('hidden');
+    
+    try {
+        const formData = {
+            email: document.getElementById('email').value,
+            password: password,
+            first_name: document.getElementById('first_name').value,
+            last_name: document.getElementById('last_name').value,
+            phone: document.getElementById('phone').value || null
+        };
+        
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            successText.textContent = 'Compte créé avec succès! Redirection...';
+            successDiv.classList.remove('hidden');
+            
+            // Rediriger vers la page de login après 2 secondes
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 2000);
+        } else {
+            errorText.textContent = data.error || 'Erreur lors de l\'inscription';
+            errorDiv.classList.remove('hidden');
+            submitBtn.disabled = false;
+            buttonText.textContent = 'Créer mon compte';
+        }
+    } catch (error) {
+        errorText.textContent = 'Erreur de connexion au serveur';
+        errorDiv.classList.remove('hidden');
+        submitBtn.disabled = false;
+        buttonText.textContent = 'Créer mon compte';
+    }
+});
+</script>
 {% endblock %}
