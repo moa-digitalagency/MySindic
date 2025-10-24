@@ -10,11 +10,89 @@ et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 ## [Non publié]
 
 ### Prochaines étapes
-- Configuration de la base de données PostgreSQL
-- Système d'authentification (Flask-Login)
-- Modèles de données (User, Residence, Maintenance, etc.)
-- Routes API de base
-- Interface utilisateur complète avec Tailwind CSS
+- Tests automatisés (unitaires et d'intégration)
+- Configuration PostgreSQL complète avec migrations
+- Interface utilisateur avancée pour les fonctionnalités
+- Génération et envoi automatique des appels de fonds
+- Système de calcul automatique de répartition des charges
+- Module de gestion des assemblées générales
+
+---
+
+## [0.2.0] - 2025-10-24
+
+### Ajouté
+- 🗄️ **Modèles de données complets** (12 modèles SQLAlchemy)
+  - `User` : Gestion des utilisateurs (superadmin/resident) avec authentification
+  - `Residence` : Gestion des copropriétés
+  - `Unit` : Gestion des lots/appartements avec tantièmes
+  - `MaintenanceRequest` : Demandes d'intervention
+  - `Document` : Documents officiels (quittances, PV, etc.)
+  - `Charge` & `ChargeDistribution` : Gestion et répartition des charges
+  - `Payment` : Suivi des paiements
+  - `News` : Actualités de la résidence
+  - `Poll`, `PollOption`, `PollVote` : Système de sondages complet
+  - Relations SQLAlchemy cohérentes avec cascading rules
+  - Méthodes to_dict() pour sérialisation JSON
+
+- ⚙️ **Configuration Flask professionnelle** (`backend/config.py`)
+  - Trois environnements : Development, Production, Testing
+  - Configuration SQLAlchemy, JWT, Flask-Login, Email
+  - Validation des secrets en production
+  - Gestion sécurisée des clés
+
+- 🔐 **Système d'authentification complet** (`backend/routes/auth.py`)
+  - Flask-Login intégré avec sessions sécurisées
+  - Endpoints : `/api/auth/register`, `/api/auth/login`, `/api/auth/logout`
+  - Endpoints : `/api/auth/me`, `/api/auth/check`
+  - Hashing des mots de passe avec Werkzeug
+  - Gestion des rôles (superadmin/resident)
+  - Mise à jour automatique de last_login
+
+- 👨‍💼 **Routes Superadmin** (`backend/routes/admin.py`)
+  - Dashboard avec statistiques globales
+  - Gestion des résidences (liste, création)
+  - Gestion des utilisateurs
+  - Décorateur `@superadmin_required` pour la sécurité
+  - Endpoints : `/api/admin/dashboard`, `/api/admin/residences`, `/api/admin/users`
+
+- 🏠 **Routes Résidents** (`backend/routes/resident.py`)
+  - Dashboard personnalisé avec demandes et actualités
+  - Création et suivi des demandes de maintenance
+  - Consultation des actualités de la résidence
+  - Endpoints : `/api/resident/dashboard`, `/api/resident/maintenance`, `/api/resident/news`
+
+- 🏗️ **Architecture améliorée**
+  - Factory pattern pour l'application Flask
+  - Blueprints pour organisation modulaire
+  - Gestion centralisée des erreurs (404, 500)
+  - Health check avec test de connexion DB
+  - Support CORS configuré
+  - Flask-Migrate intégré pour les migrations
+
+### Modifié
+- 🐍 **Application Flask** (`backend/app.py`)
+  - Intégration complète de la configuration
+  - Enregistrement automatique des blueprints
+  - Initialisation de la base de données
+  - User loader pour Flask-Login
+  - Création automatique des tables en développement
+
+### Testé
+- ✅ Application démarre sans erreur
+- ✅ Tous les endpoints API sont accessibles
+- ✅ Connexion à la base de données fonctionnelle
+- ✅ Validation par l'architecte : PASS
+- ✅ Pas de problèmes de sécurité détectés
+- ✅ Pas d'imports circulaires
+- ✅ Relations SQLAlchemy cohérentes
+
+### Notes techniques
+- **Backend** : Flask 3.1.2, SQLAlchemy 2.0.44, Flask-Login 0.6.3
+- **Base de données** : SQLite (dev) / PostgreSQL (prod à configurer)
+- **Authentification** : Flask-Login + JWT (préparé)
+- **Migrations** : Flask-Migrate 4.1.0 (prêt pour PostgreSQL)
+- **Architecture** : Factory pattern, Blueprints, Modèles séparés
 
 ---
 

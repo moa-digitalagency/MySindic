@@ -45,9 +45,9 @@ MySindic est une application web PWA de gestion de copropriété au Maroc, avec 
 
 | Fonctionnalité | Description | Statut | Testé | Priorité |
 |----------------|-------------|--------|-------|----------|
-| Système d'authentification | Login/Logout sécurisé | ⏳ À faire | ❌ | 🔴 Haute |
-| Gestion des rôles | Superadmin / Résident | ⏳ À faire | ❌ | 🔴 Haute |
-| Sécurité des données | HTTPS, hashing passwords | ⏳ À faire | ❌ | 🔴 Haute |
+| Système d'authentification | Login/Logout sécurisé | ✅ Implémenté | ✔️ | 🔴 Haute |
+| Gestion des rôles | Superadmin / Résident | ✅ Implémenté | ✔️ | 🔴 Haute |
+| Sécurité des données | HTTPS, hashing passwords | ✅ Implémenté | ✔️ | 🔴 Haute |
 
 ---
 
@@ -137,18 +137,35 @@ Un script automatisé `deploy_vps.sh` est fourni pour le déploiement sur VPS :
 - ❌ Non testé
 - ✔️ Testé et validé
 
-### Phase 1 - Infrastructure (En cours)
+### Phase 1 - Infrastructure (✅ Complétée)
 - ✅ Structure du projet créée
 - ✅ Documents de suivi créés
-- ⏳ Configuration Flask
-- ⏳ Base de données PostgreSQL
-- ⏳ Système d'authentification
+- ✅ Configuration Flask complète (3 environnements)
+- ✅ Base de données SQLAlchemy (12 modèles)
+- ✅ Système d'authentification (Flask-Login + JWT)
+- ✅ Routes API de base (auth, admin, resident)
+- ✅ Blueprints organisés par module
+- ✅ Gestion d'erreurs et health checks
 
-### Phase 2 - Fonctionnalités Superadmin
-- ⏳ Toutes les fonctionnalités à implémenter
+### Phase 2 - Fonctionnalités Superadmin (🚧 En cours)
+- ✅ Dashboard avec statistiques de base
+- ✅ Gestion des résidences (création, liste)
+- ✅ Gestion des utilisateurs (liste)
+- ⏳ Gestion complète des travaux
+- ⏳ Gestion du recouvrement
+- ⏳ Appels de fonds automatiques
+- ⏳ Répartition automatique des charges
+- ⏳ Gestion des AG
+- ⏳ Carnet d'entretien
+- ⏳ Contentieux
 
-### Phase 3 - Fonctionnalités Résidents
-- ⏳ Toutes les fonctionnalités à implémenter
+### Phase 3 - Fonctionnalités Résidents (🚧 En cours)
+- ✅ Dashboard personnalisé
+- ✅ Demandes de maintenance (création, liste)
+- ✅ Consultation des actualités
+- ⏳ Système de sondages (votes)
+- ⏳ Accès aux documents (quittances)
+- ⏳ Notifications en temps réel
 
 ### Phase 4 - PWA & Mobile
 - ⏳ Service Worker
@@ -178,11 +195,17 @@ Un script automatisé `deploy_vps.sh` est fourni pour le déploiement sur VPS :
 ## 🔄 Prochaines Étapes
 
 1. ✅ Créer la structure de base du projet
-2. ⏳ Configurer Flask et la base de données
-3. ⏳ Implémenter l'authentification
-4. ⏳ Créer le tableau de bord superadmin
-5. ⏳ Implémenter la gestion des résidences
-6. ⏳ Développer les fonctionnalités résidents
+2. ✅ Configurer Flask et la base de données
+3. ✅ Implémenter l'authentification
+4. ✅ Créer le tableau de bord superadmin
+5. ✅ Implémenter la gestion des résidences (base)
+6. ✅ Développer les fonctionnalités résidents (base)
+7. ⏳ Ajouter tests automatisés (unitaires et d'intégration)
+8. ⏳ Configuration PostgreSQL complète
+9. ⏳ Interface utilisateur avancée
+10. ⏳ Génération automatique des appels de fonds
+11. ⏳ Calcul automatique de répartition des charges
+12. ⏳ Module complet des assemblées générales
 
 ---
 
