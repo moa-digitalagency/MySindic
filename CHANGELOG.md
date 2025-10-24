@@ -10,12 +10,69 @@ et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 ## [Non publié]
 
 ### Prochaines étapes
+- Développer fonctionnalités PWA avancées (Service Worker, notifications push, mode offline)
 - Tests automatisés (unitaires et d'intégration)
-- Configuration PostgreSQL complète avec migrations
-- Interface utilisateur avancée pour les fonctionnalités
-- Génération et envoi automatique des appels de fonds
-- Système de calcul automatique de répartition des charges
-- Module de gestion des assemblées générales
+- Optimisation des performances et expérience utilisateur
+- Déploiement en production (publish sur Replit)
+
+---
+
+## [0.3.0] - 2025-10-24
+
+### Corrigé
+- 🐛 **Dashboard administrateur**
+  - Correction incompatibilité frontend/backend pour le chargement des statistiques
+  - Modification du JavaScript pour utiliser `data.stats` au lieu de `data.data`
+  - Ajout d'appels API séparés pour charger les demandes de maintenance et paiements récents
+  - Correction du calcul du taux de recouvrement
+
+- 🐛 **Système de déconnexion**
+  - Erreur "Method Not Allowed" corrigée sur /api/auth/logout
+  - Problème : liens HTML utilisaient GET au lieu de POST
+  - Solution : Ajout de la fonction JavaScript `MySindic.logout()` pour faire un POST
+  - Conversion des liens `<a>` en boutons `<button>` avec `onclick="MySindic.logout()"`
+  - Déconnexion fonctionnelle sur desktop et mobile
+
+- 🐛 **Dashboard résident**
+  - Correction de l'erreur de chargement des statistiques
+  - Modification de l'accès aux données (data.maintenance_requests, data.news, data.balance)
+  - Correction du chargement des charges impayées via /api/resident/charges/unpaid
+  - Affichage des charges impayées dans un tableau avec titre, date d'échéance et montant
+
+### Ajouté
+- 🗄️ **Migration Replit complète**
+  - Création de la base de données PostgreSQL Replit
+  - Configuration des variables d'environnement (DATABASE_URL, SESSION_SECRET, SECRET_KEY)
+  - Installation de tous les packages via uv (pyproject.toml)
+  - Configuration du workflow "Start application" sur port 5000
+  - Initialisation de la base de données avec script init_db.py
+
+- 👥 **Comptes de démonstration**
+  - Compte superadmin : admin@mysindic.ma / Admin123!
+  - Compte résident : resident@mysindic.ma / Resident123!
+  - Résidence de test : "Résidence Les Jardins"
+  - Unité de test : A101
+
+- 📝 **Documentation mise à jour**
+  - PROJECT_TRACKING.md mis à jour avec les corrections
+  - CHANGELOG.md mis à jour avec la version 0.3.0
+  - replit.md mis à jour avec les détails de la migration
+
+### Testé
+- ✅ Application démarre correctement sur Replit (port 5000)
+- ✅ Base de données PostgreSQL connectée et opérationnelle
+- ✅ Authentification fonctionnelle (login/logout)
+- ✅ Dashboard administrateur affiche correctement les statistiques
+- ✅ Dashboard résident affiche correctement les données
+- ✅ Déconnexion fonctionne sur desktop et mobile
+- ✅ Tous les endpoints API fonctionnels
+
+### Notes techniques
+- **Migration** : De Replit Agent vers environnement Replit standard
+- **Base de données** : PostgreSQL (Replit Database) avec 16 modèles
+- **Frontend** : Corrections JavaScript pour compatibilité API
+- **Backend** : Aucune modification nécessaire, API déjà conforme
+- **Workflow** : Gunicorn avec --reload pour développement
 
 ---
 
