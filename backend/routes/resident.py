@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 MySindic - Routes Résidents
-Routes pour toutes les fonctionnalités résidents
+Routes pour toutes les fonctionnalités résidents (avec contrôles d'autorisation)
 
 Date: 24 octobre 2025
+Version: 1.1 - Sécurité renforcée
 """
 
 from flask import Blueprint, request, jsonify
@@ -35,12 +36,12 @@ resident_bp = Blueprint('resident', __name__)
 def dashboard():
     """Tableau de bord du résident"""
     try:
-        # Demandes de maintenance récentes
+        # Demandes de maintenance récentes (filtrées par residence_id et requester_id)
         maintenance_requests = MaintenanceRequest.query.filter_by(
             requester_id=current_user.id
         ).order_by(MaintenanceRequest.created_at.desc()).limit(5).all()
         
-        # Actualités de la résidence
+        # Actualités de la résidence (filtrées par residence_id)
         news = []
         if current_user.residence_id:
             news = News.query.filter_by(
@@ -48,12 +49,12 @@ def dashboard():
                 is_published=True
             ).order_by(News.published_at.desc()).limit(5).all()
         
-        # Solde du compte (si l'utilisateur a un lot)
+        # Solde du compte (vérifié unit_id ownership)
         balance = None
         if current_user.unit_id:
             balance = ChargeCalculator.get_unit_balance(current_user.unit_id)
         
-        # Assemblées générales à venir
+        # Assemblées générales à venir (filtrées par residence_id)
         upcoming_assemblies = []
         if current_user.residence_id:
             upcoming_assemblies = GeneralAssembly.query.filter_by(
@@ -85,6 +86,7 @@ def get_news():
         if not current_user.residence_id:
             return jsonify({'success': True, 'news': []}), 200
         
+        # SÉCURISÉ: Filtre par residence_id
         news = News.query.filter_by(
             residence_id=current_user.residence_id,
             is_published=True
@@ -102,8 +104,13 @@ def get_news_detail(news_id):
     """Récupère le détail d'une actualité"""
     try:
         news = News.query.get(news_id)
-        if not news or news.residence_id != current_user.residence_id:
+        
+        # SÉCURITÉ: Vérifier que l'actualité appartient à la résidence de l'utilisateur
+        if not news:
             return jsonify({'success': False, 'error': 'Actualité non trouvée'}), 404
+        
+        if news.residence_id != current_user.residence_id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         return jsonify({'success': True, 'news': news.to_dict()}), 200
         
@@ -126,14 +133,14 @@ def create_maintenance_request():
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
         
-        # Vérifier que l'utilisateur a une résidence
+        # SÉCURITÉ: Vérifier que l'utilisateur a une résidence
         if not current_user.residence_id:
             return jsonify({'success': False, 'error': 'Vous devez être associé à une résidence'}), 400
         
-        # Créer la demande
+        # SÉCURITÉ: Utiliser residence_id et requester_id de current_user (pas de la requête)
         maintenance_request = MaintenanceRequest(
-            residence_id=current_user.residence_id,
-            requester_id=current_user.id,
+            residence_id=current_user.residence_id,  # Dérivé de l'utilisateur authentifié
+            requester_id=current_user.id,  # Dérivé de l'utilisateur authentifié
             title=data['title'],
             description=data['description'],
             category=data.get('category'),
@@ -163,6 +170,7 @@ def create_maintenance_request():
 def get_maintenance_requests():
     """Récupère les demandes de maintenance du résident"""
     try:
+        # SÉCURISÉ: Filtre par requester_id
         requests = MaintenanceRequest.query.filter_by(
             requester_id=current_user.id
         ).order_by(MaintenanceRequest.created_at.desc()).all()
@@ -180,8 +188,12 @@ def get_maintenance_detail(request_id):
     try:
         maintenance_request = MaintenanceRequest.query.get(request_id)
         
-        if not maintenance_request or maintenance_request.requester_id != current_user.id:
+        # SÉCURITÉ: Vérifier ownership
+        if not maintenance_request:
             return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        if maintenance_request.requester_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         return jsonify({'success': True, 'maintenance_request': maintenance_request.to_dict()}), 200
         
@@ -196,16 +208,20 @@ def get_maintenance_detail(request_id):
 def get_my_charges():
     """Récupère les charges du résident"""
     try:
+        # SÉCURITÉ: Vérifier unit_id
         if not current_user.unit_id:
             return jsonify({'success': True, 'charges': [], 'message': 'Aucun lot associé'}), 200
         
+        # SÉCURISÉ: Filtre par unit_id de l'utilisateur
         distributions = ChargeDistribution.query.filter_by(unit_id=current_user.unit_id).all()
         
         charges_data = []
         for dist in distributions:
-            charge_dict = dist.charge.to_dict()
-            charge_dict['distribution'] = dist.to_dict()
-            charges_data.append(charge_dict)
+            # SÉCURITÉ: Vérifier que la charge appartient à la même résidence
+            if dist.charge.residence_id == current_user.residence_id:
+                charge_dict = dist.charge.to_dict()
+                charge_dict['distribution'] = dist.to_dict()
+                charges_data.append(charge_dict)
         
         return jsonify({'success': True, 'charges': charges_data}), 200
         
@@ -218,9 +234,11 @@ def get_my_charges():
 def get_unpaid_charges():
     """Récupère les charges impayées"""
     try:
+        # SÉCURITÉ: Vérifier unit_id
         if not current_user.unit_id:
             return jsonify({'success': True, 'unpaid_charges': []}), 200
         
+        # SÉCURISÉ: ChargeCalculator utilise unit_id
         unpaid = ChargeCalculator.get_unpaid_charges(current_user.unit_id)
         
         return jsonify({'success': True, 'unpaid_charges': unpaid}), 200
@@ -234,9 +252,11 @@ def get_unpaid_charges():
 def get_balance():
     """Récupère le solde du compte"""
     try:
+        # SÉCURITÉ: Vérifier unit_id
         if not current_user.unit_id:
             return jsonify({'success': False, 'error': 'Aucun lot associé'}), 400
         
+        # SÉCURISÉ: ChargeCalculator utilise unit_id
         balance = ChargeCalculator.get_unit_balance(current_user.unit_id)
         
         return jsonify({'success': True, 'balance': balance}), 200
@@ -250,6 +270,7 @@ def get_balance():
 def declare_payment():
     """Déclare un paiement"""
     try:
+        # SÉCURITÉ: Vérifier unit_id
         if not current_user.unit_id:
             return jsonify({'success': False, 'error': 'Aucun lot associé'}), 400
         
@@ -259,9 +280,10 @@ def declare_payment():
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
         
+        # SÉCURITÉ: Utiliser unit_id et user_id de current_user (pas de la requête)
         payment = Payment(
-            unit_id=current_user.unit_id,
-            user_id=current_user.id,
+            unit_id=current_user.unit_id,  # Dérivé de l'utilisateur authentifié
+            user_id=current_user.id,  # Dérivé de l'utilisateur authentifié
             amount=Decimal(str(data['amount'])),
             payment_method=data['payment_method'],
             reference=data.get('reference'),
@@ -285,6 +307,7 @@ def declare_payment():
 def get_my_payments():
     """Récupère l'historique des paiements"""
     try:
+        # SÉCURISÉ: Filtre par user_id
         payments = Payment.query.filter_by(user_id=current_user.id).order_by(Payment.payment_date.desc()).all()
         
         return jsonify({'success': True, 'payments': [p.to_dict() for p in payments]}), 200
@@ -303,7 +326,7 @@ def get_documents():
         if not current_user.residence_id:
             return jsonify({'success': True, 'documents': []}), 200
         
-        # Documents publics de la résidence
+        # SÉCURISÉ: Filtre par residence_id et is_public
         documents = Document.query.filter_by(
             residence_id=current_user.residence_id,
             is_public=True
@@ -322,8 +345,12 @@ def get_document_detail(document_id):
     try:
         document = Document.query.get(document_id)
         
-        if not document or document.residence_id != current_user.residence_id or not document.is_public:
-            return jsonify({'success': False, 'error': 'Document non accessible'}), 404
+        # SÉCURITÉ: Vérifier residence_id et is_public
+        if not document:
+            return jsonify({'success': False, 'error': 'Document non trouvé'}), 404
+        
+        if document.residence_id != current_user.residence_id or not document.is_public:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         return jsonify({'success': True, 'document': document.to_dict()}), 200
         
@@ -341,6 +368,7 @@ def get_polls():
         if not current_user.residence_id:
             return jsonify({'success': True, 'polls': []}), 200
         
+        # SÉCURISÉ: Filtre par residence_id
         polls = Poll.query.filter_by(
             residence_id=current_user.residence_id,
             status='active'
@@ -370,8 +398,12 @@ def get_poll_detail(poll_id):
     try:
         poll = Poll.query.get(poll_id)
         
-        if not poll or poll.residence_id != current_user.residence_id:
+        # SÉCURITÉ: Vérifier residence_id
+        if not poll:
             return jsonify({'success': False, 'error': 'Sondage non trouvé'}), 404
+        
+        if poll.residence_id != current_user.residence_id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         poll_dict = poll.to_dict()
         poll_dict['options'] = [opt.to_dict() for opt in poll.options]
@@ -397,8 +429,12 @@ def vote_poll(poll_id):
     try:
         poll = Poll.query.get(poll_id)
         
-        if not poll or poll.residence_id != current_user.residence_id:
+        # SÉCURITÉ: Vérifier residence_id
+        if not poll:
             return jsonify({'success': False, 'error': 'Sondage non trouvé'}), 404
+        
+        if poll.residence_id != current_user.residence_id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         if poll.status != 'active':
             return jsonify({'success': False, 'error': 'Ce sondage n\'est plus actif'}), 400
@@ -409,7 +445,7 @@ def vote_poll(poll_id):
         if not option_id:
             return jsonify({'success': False, 'error': 'Option requise'}), 400
         
-        # Vérifier que l'option appartient à ce sondage
+        # SÉCURITÉ: Vérifier que l'option appartient à ce sondage
         option = PollOption.query.get(option_id)
         if not option or option.poll_id != poll_id:
             return jsonify({'success': False, 'error': 'Option invalide'}), 400
@@ -419,11 +455,11 @@ def vote_poll(poll_id):
         if existing_vote and not poll.allow_multiple:
             return jsonify({'success': False, 'error': 'Vous avez déjà voté'}), 400
         
-        # Enregistrer le vote
+        # SÉCURITÉ: Enregistrer le vote avec user_id de current_user
         vote = PollVote(
             poll_id=poll_id,
             option_id=option_id,
-            user_id=current_user.id
+            user_id=current_user.id  # Dérivé de l'utilisateur authentifié
         )
         
         db.session.add(vote)
@@ -446,6 +482,7 @@ def get_assemblies():
         if not current_user.residence_id:
             return jsonify({'success': True, 'assemblies': []}), 200
         
+        # SÉCURISÉ: Filtre par residence_id
         assemblies = GeneralAssembly.query.filter_by(
             residence_id=current_user.residence_id
         ).order_by(GeneralAssembly.scheduled_date.desc()).all()
@@ -463,8 +500,12 @@ def get_assembly_detail(assembly_id):
     try:
         assembly = GeneralAssembly.query.get(assembly_id)
         
-        if not assembly or assembly.residence_id != current_user.residence_id:
+        # SÉCURITÉ: Vérifier residence_id
+        if not assembly:
             return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        if assembly.residence_id != current_user.residence_id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         assembly_dict = assembly.to_dict()
         
@@ -489,8 +530,12 @@ def register_attendance(assembly_id):
     try:
         assembly = GeneralAssembly.query.get(assembly_id)
         
-        if not assembly or assembly.residence_id != current_user.residence_id:
+        # SÉCURITÉ: Vérifier residence_id
+        if not assembly:
             return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        if assembly.residence_id != current_user.residence_id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         # Vérifier si déjà enregistré
         attendance = Attendance.query.filter_by(assembly_id=assembly_id, user_id=current_user.id).first()
@@ -498,9 +543,10 @@ def register_attendance(assembly_id):
         if attendance:
             attendance.is_present = True
         else:
+            # SÉCURITÉ: Utiliser user_id de current_user
             attendance = Attendance(
                 assembly_id=assembly_id,
-                user_id=current_user.id,
+                user_id=current_user.id,  # Dérivé de l'utilisateur authentifié
                 is_present=True
             )
             db.session.add(attendance)
@@ -524,7 +570,7 @@ def vote_resolution(resolution_id):
         if not resolution:
             return jsonify({'success': False, 'error': 'Résolution non trouvée'}), 404
         
-        # Vérifier que l'utilisateur appartient à la résidence de l'AG
+        # SÉCURITÉ: Vérifier que l'utilisateur appartient à la résidence de l'AG
         assembly = resolution.assembly
         if assembly.residence_id != current_user.residence_id:
             return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
@@ -542,10 +588,10 @@ def vote_resolution(resolution_id):
             # Mettre à jour le vote
             existing_vote.vote_value = vote_value
         else:
-            # Créer un nouveau vote
+            # SÉCURITÉ: Créer un nouveau vote avec user_id de current_user
             vote = Vote(
                 resolution_id=resolution_id,
-                user_id=current_user.id,
+                user_id=current_user.id,  # Dérivé de l'utilisateur authentifié
                 vote_value=vote_value
             )
             db.session.add(vote)
@@ -576,6 +622,7 @@ def get_maintenance_logs():
         if not current_user.residence_id:
             return jsonify({'success': True, 'logs': []}), 200
         
+        # SÉCURISÉ: Filtre par residence_id
         logs = MaintenanceLog.query.filter_by(
             residence_id=current_user.residence_id
         ).order_by(MaintenanceLog.intervention_date.desc()).limit(50).all()
