@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+MySindic - Modèles de Données
+Initialisation des modèles SQLAlchemy
+
+Date: 24 octobre 2025
+"""
+
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+# Instances des extensions
+db = SQLAlchemy()
+migrate = Migrate()
+
+
+def init_db(app):
+    """
+    Initialise la base de données avec l'application Flask
+    
+    Args:
+        app: Instance de l'application Flask
+    """
+    db.init_app(app)
+    migrate.init_app(app, db)
+    
+    # Importer tous les modèles ici pour que Flask-Migrate les détecte
+    from backend.models.user import User
+    from backend.models.residence import Residence, Unit
+    from backend.models.maintenance import MaintenanceRequest
+    from backend.models.document import Document
+    from backend.models.charge import Charge, ChargeDistribution
+    from backend.models.payment import Payment
+    from backend.models.news import News
+    from backend.models.poll import Poll, PollOption, PollVote
