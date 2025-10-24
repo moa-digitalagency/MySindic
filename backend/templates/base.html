@@ -77,11 +77,11 @@
                     <div class="ml-3 relative">
                         <div class="flex items-center space-x-3">
                             <span class="text-sm text-gray-700 hidden lg:inline">{{ current_user.username }}</span>
-                            <a href="{{ url_for('auth.logout') }}" class="text-gray-500 hover:text-gray-700 transition" title="Déconnexion">
+                            <button onclick="MySindic.logout()" class="text-gray-500 hover:text-gray-700 transition" title="Déconnexion">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -150,9 +150,9 @@
                     <div class="flex items-center px-4 py-2">
                         <span class="text-sm text-gray-700 font-medium">{{ current_user.username }}</span>
                     </div>
-                    <a href="{{ url_for('auth.logout') }}" class="border-transparent text-red-600 hover:bg-red-50 hover:border-red-500 hover:text-red-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
+                    <button onclick="MySindic.logout()" class="border-transparent text-red-600 hover:bg-red-50 hover:border-red-500 hover:text-red-700 block w-full text-left pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
                         🚪 Déconnexion
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>

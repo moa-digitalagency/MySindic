@@ -173,6 +173,28 @@ function hideLoading(elementId, content) {
     }
 }
 
+async function logout() {
+    try {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = '/';
+        } else {
+            showToast('Erreur lors de la déconnexion', 'error');
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        window.location.href = '/';
+    }
+}
+
 window.MySindic = {
     showToast,
     confirmAction,
@@ -184,5 +206,6 @@ window.MySindic = {
     formatDate,
     debounce,
     showLoading,
-    hideLoading
+    hideLoading,
+    logout
 };
