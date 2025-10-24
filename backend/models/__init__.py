@@ -34,3 +34,6 @@ def init_db(app):
     from backend.models.payment import Payment
     from backend.models.news import News
     from backend.models.poll import Poll, PollOption, PollVote
+    from backend.models.general_assembly import GeneralAssembly, Resolution, Vote, Attendance
+    from backend.models.litigation import Litigation
+    from backend.models.maintenance_log import MaintenanceLog
