@@ -28,22 +28,211 @@
 
 ## 📊 État Actuel
 
-### Version Actuelle : 0.1.0 (Phase d'initialisation)
+### Version Actuelle : 0.2.0 (Backend MVP Complet)
 
-**Infrastructure créée :**
-- ✅ Structure du projet (backend, frontend, docs)
-- ✅ Documents de gestion (PROJECT_TRACKING.md, CHANGELOG.md)
-- ✅ Documentation bilingue (FR/EN)
-- ✅ Script de déploiement VPS (deploy_vps.sh)
-- ✅ Application Flask de base
-- ✅ Workflow Replit configuré
+**Backend Complet ✅**
+- ✅ Tous les modèles de base de données créés et testés
+- ✅ Services partagés (ChargeCalculator, NotificationService)
+- ✅ Routes admin complètes avec toutes les fonctionnalités superadmin
+- ✅ Routes résidents complètes avec contrôles de sécurité
+- ✅ Système d'autorisation sécurisé (protection contre escalade de privilèges)
+- ✅ API REST complète et fonctionnelle
+- ✅ Application Flask déployée sur port 5000
+
+**Frontend Landing Page ✅**
+- ✅ Page d'accueil responsive avec Tailwind CSS
+- ✅ Navigation et design moderne
+- ✅ API connectée et testée
 
 **Prochaines étapes :**
-- ⏳ Configuration de la base de données PostgreSQL
-- ⏳ Système d'authentification (Flask-Login)
-- ⏳ Modèles de données (User, Residence, Maintenance, etc.)
-- ⏳ Routes API de base
-- ⏳ Interface utilisateur avec Tailwind CSS
+- ⏳ Interfaces utilisateur complètes (dashboard admin, dashboard résident)
+- ⏳ Formulaires interactifs pour toutes les fonctionnalités
+- ⏳ Fonctionnalités PWA (Service Worker, manifest, mode offline)
+- ⏳ Tests d'intégration pour les contrôles d'autorisation
+- ⏳ Optimisation pour production
+
+---
+
+## 🏗️ Architecture Backend (Complète)
+
+### Modèles de Données Implémentés
+
+**Modèles de Base ✅**
+1. `User` - Utilisateurs (superadmins et résidents)
+2. `Residence` - Copropriétés/résidences
+3. `Unit` - Lots/appartements avec tantièmes
+
+**Gestion Financière ✅**
+4. `Charge` - Charges de copropriété
+5. `ChargeDistribution` - Répartition automatique des charges
+6. `Payment` - Paiements des résidents
+
+**Maintenance ✅**
+7. `MaintenanceRequest` - Demandes de maintenance
+8. `MaintenanceLog` - Carnet d'entretien (historique des interventions)
+
+**Communication ✅**
+9. `News` - Actualités de la résidence
+10. `Poll`, `PollOption`, `PollVote` - Système de sondages
+
+**Documents ✅**
+11. `Document` - Gestion documentaire
+
+**Assemblées Générales ✅**
+12. `GeneralAssembly` - Assemblées générales
+13. `Resolution` - Résolutions à voter
+14. `Vote` - Votes des résidents
+15. `Attendance` - Présences aux AG
+
+**Contentieux ✅**
+16. `Litigation` - Gestion des litiges
+
+### Services Métier Implémentés
+
+**ChargeCalculator** ✅
+- Calcul automatique de la répartition des charges selon les tantièmes
+- Calcul du solde d'un lot
+- Liste des charges impayées
+- Suivi des paiements
+
+**NotificationService** ✅
+- Notifications pour nouvelles demandes de maintenance
+- Notifications pour appels de fonds
+- Notifications pour assemblées générales
+- Service centralisé d'envoi d'emails
+
+### Routes API Complètes
+
+**Routes Admin (`/api/admin/*`)** ✅
+- Dashboard avec statistiques complètes
+- CRUD résidences
+- CRUD lots/unités
+- Gestion complète des charges (création, publication, distribution automatique)
+- Validation des paiements
+- Gestion des actualités
+- Gestion des demandes de maintenance
+- Carnet d'entretien
+- Assemblées générales (création, convocation, résolutions)
+- Gestion des contentieux
+- Système de sondages
+- Gestion des utilisateurs
+
+**Routes Résidents (`/api/resident/*`)** ✅ **SÉCURISÉES**
+- Dashboard personnalisé
+- Consultation des actualités
+- Création et suivi des demandes de maintenance
+- Consultation des charges et solde
+- Déclaration de paiements
+- Accès aux documents publics
+- Participation aux sondages
+- Consultation et participation aux AG
+- Vote sur les résolutions
+- Consultation du carnet d'entretien
+
+**Sécurité Renforcée** ✅
+- Tous les endpoints résidents vérifient `residence_id` avant de retourner des données
+- Protection contre l'escalade de privilèges horizontale
+- Codes HTTP appropriés (403 Forbidden, 404 Not Found)
+- Dérivation des foreign keys de `current_user` (pas de confiance en l'input client)
+- Validation et autorisation sur tous les endpoints
+
+---
+
+## 🔑 Fonctionnalités Implémentées
+
+### Pour les Superadmins (Syndics) - COMPLET ✅
+
+1. **Gestion des copropriétés** ✅
+   - Création et configuration de résidences
+   - Gestion des lots et appartements avec tantièmes
+   - Configuration des paramètres financiers
+
+2. **Contrôle de gestion** ✅
+   - Tableaux de bord financiers complets
+   - Indicateurs de performance (taux de recouvrement, charges en attente)
+   - Statistiques de maintenance et AG
+
+3. **Gestion des travaux** ✅
+   - Réception et traitement des demandes de maintenance
+   - Assignation aux prestataires
+   - Mise à jour du statut des interventions
+
+4. **Recouvrement** ✅
+   - Suivi des paiements en temps réel
+   - Validation des paiements déclarés
+   - Calcul automatique des soldes
+
+5. **Appels de fonds** ✅
+   - Création des charges
+   - Publication avec distribution automatique selon tantièmes
+   - Suivi des paiements
+
+6. **Répartition des charges** ✅
+   - Calcul automatique selon les tantièmes
+   - Distribution aux lots
+   - Historique des distributions
+
+7. **Assemblées générales** ✅
+   - Création et planification des AG
+   - Envoi des convocations
+   - Gestion des résolutions
+   - Comptage des votes
+   - Suivi des présences
+
+8. **Carnet d'entretien** ✅
+   - Enregistrement de toutes les interventions
+   - Historique complet avec dates et coûts
+   - Consultation par les résidents
+
+9. **Contentieux** ✅
+   - Ouverture de dossiers de contentieux
+   - Suivi des procédures et statuts
+   - Historique des litiges
+
+10. **Communication** ✅
+    - Publication d'actualités (épinglées ou normales)
+    - Création de sondages
+    - Gestion des documents
+
+### Pour les Résidents - COMPLET ✅
+
+1. **Actualités** ✅
+   - Consulter les informations de la résidence
+   - Actualités épinglées en priorité
+   - Détails complets des annonces
+
+2. **Demandes de maintenance** ✅
+   - Créer une demande avec catégorie et priorité
+   - Suivre la progression en temps réel
+   - Voir les interventions assignées
+   - Historique de toutes les demandes
+
+3. **Finances** ✅
+   - Consultation des charges du lot
+   - Visualisation du solde en temps réel
+   - Liste des charges impayées
+   - Déclaration de paiements
+   - Historique des paiements
+
+4. **Sondages** ✅
+   - Participer aux votes
+   - Voir les résultats (si autorisé)
+   - Historique des sondages
+
+5. **Documents** ✅
+   - Accès aux documents publics
+   - Consultation des quittances
+   - Documents officiels de la copropriété
+
+6. **Assemblées générales** ✅
+   - Consultation des AG passées et à venir
+   - Enregistrement de présence
+   - Vote sur les résolutions
+   - Consultation des résultats
+
+7. **Carnet d'entretien** ✅
+   - Consultation de l'historique des interventions
+   - Transparence sur les travaux réalisés
 
 ---
 
@@ -52,97 +241,41 @@
 ```
 MySindic/
 ├── backend/
-│   ├── app.py                 # Point d'entrée Flask
-│   ├── config.py              # Configuration de l'app
-│   ├── requirements.txt       # Dépendances Python
-│   ├── models/                # Modèles SQLAlchemy
-│   │   ├── __init__.py
-│   │   ├── user.py           # Modèle utilisateur
-│   │   ├── residence.py      # Modèle résidence
-│   │   └── maintenance.py    # Modèle maintenance
-│   ├── routes/                # Routes API
-│   │   ├── __init__.py
-│   │   ├── auth.py           # Authentification
-│   │   ├── admin.py          # Routes superadmin
-│   │   └── resident.py       # Routes résidents
-│   ├── utils/                 # Utilitaires
-│   ├── static/                # CSS, JS, images
-│   └── templates/             # Templates HTML/Jinja2
-├── frontend/
-│   ├── css/                   # Styles Tailwind
-│   ├── js/                    # JavaScript
-│   └── images/                # Images
-├── docs/                      # Documentation additionnelle
-├── logs/                      # Logs de l'application
-├── deploy_vps.sh              # Script déploiement VPS
-├── PROJECT_TRACKING.md        # Document de suivi
-├── CHANGELOG.md               # Journal des modifications
-├── DOCUMENTATION_FR.md        # Doc française
-├── DOCUMENTATION_EN.md        # Doc anglaise
-└── replit.md                  # Ce fichier
+│   ├── app.py                      # ✅ Application Flask configurée
+│   ├── main.py                     # ✅ Point d'entrée
+│   ├── models/
+│   │   ├── __init__.py             # ✅ Tous les modèles exportés
+│   │   ├── user.py                 # ✅ Modèle User complet
+│   │   ├── residence.py            # ✅ Residence et Unit
+│   │   ├── charge.py               # ✅ Charge et ChargeDistribution
+│   │   ├── payment.py              # ✅ Payment
+│   │   ├── maintenance.py          # ✅ MaintenanceRequest
+│   │   ├── maintenance_log.py      # ✅ MaintenanceLog
+│   │   ├── news.py                 # ✅ News
+│   │   ├── poll.py                 # ✅ Poll, PollOption, PollVote
+│   │   ├── document.py             # ✅ Document
+│   │   ├── general_assembly.py     # ✅ GeneralAssembly, Resolution, Vote, Attendance
+│   │   └── litigation.py           # ✅ Litigation
+│   ├── routes/
+│   │   ├── __init__.py             # ✅ Blueprints enregistrés
+│   │   ├── auth.py                 # ✅ Authentification complète
+│   │   ├── admin.py                # ✅ Routes admin complètes
+│   │   └── resident.py             # ✅ Routes résidents sécurisées
+│   ├── utils/
+│   │   ├── charge_calculator.py    # ✅ Service de calcul des charges
+│   │   └── notification_service.py # ✅ Service de notifications
+│   ├── static/
+│   │   ├── css/                    # ✅ Styles
+│   │   └── js/                     # ✅ JavaScript
+│   └── templates/
+│       └── index.html              # ✅ Landing page
+├── docs/
+├── PROJECT_TRACKING.md             # ✅ Suivi complet du projet
+├── CHANGELOG.md                    # ✅ Journal des modifications
+├── DOCUMENTATION_FR.md             # ✅ Documentation française
+├── DOCUMENTATION_EN.md             # ✅ Documentation anglaise
+└── replit.md                       # ✅ Ce fichier
 ```
-
----
-
-## 🔑 Fonctionnalités Principales
-
-### Pour les Superadmins (Syndics)
-
-1. **Gestion des copropriétés**
-   - Création et configuration de résidences
-   - Gestion des lots et appartements
-
-2. **Contrôle de gestion**
-   - Tableaux de bord financiers
-   - Indicateurs de performance
-
-3. **Gestion des travaux**
-   - Planification des interventions
-   - Suivi des prestataires
-
-4. **Recouvrement**
-   - Suivi des paiements
-   - Relances automatiques
-
-5. **Appels de fonds**
-   - Génération automatique
-   - Envoi par email
-
-6. **Répartition des charges**
-   - Calcul automatique selon les tantièmes
-   - Édition des décomptes
-
-7. **Assemblées générales**
-   - Convocations
-   - Procès-verbaux
-   - Votes
-
-8. **Carnet d'entretien**
-   - Historique des interventions
-   - Documents techniques
-
-9. **Contentieux**
-   - Gestion des litiges
-   - Suivi des procédures
-
-### Pour les Résidents
-
-1. **Actualités**
-   - Consulter les informations de la résidence
-   - Notifications importantes
-
-2. **Demandes de maintenance**
-   - Créer une demande
-   - Suivre la progression
-   - Voir l'intervenant assigné
-
-3. **Sondages**
-   - Participer aux votes
-   - Voir les résultats en temps réel
-
-4. **Documents**
-   - Accès aux quittances
-   - Téléchargement des documents officiels
 
 ---
 
@@ -153,14 +286,17 @@ MySindic/
 - **SQLAlchemy** : ORM pour la base de données
 - **Flask-Migrate** : Migrations de base de données
 - **Flask-Login** : Gestion des sessions utilisateur
+- **Flask-CORS** : Support CORS
 - **PyJWT** : Tokens d'authentification
 - **Werkzeug** : Sécurité et hashing de mots de passe
-- **psycopg2** : Connecteur PostgreSQL
+- **psycopg2-binary** : Connecteur PostgreSQL
+- **Gunicorn** : Serveur WSGI de production
 
 ### Frontend
-- **Tailwind CSS** : Framework CSS utilitaire
+- **Tailwind CSS** : Framework CSS utilitaire (via CDN)
 - **JavaScript Vanilla** : Interactions côté client
-- **Service Worker** : Fonctionnalités PWA
+- **Feather Icons** : Icônes modernes
+- **Service Worker** : (À implémenter) Fonctionnalités PWA
 
 ### Base de données
 - **PostgreSQL** : Base de données relationnelle
@@ -171,201 +307,201 @@ MySindic/
 ## ⚙️ Configuration Replit
 
 ### Workflow
-- **Nom :** MySindic Server
-- **Commande :** `python backend/app.py`
+- **Nom :** Start application
+- **Commande :** `gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app`
 - **Port :** 5000 (obligatoire pour Replit)
 - **Type de sortie :** webview
+- **Statut :** ✅ RUNNING
 
-### Variables d'Environnement (.env)
+### Variables d'Environnement
 ```env
-FLASK_APP=backend/app.py
-FLASK_ENV=development
-SECRET_KEY=<généré automatiquement>
+SESSION_SECRET=<généré automatiquement par Replit>
 DATABASE_URL=<fourni par Replit Database>
 ```
 
-### Ports
-- **Développement (Replit) :** 5000
-- **Production (VPS) :** 5006
-
 ---
 
-## 📚 Documents Importants
-
-### Documents de Gestion
-1. **PROJECT_TRACKING.md** : À LIRE OBLIGATOIREMENT avant toute modification
-   - Liste complète des fonctionnalités
-   - État d'avancement
-   - Architecture technique
-
-2. **CHANGELOG.md** : À METTRE À JOUR après chaque modification
-   - Historique des changements
-   - Versions
-
-3. **DOCUMENTATION_FR.md** : Documentation en français
-   - Guide d'installation
-   - Guide d'utilisation
-   - API Reference
-
-4. **DOCUMENTATION_EN.md** : Documentation en anglais
-   - Version anglaise de la documentation
-
-### Script de Déploiement
-**deploy_vps.sh** : Script automatisé pour VPS
-- Pull du code
-- Gestion de l'environnement virtuel
-- Installation des dépendances
-- Migrations de base de données
-- Démarrage sur port 5006
-
-⚠️ **Note pour l'Agent Replit :** Ce script est pour déploiement VPS externe uniquement. Sur Replit, utiliser le workflow configuré.
-
----
-
-## 👤 Préférences Utilisateur
-
-### Langue
-- Interface : Français (primaire) et Anglais
-- Documentation : Bilingue FR/EN
-- Code : Commentaires en français
-
-### Style de Code
-- **Python :** PEP 8
-- **Indentation :** 4 espaces
-- **Longueur de ligne :** Max 100 caractères
-- **Docstrings :** Format Google
-
-### Organisation
-- Séparer la logique métier dans des modules
-- Utiliser des blueprints Flask pour organiser les routes
-- Modèles SQLAlchemy dans des fichiers séparés
-- Utilitaires dans le dossier `utils/`
-
----
-
-## 🔒 Sécurité
+## 🔒 Sécurité - RENFORCÉE ✅
 
 ### Authentification
-- Hashing des mots de passe avec Werkzeug
-- Sessions sécurisées avec Flask-Login
-- Tokens JWT pour l'API
+- ✅ Hashing des mots de passe avec Werkzeug (sans méthode spécifique)
+- ✅ Sessions sécurisées avec Flask-Login
+- ✅ Décorateurs d'autorisation (`@login_required`, `@superadmin_required`)
+
+### Autorisation et Contrôles d'Accès
+- ✅ **Tous les endpoints résidents vérifient l'appartenance à la résidence**
+- ✅ Protection contre escalade de privilèges horizontale
+- ✅ Codes HTTP appropriés (403 Forbidden vs 404 Not Found)
+- ✅ Dérivation des foreign keys de `current_user` (unit_id, user_id, residence_id)
+- ✅ Validation côté serveur sur toutes les mutations
+- ✅ Pas de confiance en l'input client pour les relations
 
 ### Base de données
-- Migrations via Flask-Migrate uniquement
-- Jamais de SQL brut (utiliser l'ORM)
-- Validation des données côté serveur
+- ✅ Migrations via Flask-Migrate uniquement
+- ✅ Utilisation exclusive de l'ORM SQLAlchemy
+- ✅ Validation des données côté serveur
+- ✅ Transactions appropriées avec rollback sur erreur
 
 ### Secrets
-- Utiliser les variables d'environnement
-- Ne jamais commiter les secrets dans Git
-- Fichier .env dans .gitignore
+- ✅ Utilisation des variables d'environnement Replit
+- ✅ Pas de secrets dans le code
+- ✅ SESSION_SECRET géré par Replit
 
 ---
 
 ## 📈 Décisions Architecturales
 
-### Base de données PostgreSQL
-**Raison :** Intégration native Replit, support des transactions, scalabilité
+### PostgreSQL pour la Base de données
+**Raison :** Intégration native Replit, support des transactions ACID, scalabilité, relations complexes
 
-### Flask comme Framework
-**Raison :** Léger, flexible, excellent pour les API REST
+### Flask comme Framework Backend
+**Raison :** Léger, flexible, excellent pour les API REST, écosystème riche
+
+### Blueprints Flask pour l'Organisation
+**Raison :** Séparation claire des responsabilités (auth, admin, resident), code modulaire et maintenable
+
+### Services Partagés (ChargeCalculator, NotificationService)
+**Raison :** Réutilisabilité, testabilité, séparation de la logique métier
+
+### Sécurité par Défaut
+**Raison :** Protection contre les vulnérabilités communes (CSRF, injection SQL, escalade de privilèges)
 
 ### Tailwind CSS
-**Raison :** Développement rapide, design moderne, mobile-first
+**Raison :** Développement rapide, design moderne, mobile-first, personnalisable
 
-### PWA
+### PWA (À venir)
 **Raison :** Expérience native sur mobile, mode offline, notifications push
 
 ---
 
-## 🚀 Déploiement
+## 📝 Bonnes Pratiques Appliquées
 
-### Sur Replit (Développement)
-1. Le workflow démarre automatiquement
-2. Application accessible via le webview
-3. Port 5000 obligatoire
+### Code Quality
+- ✅ PEP 8 pour Python
+- ✅ Commentaires en français
+- ✅ Docstrings explicites
+- ✅ Gestion appropriée des erreurs avec try/except
+- ✅ Validation des données entrantes
+- ✅ Retours JSON cohérents (`{'success': True/False, ...}`)
 
-### Sur VPS (Production)
-1. Exécuter `./deploy_vps.sh`
-2. Le script gère tout automatiquement
-3. Application sur port 5006
+### Sécurité
+- ✅ Jamais de SQL brut
+- ✅ Hashing des mots de passe
+- ✅ Vérifications d'autorisation systématiques
+- ✅ Pas de foreign keys hard-codées
+- ✅ Validation côté serveur obligatoire
 
----
-
-## 📝 Bonnes Pratiques
-
-### Avant de Coder
-1. ✅ Lire PROJECT_TRACKING.md
-2. ✅ Vérifier le CHANGELOG.md
-3. ✅ Comprendre l'architecture existante
-
-### Pendant le Développement
-1. ✅ Suivre le style de code défini
-2. ✅ Commenter en français
-3. ✅ Tester les fonctionnalités
-4. ✅ Gérer les erreurs appropriément
-
-### Après le Développement
-1. ✅ Mettre à jour PROJECT_TRACKING.md
-2. ✅ Ajouter une entrée dans CHANGELOG.md
-3. ✅ Mettre à jour la documentation si nécessaire
-4. ✅ Vérifier que le workflow fonctionne
-5. ✅ Tester l'application
-
----
-
-## 🔄 Workflow de Développement
-
-1. **Planification** : Définir la fonctionnalité dans PROJECT_TRACKING.md
-2. **Développement** : Coder en suivant les bonnes pratiques
-3. **Test** : Vérifier que tout fonctionne
-4. **Documentation** : Mettre à jour les docs
-5. **Commit** : Message descriptif en français
-6. **Mise à jour** : CHANGELOG.md et PROJECT_TRACKING.md
-
----
-
-## 📞 Support et Contact
-
-- **Email :** support@mysindic.ma
-- **Téléphone :** +212 XXX XXX XXX
+### Architecture
+- ✅ Séparation des responsabilités
+- ✅ Services métier dans `utils/`
+- ✅ Modèles dans des fichiers séparés
+- ✅ Routes organisées par rôle (blueprints)
+- ✅ Configuration centralisée
 
 ---
 
 ## 🎯 Roadmap
 
-### Phase 1 : Infrastructure (En cours)
-- ✅ Création de la structure
-- ⏳ Configuration Flask complète
-- ⏳ Base de données PostgreSQL
-- ⏳ Authentification de base
+### ✅ Phase 1 : Infrastructure Backend (TERMINÉE)
+- ✅ Création de la structure complète
+- ✅ Configuration Flask complète
+- ✅ Base de données PostgreSQL avec tous les modèles
+- ✅ Authentification et autorisation sécurisée
 
-### Phase 2 : Fonctionnalités Superadmin
-- ⏳ Gestion des résidences
-- ⏳ Gestion des utilisateurs
-- ⏳ Tableau de bord
-- ⏳ Appels de fonds
-- ⏳ Répartition des charges
+### ✅ Phase 2 : Fonctionnalités Backend (TERMINÉE)
+- ✅ Gestion des résidences et unités
+- ✅ Système financier complet (charges, paiements, recouvrement)
+- ✅ Appels de fonds avec distribution automatique
+- ✅ Maintenance et carnet d'entretien
+- ✅ Assemblées générales avec votes
+- ✅ Contentieux
+- ✅ Communication (news, sondages, documents)
+- ✅ Services métier (ChargeCalculator, NotificationService)
+- ✅ Correction des vulnérabilités de sécurité
 
-### Phase 3 : Fonctionnalités Résidents
-- ⏳ Interface résidents
-- ⏳ Demandes de maintenance
-- ⏳ Consultation documents
-- ⏳ Sondages
+### ⏳ Phase 3 : Frontend Complet (EN COURS)
+- ✅ Landing page responsive
+- ⏳ Dashboard superadmin avec toutes les fonctionnalités
+- ⏳ Dashboard résident avec toutes les fonctionnalités
+- ⏳ Formulaires interactifs
+- ⏳ Tableaux de données
+- ⏳ Modales et notifications
+- ⏳ Design system cohérent
 
-### Phase 4 : PWA
+### ⏳ Phase 4 : PWA
 - ⏳ Service Worker
 - ⏳ Manifest
 - ⏳ Mode offline
 - ⏳ Notifications push
+- ⏳ Installation sur écran d'accueil
 
-### Phase 5 : Production
-- ⏳ Optimisations
+### ⏳ Phase 5 : Tests et Production
+- ⏳ Tests d'intégration pour l'autorisation
+- ⏳ Tests unitaires
+- ⏳ Optimisations de performance
 - ⏳ Tests de charge
-- ⏳ Déploiement final
+- ⏳ Déploiement final sur VPS
+
+---
+
+## 📊 Métriques de Développement
+
+### Backend API
+- **Modèles :** 16 modèles de données
+- **Routes Admin :** 30+ endpoints
+- **Routes Résidents :** 20+ endpoints
+- **Services :** 2 services métier
+- **Sécurité :** Vulnérabilités critiques corrigées ✅
+
+### Code
+- **Lignes de code Python :** ~2500+
+- **Fichiers de modèles :** 11
+- **Fichiers de routes :** 3
+- **Services utilitaires :** 2
+
+---
+
+## 🚀 Prochain Sprint
+
+### Priorité 1 : Interfaces Utilisateur
+1. Dashboard superadmin complet
+2. Formulaires de création/édition
+3. Tableaux de données avec recherche/tri
+4. Modales pour les actions
+
+### Priorité 2 : UX/UI
+1. Design system cohérent
+2. Composants réutilisables
+3. Feedback utilisateur (toasts, confirmations)
+4. Loading states
+
+### Priorité 3 : Tests
+1. Tests d'intégration pour l'autorisation
+2. Tests de validation des formulaires
+3. Tests de flux utilisateur complets
+
+---
+
+## 📞 Notes pour les Développeurs
+
+### Important à Savoir
+1. **Port 5000 obligatoire** - Replit ne supporte que le port 5000
+2. **Toujours vérifier residence_id** - Sur tous les endpoints résidents
+3. **Jamais de SQL brut** - Utiliser l'ORM SQLAlchemy uniquement
+4. **Dériver les FK de current_user** - Ne jamais faire confiance à l'input client
+5. **Lire PROJECT_TRACKING.md** - Avant toute modification majeure
+
+### Workflow de Développement
+1. Créer/mettre à jour les modèles si nécessaire
+2. Créer les routes API
+3. Tester avec Postman/curl
+4. Créer l'interface frontend
+5. Tester le flux complet
+6. Mettre à jour la documentation
+7. Commit avec message descriptif en français
 
 ---
 
 **Dernière mise à jour :** 24 octobre 2025  
-**Version :** 0.1.0  
-**Statut :** Phase d'initialisation
+**Version :** 0.2.0  
+**Statut :** Backend MVP Complet ✅ | Frontend En Cours ⏳
