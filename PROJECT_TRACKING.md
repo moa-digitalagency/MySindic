@@ -21,35 +21,64 @@ MySindic est une application web PWA de gestion de copropriété au Maroc, avec 
 
 ### 👨‍💼 SUPERADMIN
 
-| Fonctionnalité | Description | Statut | Testé | Priorité |
-|----------------|-------------|--------|-------|----------|
-| Création de copropriété | Créer et configurer une nouvelle résidence | ⏳ À faire | ❌ | 🔴 Haute |
-| État de contrôle de gestion | Tableau de bord financier et indicateurs | ⏳ À faire | ❌ | 🔴 Haute |
-| Gestion des travaux | Planification et suivi des travaux | ⏳ À faire | ❌ | 🟡 Moyenne |
-| Gestion du recouvrement | Suivi des paiements et relances | ⏳ À faire | ❌ | 🔴 Haute |
-| Gestion des contentieux | Gestion des litiges et procédures | ⏳ À faire | ❌ | 🟡 Moyenne |
-| Carnet d'entretien | Historique des interventions | ⏳ À faire | ❌ | 🟡 Moyenne |
-| Assemblées générales | Organisation et gestion des AG | ⏳ À faire | ❌ | 🔴 Haute |
-| Appels de fonds | Édition et envoi automatique | ⏳ À faire | ❌ | 🔴 Haute |
-| Répartition des charges | Calcul automatique des charges | ⏳ À faire | ❌ | 🔴 Haute |
+| Fonctionnalité | Description | Statut | Endpoints | Priorité |
+|----------------|-------------|--------|-----------|----------|
+| Dashboard statistiques | Tableau de bord avec indicateurs clés | ✅ Implémenté | GET /api/admin/dashboard | 🔴 Haute |
+| Création de copropriété | Créer et configurer une nouvelle résidence | ✅ Implémenté | POST /api/admin/residences | 🔴 Haute |
+| Gestion résidences | CRUD complet des résidences | ✅ Implémenté | GET/PUT /api/admin/residences | 🔴 Haute |
+| Gestion des lots | Création et gestion des unités | ✅ Implémenté | GET/POST /api/admin/residences/{id}/units | 🔴 Haute |
+| Gestion des travaux | Suivi et mise à jour des demandes de maintenance | ✅ Implémenté | GET/PUT /api/admin/maintenance | 🟡 Moyenne |
+| Gestion du recouvrement | Suivi des paiements et validation | ✅ Implémenté | GET/POST /api/admin/payments | 🔴 Haute |
+| Gestion des contentieux | Gestion des litiges et procédures | ✅ Implémenté | GET/POST/PUT /api/admin/litigations | 🟡 Moyenne |
+| Carnet d'entretien | Historique des interventions | ✅ Implémenté | GET/POST /api/admin/maintenance-logs | 🟡 Moyenne |
+| Assemblées générales | Organisation complète des AG | ✅ Implémenté | GET/POST /api/admin/assemblies | 🔴 Haute |
+| Résolutions AG | Création et gestion des résolutions | ✅ Implémenté | POST /api/admin/assemblies/{id}/resolutions | 🔴 Haute |
+| Convocations AG | Envoi automatique des convocations | ✅ Implémenté | POST /api/admin/assemblies/{id}/send-convocations | 🔴 Haute |
+| Appels de fonds | Création des charges | ✅ Implémenté | POST /api/admin/charges | 🔴 Haute |
+| Répartition des charges | Calcul automatique par tantièmes | ✅ Implémenté | POST /api/admin/charges/{id}/publish | 🔴 Haute |
+| Solde des lots | Consultation du solde par lot | ✅ Implémenté | GET /api/admin/units/{id}/balance | 🔴 Haute |
+| Gestion actualités | Création et modification | ✅ Implémenté | POST/PUT /api/admin/news | 🟡 Moyenne |
+| Gestion sondages | Création et fermeture | ✅ Implémenté | POST /api/admin/polls | 🟡 Moyenne |
+| Gestion utilisateurs | Liste et modification | ✅ Implémenté | GET/PUT /api/admin/users | 🔴 Haute |
 
 ### 🏠 RÉSIDENTS
 
-| Fonctionnalité | Description | Statut | Testé | Priorité |
-|----------------|-------------|--------|-------|----------|
-| Actualités de la résidence | Consultation des informations | ⏳ À faire | ❌ | 🔴 Haute |
-| Demandes de maintenance | Créer et suivre les demandes | ⏳ À faire | ❌ | 🔴 Haute |
-| Suivi des interventions | Voir qui traite les demandes | ⏳ À faire | ❌ | 🔴 Haute |
-| Sondages | Participer et voir les résultats | ⏳ À faire | ❌ | 🟡 Moyenne |
-| Accès documents | Quittances et documents officiels | ⏳ À faire | ❌ | 🔴 Haute |
+| Fonctionnalité | Description | Statut | Endpoints | Priorité |
+|----------------|-------------|--------|-----------|----------|
+| Dashboard personnalisé | Vue d'ensemble (maintenance, solde, AG, news) | ✅ Implémenté | GET /api/resident/dashboard | 🔴 Haute |
+| Actualités de la résidence | Consultation des informations | ✅ Implémenté | GET /api/resident/news | 🔴 Haute |
+| Détail actualité | Voir une actualité complète | ✅ Implémenté | GET /api/resident/news/{id} | 🔴 Haute |
+| Demandes de maintenance | Créer et suivre les demandes | ✅ Implémenté | POST/GET /api/resident/maintenance | 🔴 Haute |
+| Détail demande | Suivi détaillé d'une demande | ✅ Implémenté | GET /api/resident/maintenance/{id} | 🔴 Haute |
+| Historique interventions | Consulter le carnet d'entretien | ✅ Implémenté | GET /api/resident/maintenance-logs | 🔴 Haute |
+| Consultation des charges | Voir toutes les charges du lot | ✅ Implémenté | GET /api/resident/charges | 🔴 Haute |
+| Charges impayées | Liste des charges non réglées | ✅ Implémenté | GET /api/resident/charges/unpaid | 🔴 Haute |
+| Solde du compte | Consulter le solde actuel | ✅ Implémenté | GET /api/resident/balance | 🔴 Haute |
+| Déclaration paiement | Déclarer un paiement effectué | ✅ Implémenté | POST /api/resident/payments | 🔴 Haute |
+| Historique paiements | Consulter l'historique des paiements | ✅ Implémenté | GET /api/resident/payments | 🔴 Haute |
+| Accès documents | Consulter les documents publics | ✅ Implémenté | GET /api/resident/documents | 🔴 Haute |
+| Détail document | Voir un document complet | ✅ Implémenté | GET /api/resident/documents/{id} | 🔴 Haute |
+| Sondages actifs | Voir les sondages en cours | ✅ Implémenté | GET /api/resident/polls | 🟡 Moyenne |
+| Voter sondage | Participer à un sondage | ✅ Implémenté | POST /api/resident/polls/{id}/vote | 🟡 Moyenne |
+| Résultats sondage | Voir les résultats | ✅ Implémenté | GET /api/resident/polls/{id} | 🟡 Moyenne |
+| Liste AG | Consulter les assemblées générales | ✅ Implémenté | GET /api/resident/assemblies | 🔴 Haute |
+| Détail AG | Voir le détail d'une AG et résolutions | ✅ Implémenté | GET /api/resident/assemblies/{id} | 🔴 Haute |
+| Confirmer présence | S'inscrire à une AG | ✅ Implémenté | POST /api/resident/assemblies/{id}/attend | 🔴 Haute |
+| Voter résolutions | Voter sur les résolutions d'une AG | ✅ Implémenté | POST /api/resident/resolutions/{id}/vote | 🔴 Haute |
 
 ### 🔐 AUTHENTIFICATION & SÉCURITÉ
 
-| Fonctionnalité | Description | Statut | Testé | Priorité |
-|----------------|-------------|--------|-------|----------|
-| Système d'authentification | Login/Logout sécurisé | ✅ Implémenté | ✔️ | 🔴 Haute |
-| Gestion des rôles | Superadmin / Résident | ✅ Implémenté | ✔️ | 🔴 Haute |
-| Sécurité des données | HTTPS, hashing passwords | ✅ Implémenté | ✔️ | 🔴 Haute |
+| Fonctionnalité | Description | Statut | Endpoints | Priorité |
+|----------------|-------------|--------|-----------|----------|
+| Inscription | Création de compte utilisateur | ✅ Implémenté | POST /api/auth/register | 🔴 Haute |
+| Connexion | Login avec email/password | ✅ Implémenté | POST /api/auth/login | 🔴 Haute |
+| Déconnexion | Logout sécurisé | ✅ Implémenté | POST /api/auth/logout | 🔴 Haute |
+| Utilisateur actuel | Récupération des infos user | ✅ Implémenté | GET /api/auth/me | 🔴 Haute |
+| Vérification auth | Vérifier si connecté | ✅ Implémenté | GET /api/auth/check | 🔴 Haute |
+| Gestion des rôles | Superadmin / Résident | ✅ Implémenté | Middleware | 🔴 Haute |
+| Hashing passwords | Werkzeug password hashing | ✅ Implémenté | Backend | 🔴 Haute |
+| Protection des routes | Login required, role required | ✅ Implémenté | Decorators | 🔴 Haute |
+| Validation residence_id | Protection contre escalade privilèges | ✅ Implémenté | Tous endpoints | 🔴 Haute |
 
 ---
 
@@ -101,8 +130,63 @@ MySindic/
 
 1. **Backend API RESTful** : Flask avec routes organisées par module
 2. **Frontend responsive** : HTML/CSS/JS avec Tailwind CSS
-3. **PWA** : Service Worker pour le mode offline
-4. **Sécurité** : JWT pour l'authentification, HTTPS obligatoire
+3. **PWA** : Service Worker pour le mode offline (en planification)
+4. **Sécurité** : Flask-Login pour l'authentification, Werkzeug pour hashing
+
+### Modèles de Données (18 tables)
+
+1. **User** - Utilisateurs (superadmin/resident)
+2. **Residence** - Copropriétés
+3. **Unit** - Lots/appartements avec tantièmes
+4. **MaintenanceRequest** - Demandes de maintenance
+5. **MaintenanceLog** - Carnet d'entretien
+6. **Document** - Documents officiels
+7. **Charge** - Appels de fonds
+8. **ChargeDistribution** - Répartition des charges par lot
+9. **Payment** - Paiements des résidents
+10. **News** - Actualités de la résidence
+11. **Poll** - Sondages
+12. **PollOption** - Options de sondage
+13. **PollVote** - Votes sur sondages
+14. **GeneralAssembly** - Assemblées générales
+15. **Resolution** - Résolutions d'AG
+16. **Vote** - Votes sur résolutions
+17. **Attendance** - Présence aux AG
+18. **Litigation** - Litiges/contentieux
+
+### Services Métier
+
+1. **ChargeCalculator** - Calcul automatique de la répartition des charges
+   - `calculate_distribution()` : Répartit une charge selon les tantièmes
+   - `get_unit_balance()` : Calcule le solde d'un lot
+   - `get_unpaid_charges()` : Liste les charges impayées
+
+2. **NotificationService** - Notifications par email
+   - `notify_new_maintenance_request()` : Alerte admin nouvelle demande
+   - `notify_maintenance_status_update()` : Alerte résident changement statut
+   - `notify_fund_call()` : Notification appel de fonds
+   - `notify_assembly_convocation()` : Envoi convocations AG
+
+### Récapitulatif API (60+ endpoints)
+
+**Authentification (5 endpoints):**
+- POST /api/auth/register
+- POST /api/auth/login  
+- POST /api/auth/logout
+- GET /api/auth/me
+- GET /api/auth/check
+
+**Admin (32 endpoints):**
+- Dashboard, Résidences, Unités, Charges, Paiements
+- Actualités, Maintenance, Carnet entretien
+- AG, Résolutions, Convocations
+- Litiges, Sondages, Utilisateurs
+
+**Résidents (24 endpoints):**
+- Dashboard, Actualités, Maintenance
+- Charges, Paiements, Documents
+- Sondages, AG, Résolutions
+- Carnet d'entretien
 
 ---
 
@@ -156,30 +240,40 @@ Un script automatisé `deploy_vps.sh` est fourni pour le déploiement sur VPS :
 - ✅ Workflow configuré et fonctionnel (port 5000)
 - ✅ Landing page responsive opérationnelle
 
-### Phase 2 - Fonctionnalités Superadmin (🚧 En cours)
-- ✅ Dashboard avec statistiques de base
-- ✅ Gestion des résidences (création, liste)
-- ✅ Gestion des utilisateurs (liste)
-- ⏳ Gestion complète des travaux
-- ⏳ Gestion du recouvrement
-- ⏳ Appels de fonds automatiques
-- ⏳ Répartition automatique des charges
-- ⏳ Gestion des AG
-- ⏳ Carnet d'entretien
-- ⏳ Contentieux
+### Phase 2 - Fonctionnalités Superadmin (✅ Complétée)
+- ✅ Dashboard avec statistiques complètes (résidences, users, charges, maintenance, impayés)
+- ✅ Gestion des résidences (création, modification, liste)
+- ✅ Gestion des lots/unités (création, consultation, tantièmes)
+- ✅ Gestion des utilisateurs (liste, modification)
+- ✅ Gestion complète des travaux (suivi maintenance, assignation, dates)
+- ✅ Gestion du recouvrement (paiements, validation, soldes)
+- ✅ Appels de fonds (création charges, publication)
+- ✅ Répartition automatique des charges (calcul par tantièmes via ChargeCalculator)
+- ✅ Gestion des AG (création, convocations, résolutions)
+- ✅ Carnet d'entretien (création interventions, historique)
+- ✅ Contentieux (création, modification, suivi litiges)
+- ✅ Actualités (création, modification, publication)
+- ✅ Sondages (création, fermeture)
 
-### Phase 3 - Fonctionnalités Résidents (🚧 En cours)
-- ✅ Dashboard personnalisé
-- ✅ Demandes de maintenance (création, liste)
-- ✅ Consultation des actualités
-- ⏳ Système de sondages (votes)
-- ⏳ Accès aux documents (quittances)
-- ⏳ Notifications en temps réel
+### Phase 3 - Fonctionnalités Résidents (✅ Complétée)
+- ✅ Dashboard personnalisé (maintenance récente, news, solde, AG à venir)
+- ✅ Demandes de maintenance (création, consultation, suivi statut)
+- ✅ Consultation des actualités (liste, détails, filtrées par résidence)
+- ✅ Système de sondages (consultation, vote, résultats)
+- ✅ Accès aux documents publics (consultation, téléchargement)
+- ✅ Gestion financière (consultation charges, impayés, solde)
+- ✅ Déclaration paiements (avec référence, description)
+- ✅ Historique paiements (consultation complète)
+- ✅ Assemblées générales (consultation, confirmation présence)
+- ✅ Vote sur résolutions (participation aux votes AG)
+- ✅ Carnet d'entretien (consultation historique interventions)
 
-### Phase 4 - PWA & Mobile
-- ⏳ Service Worker
-- ⏳ Manifest PWA
-- ⏳ Design responsive
+### Phase 4 - PWA & Mobile (⏳ En planification)
+- ⏳ Service Worker (pour mode offline)
+- ⏳ Manifest PWA (installabilité)
+- ✅ Design responsive (Tailwind CSS mobile-first)
+- ⏳ Notifications push
+- ⏳ Mode offline complet
 
 ---
 
