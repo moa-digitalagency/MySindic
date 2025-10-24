@@ -489,7 +489,10 @@ DATABASE_URL=<fourni par Replit Database>
 2. **Toujours vérifier residence_id** - Sur tous les endpoints résidents
 3. **Jamais de SQL brut** - Utiliser l'ORM SQLAlchemy uniquement
 4. **Dériver les FK de current_user** - Ne jamais faire confiance à l'input client
-5. **Lire PROJECT_TRACKING.md** - Avant toute modification majeure
+5. **⚠️ TOUJOURS lire et mettre à jour PROJECT_TRACKING.md** - Avant ET après toute modification majeure
+   - Ce fichier est le document de référence pour le suivi du projet
+   - Marquer les tâches comme terminées dès qu'elles sont complètes
+   - Ajouter de nouvelles tâches identifiées pendant le développement
 
 ### Workflow de Développement
 1. Créer/mettre à jour les modèles si nécessaire
@@ -504,4 +507,21 @@ DATABASE_URL=<fourni par Replit Database>
 
 **Dernière mise à jour :** 24 octobre 2025  
 **Version :** 0.2.0  
-**Statut :** Backend MVP Complet ✅ | Frontend En Cours ⏳
+**Statut :** Backend MVP Complet ✅ | Frontend En Cours ⏳ | Migration Replit ✅  
+
+---
+
+## 🔄 Historique de Migration
+
+### Migration vers Replit - 24 octobre 2025 ✅
+
+**Actions effectuées :**
+1. ✅ Configuration environnement Python 3.11
+2. ✅ Installation dépendances via pyproject.toml
+3. ✅ Création PostgreSQL Database (Replit)
+4. ✅ Configuration workflow webview port 5000
+5. ✅ Démarrage application avec Gunicorn
+6. ✅ Vérification fonctionnement complet
+7. ✅ Documentation synchronisée
+
+**Résultat :** Application 100% opérationnelle sur Replit
