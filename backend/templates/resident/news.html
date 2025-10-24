@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Actualités - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Actualités de la Résidence</h1>
+            <p class="mt-2 text-sm text-gray-700">Restez informé des dernières nouvelles</p>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="mb-4">
+            <div class="flex flex-wrap gap-2">
+                <button onclick="filterByCategory('')" id="filter-all" class="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white">
+                    Toutes
+                </button>
+                <button onclick="filterByCategory('info')" id="filter-info" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Info
+                </button>
+                <button onclick="filterByCategory('announcement')" id="filter-announcement" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Annonce
+                </button>
+                <button onclick="filterByCategory('warning')" id="filter-warning" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Alerte
+                </button>
+                <button onclick="filterByCategory('maintenance')" id="filter-maintenance" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Travaux
+                </button>
+            </div>
+        </div>
+
+        <div id="news-list" class="space-y-4">
+            <div class="flex justify-center py-8">
+                <div class="loading-spinner border-indigo-600"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails Actualité -->
+<div id="newsModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="modal-title">Détails de l'actualité</h2>
+                <button onclick="MySindic.closeModal('newsModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="news-details" class="space-y-4">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allNews = [];
+let currentCategory = '';
+
+async function loadNews() {
+    try {
+        const response = await fetch('/api/resident/news');
+        const data = await response.json();
+        
+        if (data.success) {
+            allNews = data.news;
+            filterByCategory(currentCategory);
+        } else {
+            MySindic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function filterByCategory(category) {
+    currentCategory = category;
+    
+    document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+    });
+    
+    const activeBtn = category ? document.getElementById(`filter-${category}`) : document.getElementById('filter-all');
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+        activeBtn.classList.add('bg-indigo-600', 'text-white');
+    }
+    
+    const filtered = category ? allNews.filter(n => n.category === category) : allNews;
+    displayNews(filtered);
+}
+
+function displayNews(newsList) {
+    const container = document.getElementById('news-list');
+    
+    if (newsList.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune actualité</h3>
+                <p class="mt-1 text-sm text-gray-500">Aucune actualité n'est disponible pour le moment.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const getCategoryIcon = (category) => {
+        switch(category) {
+            case 'info': return 'ℹ️';
+            case 'announcement': return '📢';
+            case 'warning': return '⚠️';
+            case 'maintenance': return '🔧';
+            default: return '📄';
+        }
+    };
+    
+    const getCategoryColor = (category) => {
+        switch(category) {
+            case 'info': return 'badge-info';
+            case 'announcement': return 'badge-success';
+            case 'warning': return 'badge-warning';
+            case 'maintenance': return 'badge-danger';
+            default: return 'badge-info';
+        }
+    };
+    
+    const pinnedNews = newsList.filter(n => n.is_pinned);
+    const regularNews = newsList.filter(n => !n.is_pinned);
+    
+    let html = '';
+    
+    if (pinnedNews.length > 0) {
+        html += '<div class="mb-6"><h3 class="text-sm font-medium text-gray-500 mb-3">📌 Épinglées</h3>';
+        html += pinnedNews.map(news => createNewsCard(news, getCategoryIcon, getCategoryColor, true)).join('');
+        html += '</div>';
+    }
+    
+    if (regularNews.length > 0) {
+        if (pinnedNews.length > 0) {
+            html += '<h3 class="text-sm font-medium text-gray-500 mb-3">Actualités récentes</h3>';
+        }
+        html += regularNews.map(news => createNewsCard(news, getCategoryIcon, getCategoryColor, false)).join('');
+    }
+    
+    container.innerHTML = html;
+}
+
+function createNewsCard(news, getCategoryIcon, getCategoryColor, isPinned) {
+    return `
+        <div class="card ${isPinned ? 'border-2 border-indigo-300 bg-indigo-50' : ''} cursor-pointer hover:shadow-xl transition-shadow" onclick="viewNewsDetails(${news.id})">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 text-3xl mr-4">
+                    ${getCategoryIcon(news.category)}
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2">
+                                ${news.is_important ? '<span class="text-red-500 font-bold">★</span>' : ''}
+                                <h3 class="text-lg font-semibold text-gray-900">${news.title}</h3>
+                            </div>
+                            <p class="mt-2 text-gray-600 line-clamp-3">${news.content}</p>
+                        </div>
+                        <span class="badge ${getCategoryColor(news.category)} ml-4">
+                            ${news.category}
+                        </span>
+                    </div>
+                    
+                    <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                        <div class="flex items-center space-x-4">
+                            <span>📅 ${MySindic.formatDate(news.published_at || news.created_at)}</span>
+                            ${news.author_name ? `<span>✍️ ${news.author_name}</span>` : ''}
+                        </div>
+                        <button class="text-indigo-600 hover:text-indigo-800 font-medium">
+                            Lire plus →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function viewNewsDetails(newsId) {
+    try {
+        const response = await fetch(`/api/resident/news/${newsId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const news = data.news;
+            
+            document.getElementById('modal-title').textContent = news.title;
+            
+            const getCategoryIcon = (category) => {
+                switch(category) {
+                    case 'info': return 'ℹ️';
+                    case 'announcement': return '📢';
+                    case 'warning': return '⚠️';
+                    case 'maintenance': return '🔧';
+                    default: return '📄';
+                }
+            };
+            
+            const getCategoryColor = (category) => {
+                switch(category) {
+                    case 'info': return 'bg-blue-100 text-blue-800';
+                    case 'announcement': return 'bg-green-100 text-green-800';
+                    case 'warning': return 'bg-yellow-100 text-yellow-800';
+                    case 'maintenance': return 'bg-red-100 text-red-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            };
+            
+            const details = `
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-4xl">${getCategoryIcon(news.category)}</span>
+                        <div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(news.category)}">
+                                ${news.category}
+                            </span>
+                            ${news.is_important ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">★ Important</span>' : ''}
+                            ${news.is_pinned ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">📌 Épinglé</span>' : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <div class="prose max-w-none">
+                            ${news.content.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4 text-sm text-gray-500">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="font-medium">Publié le</label>
+                                <p>${MySindic.formatDate(news.published_at || news.created_at)}</p>
+                            </div>
+                            ${news.author_name ? `
+                                <div>
+                                    <label class="font-medium">Auteur</label>
+                                    <p>${news.author_name}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('news-details').innerHTML = details;
+            MySindic.openModal('newsModal');
+        } else {
+            MySindic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadNews();
+});
+</script>
+{% endblock %}

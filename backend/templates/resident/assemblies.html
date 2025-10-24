@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Assemblées Générales - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">Assemblées Générales</h1>
+            <p class="mt-2 text-sm text-gray-700">Consultez les AG et participez aux votes</p>
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">📅</div>
+            <div class="stat-card-title text-xs sm:text-sm">AG à venir</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-upcoming">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">🗳️</div>
+            <div class="stat-card-title text-xs sm:text-sm">Mes votes</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-votes">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">✅</div>
+            <div class="stat-card-title text-xs sm:text-sm">Terminées</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-completed">-</div>
+        </div>
+    </div>
+
+    <div class="mt-8 space-y-6">
+        <div class="card">
+            <h3 class="text-base sm:text-lg font-semibold mb-4">Assemblées à venir</h3>
+            <div id="upcoming-assemblies" class="space-y-4">
+                <div class="flex justify-center py-4">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="text-base sm:text-lg font-semibold mb-4">Assemblées passées</h3>
+            <div id="past-assemblies" class="space-y-4">
+                <div class="flex justify-center py-4">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="viewAssemblyModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-full sm:max-w-4xl m-4 max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900" id="view-assembly-title">Détails de l'assemblée</h3>
+                <button onclick="MySindic.closeModal('viewAssemblyModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="view-assembly-content" class="p-4 sm:p-6">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let upcomingAssemblies = [];
+let pastAssemblies = [];
+let myVotes = new Set();
+
+async function loadAssemblies() {
+    try {
+        const response = await fetch('/api/resident/assemblies');
+        const data = await response.json();
+        
+        if (data.success) {
+            const assemblies = data.data || [];
+            const now = new Date();
+            
+            upcomingAssemblies = assemblies.filter(a => new Date(a.scheduled_date) >= now);
+            pastAssemblies = assemblies.filter(a => new Date(a.scheduled_date) < now);
+            
+            updateStats();
+            renderUpcomingAssemblies();
+            renderPastAssemblies();
+        }
+    } catch (error) {
+        console.error('Error loading assemblies:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function updateStats() {
+    document.getElementById('stat-upcoming').textContent = upcomingAssemblies.length;
+    document.getElementById('stat-votes').textContent = myVotes.size;
+    document.getElementById('stat-completed').textContent = pastAssemblies.length;
+}
+
+function renderUpcomingAssemblies() {
+    const container = document.getElementById('upcoming-assemblies');
+    
+    if (upcomingAssemblies.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4 text-sm">Aucune assemblée prévue</p>';
+        return;
+    }
+    
+    container.innerHTML = upcomingAssemblies.map(assembly => `
+        <div class="border rounded-lg p-4 hover:shadow-md transition bg-gradient-to-r from-blue-50 to-white">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div class="flex-1">
+                    <h4 class="text-base sm:text-lg font-semibold text-gray-900">${assembly.title}</h4>
+                    <div class="mt-2 space-y-1 text-xs sm:text-sm text-gray-600">
+                        <p class="flex items-center gap-2">
+                            <span>📅</span>
+                            <span>${MySindic.formatDate(assembly.scheduled_date)}</span>
+                        </p>
+                        ${assembly.location ? `
+                        <p class="flex items-center gap-2">
+                            <span>📍</span>
+                            <span>${assembly.location}</span>
+                        </p>
+                        ` : ''}
+                        <p class="flex items-center gap-2">
+                            <span>🏷️</span>
+                            <span class="badge badge-info">${getTypeLabel(assembly.assembly_type)}</span>
+                        </p>
+                    </div>
+                    ${assembly.description ? `
+                    <p class="mt-2 text-xs sm:text-sm text-gray-700 line-clamp-2">${assembly.description}</p>
+                    ` : ''}
+                </div>
+                <div class="flex flex-row sm:flex-col gap-2">
+                    <button onclick="viewAssembly(${assembly.id})" class="btn-primary text-xs sm:text-sm px-3 py-2 flex-1 sm:flex-none">
+                        Voir détails
+                    </button>
+                    ${assembly.status === 'in_progress' ? `
+                    <button onclick="viewAssembly(${assembly.id})" class="btn-success text-xs sm:text-sm px-3 py-2 flex-1 sm:flex-none">
+                        🗳️ Voter
+                    </button>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderPastAssemblies() {
+    const container = document.getElementById('past-assemblies');
+    
+    if (pastAssemblies.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4 text-sm">Aucune assemblée passée</p>';
+        return;
+    }
+    
+    container.innerHTML = pastAssemblies.slice(0, 5).map(assembly => `
+        <div class="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex-1">
+                    <h4 class="text-sm sm:text-base font-medium text-gray-900">${assembly.title}</h4>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">
+                        ${MySindic.formatDate(assembly.scheduled_date)} • ${getTypeLabel(assembly.assembly_type)}
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    ${getStatusBadge(assembly.status)}
+                    <button onclick="viewAssembly(${assembly.id})" class="text-indigo-600 hover:text-indigo-800 text-xs sm:text-sm">
+                        Voir PV
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getTypeLabel(type) {
+    const labels = {
+        'ordinaire': 'Ordinaire',
+        'extraordinaire': 'Extraordinaire'
+    };
+    return labels[type] || type;
+}
+
+function getStatusBadge(status) {
+    const badges = {
+        'planned': '<span class="badge badge-warning text-xs">Planifiée</span>',
+        'in_progress': '<span class="badge badge-info text-xs">En cours</span>',
+        'completed': '<span class="badge badge-success text-xs">Terminée</span>',
+        'cancelled': '<span class="badge badge-danger text-xs">Annulée</span>'
+    };
+    return badges[status] || status;
+}
+
+async function viewAssembly(assemblyId) {
+    try {
+        const response = await fetch(`/api/resident/assemblies/${assemblyId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const assembly = data.data;
+            const resolutions = assembly.resolutions || [];
+            
+            document.getElementById('view-assembly-title').textContent = assembly.title;
+            document.getElementById('view-assembly-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Date</p>
+                            <p class="font-medium">${MySindic.formatDate(assembly.scheduled_date)}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Type</p>
+                            <p class="font-medium">${getTypeLabel(assembly.assembly_type)}</p>
+                        </div>
+                        ${assembly.location ? `
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Lieu</p>
+                            <p class="font-medium">${assembly.location}</p>
+                        </div>
+                        ` : ''}
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Statut</p>
+                            ${getStatusBadge(assembly.status)}
+                        </div>
+                    </div>
+                    
+                    ${assembly.description ? `
+                    <div>
+                        <p class="text-xs sm:text-sm text-gray-500 mb-2">Ordre du jour</p>
+                        <p class="text-gray-700 text-sm sm:text-base">${assembly.description}</p>
+                    </div>
+                    ` : ''}
+                    
+                    <div>
+                        <h4 class="text-base sm:text-lg font-semibold mb-4">Résolutions (${resolutions.length})</h4>
+                        
+                        ${resolutions.length === 0 ? `
+                        <p class="text-gray-500 text-center py-4 text-sm">Aucune résolution</p>
+                        ` : `
+                        <div class="space-y-4">
+                            ${resolutions.map((res, index) => `
+                                <div class="border rounded-lg p-3 sm:p-4 bg-gray-50">
+                                    <div class="flex flex-col gap-3">
+                                        <div>
+                                            <p class="font-medium text-sm sm:text-base">${index + 1}. ${res.title}</p>
+                                            ${res.description ? `<p class="text-xs sm:text-sm text-gray-600 mt-1">${res.description}</p>` : ''}
+                                            <p class="text-xs text-gray-500 mt-2">Type: ${getVoteTypeLabel(res.vote_type)}</p>
+                                        </div>
+                                        
+                                        ${assembly.status === 'in_progress' && res.status === 'voting' ? `
+                                        <div class="flex flex-col sm:flex-row gap-2">
+                                            <button onclick="vote(${res.id}, 'for')" class="btn-success flex-1 text-xs sm:text-sm">
+                                                👍 Pour
+                                            </button>
+                                            <button onclick="vote(${res.id}, 'against')" class="btn-danger flex-1 text-xs sm:text-sm">
+                                                👎 Contre
+                                            </button>
+                                            <button onclick="vote(${res.id}, 'abstain')" class="btn-secondary flex-1 text-xs sm:text-sm">
+                                                🤷 Abstention
+                                            </button>
+                                        </div>
+                                        ` : `
+                                        <div>
+                                            ${getResolutionStatusBadge(res.status)}
+                                            ${res.status === 'approved' || res.status === 'rejected' ? `
+                                            <div class="mt-3 grid grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+                                                <div class="text-center p-2 bg-green-50 rounded">
+                                                    <p class="text-green-600 font-semibold">${res.votes_for || 0}</p>
+                                                    <p class="text-gray-500">Pour</p>
+                                                </div>
+                                                <div class="text-center p-2 bg-red-50 rounded">
+                                                    <p class="text-red-600 font-semibold">${res.votes_against || 0}</p>
+                                                    <p class="text-gray-500">Contre</p>
+                                                </div>
+                                                <div class="text-center p-2 bg-gray-100 rounded">
+                                                    <p class="text-gray-600 font-semibold">${res.votes_abstain || 0}</p>
+                                                    <p class="text-gray-500">Abstention</p>
+                                                </div>
+                                            </div>
+                                            ` : ''}
+                                        </div>
+                                        `}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        `}
+                    </div>
+                </div>
+            `;
+            
+            MySindic.openModal('viewAssemblyModal');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function getVoteTypeLabel(type) {
+    const labels = {
+        'simple': 'Majorité simple',
+        'double_majorite': 'Double majorité',
+        'unanimite': 'Unanimité'
+    };
+    return labels[type] || type;
+}
+
+function getResolutionStatusBadge(status) {
+    const badges = {
+        'pending': '<span class="badge badge-warning text-xs">En attente</span>',
+        'voting': '<span class="badge badge-info text-xs">Vote en cours</span>',
+        'approved': '<span class="badge badge-success text-xs">✅ Approuvée</span>',
+        'rejected': '<span class="badge badge-danger text-xs">❌ Rejetée</span>'
+    };
+    return badges[status] || status;
+}
+
+async function vote(resolutionId, voteValue) {
+    if (!confirm(`Confirmer votre vote: ${voteValue === 'for' ? 'Pour' : voteValue === 'against' ? 'Contre' : 'Abstention'} ?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/resident/votes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                resolution_id: resolutionId,
+                vote_value: voteValue
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            MySindic.showToast('Vote enregistré avec succès', 'success');
+            myVotes.add(resolutionId);
+            updateStats();
+            loadAssemblies();
+            MySindic.closeModal('viewAssemblyModal');
+        } else {
+            MySindic.showToast(result.message || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors du vote', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadAssemblies();
+});
+</script>
+{% endblock %}

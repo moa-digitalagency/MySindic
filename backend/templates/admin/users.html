@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Utilisateurs - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Gestion des Utilisateurs</h1>
+            <p class="mt-2 text-sm text-gray-700">Tous les utilisateurs de la plateforme</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button onclick="openCreateUserModal()" class="btn-primary">
+                Nouvel Utilisateur
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="card">
+            <div class="mb-4 flex space-x-4">
+                <div class="flex-1">
+                    <label class="label-field">Rechercher</label>
+                    <input type="text" id="search-input" class="input-field" placeholder="Nom, email..." onkeyup="filterUsers()">
+                </div>
+                <div class="flex-1">
+                    <label class="label-field">Filtrer par rôle</label>
+                    <select id="filter-role" class="input-field" onchange="filterUsers()">
+                        <option value="">Tous</option>
+                        <option value="superadmin">Super Admin</option>
+                        <option value="resident">Résident</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="users-list" class="overflow-x-auto">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Créer/Éditer Utilisateur -->
+<div id="userModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="modal-title">Nouvel Utilisateur</h2>
+                <button onclick="MySindic.closeModal('userModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="userForm" class="space-y-4">
+                <input type="hidden" id="user-id">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Nom d'utilisateur *</label>
+                        <input type="text" id="user-username" class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="label-field">Email *</label>
+                        <input type="email" id="user-email" class="input-field" required>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Prénom</label>
+                        <input type="text" id="user-firstname" class="input-field">
+                    </div>
+                    <div>
+                        <label class="label-field">Nom</label>
+                        <input type="text" id="user-lastname" class="input-field">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label-field">Téléphone</label>
+                    <input type="tel" id="user-phone" class="input-field">
+                </div>
+                
+                <div id="password-section">
+                    <label class="label-field">Mot de passe *</label>
+                    <input type="password" id="user-password" class="input-field" required>
+                    <p class="text-sm text-gray-500 mt-1">Minimum 6 caractères</p>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <h3 class="font-medium text-gray-900 mb-3">Rôle et Permissions</h3>
+                    
+                    <div>
+                        <label class="label-field">Rôle *</label>
+                        <select id="user-role" class="input-field" required onchange="toggleResidenceFields()">
+                            <option value="">Sélectionner un rôle</option>
+                            <option value="superadmin">Super Administrateur</option>
+                            <option value="resident">Résident</option>
+                        </select>
+                    </div>
+                    
+                    <div id="residence-fields" class="mt-4 space-y-4 hidden">
+                        <div>
+                            <label class="label-field">Résidence</label>
+                            <select id="user-residence" class="input-field">
+                                <option value="">Sélectionner une résidence</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="label-field">Numéro de lot</label>
+                            <input type="text" id="user-unit" class="input-field" placeholder="Ex: A101">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" id="user-active" class="h-4 w-4 text-indigo-600 rounded" checked>
+                    <label for="user-active" class="ml-2 text-sm text-gray-700">Compte actif</label>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="MySindic.closeModal('userModal')" class="btn-secondary">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allUsers = [];
+let residences = [];
+
+async function loadResidences() {
+    try {
+        const response = await fetch('/api/admin/residences');
+        const data = await response.json();
+        
+        if (data.success) {
+            residences = data.residences;
+            const select = document.getElementById('user-residence');
+            residences.forEach(r => {
+                select.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error loading residences:', error);
+    }
+}
+
+async function loadUsers() {
+    try {
+        const response = await fetch('/api/admin/users');
+        const data = await response.json();
+        
+        if (data.success) {
+            allUsers = data.users || [];
+            filterUsers();
+        } else {
+            document.getElementById('users-list').innerHTML = '<p class="text-center text-gray-500 py-8">Impossible de charger les utilisateurs</p>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('users-list').innerHTML = '<p class="text-center text-red-500 py-8">Erreur lors du chargement des utilisateurs</p>';
+    }
+}
+
+function filterUsers() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const roleFilter = document.getElementById('filter-role').value;
+    
+    let filtered = allUsers;
+    
+    if (searchTerm) {
+        filtered = filtered.filter(u => 
+            (u.username && u.username.toLowerCase().includes(searchTerm)) ||
+            (u.email && u.email.toLowerCase().includes(searchTerm)) ||
+            (u.first_name && u.first_name.toLowerCase().includes(searchTerm)) ||
+            (u.last_name && u.last_name.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    if (roleFilter) {
+        filtered = filtered.filter(u => {
+            if (roleFilter === 'superadmin') return u.is_superadmin;
+            if (roleFilter === 'resident') return !u.is_superadmin;
+            return true;
+        });
+    }
+    
+    displayUsers(filtered);
+}
+
+function displayUsers(usersList) {
+    const container = document.getElementById('users-list');
+    
+    if (usersList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucun utilisateur trouvé</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Résidence</th>
+                    <th>Lot</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${usersList.map(u => `
+                    <tr>
+                        <td>
+                            <div class="font-medium text-gray-900">${u.username}</div>
+                            ${u.first_name || u.last_name ? `<div class="text-sm text-gray-500">${u.first_name || ''} ${u.last_name || ''}</div>` : ''}
+                        </td>
+                        <td>${u.email}</td>
+                        <td>
+                            <span class="badge ${u.is_superadmin ? 'badge-danger' : 'badge-info'}">
+                                ${u.is_superadmin ? 'Super Admin' : 'Résident'}
+                            </span>
+                        </td>
+                        <td>${u.residence_name || '-'}</td>
+                        <td>${u.unit_number || '-'}</td>
+                        <td>
+                            <span class="badge ${u.is_active ? 'badge-success' : 'badge-warning'}">
+                                ${u.is_active ? 'Actif' : 'Inactif'}
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="editUser(${u.id})" class="text-indigo-600 hover:text-indigo-800">
+                                Éditer
+                            </button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function openCreateUserModal() {
+    document.getElementById('modal-title').textContent = 'Nouvel Utilisateur';
+    document.getElementById('userForm').reset();
+    document.getElementById('user-id').value = '';
+    document.getElementById('user-active').checked = true;
+    document.getElementById('password-section').style.display = 'block';
+    document.getElementById('user-password').required = true;
+    document.getElementById('residence-fields').classList.add('hidden');
+    MySindic.openModal('userModal');
+}
+
+function editUser(userId) {
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) return;
+    
+    document.getElementById('modal-title').textContent = 'Éditer Utilisateur';
+    document.getElementById('user-id').value = user.id;
+    document.getElementById('user-username').value = user.username;
+    document.getElementById('user-email').value = user.email;
+    document.getElementById('user-firstname').value = user.first_name || '';
+    document.getElementById('user-lastname').value = user.last_name || '';
+    document.getElementById('user-phone').value = user.phone || '';
+    document.getElementById('user-role').value = user.is_superadmin ? 'superadmin' : 'resident';
+    document.getElementById('user-active').checked = user.is_active;
+    
+    document.getElementById('password-section').style.display = 'none';
+    document.getElementById('user-password').required = false;
+    
+    if (!user.is_superadmin) {
+        document.getElementById('residence-fields').classList.remove('hidden');
+        document.getElementById('user-residence').value = user.residence_id || '';
+        document.getElementById('user-unit').value = user.unit_number || '';
+    }
+    
+    MySindic.openModal('userModal');
+}
+
+function toggleResidenceFields() {
+    const role = document.getElementById('user-role').value;
+    const residenceFields = document.getElementById('residence-fields');
+    
+    if (role === 'resident') {
+        residenceFields.classList.remove('hidden');
+    } else {
+        residenceFields.classList.add('hidden');
+    }
+}
+
+document.getElementById('userForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const userId = document.getElementById('user-id').value;
+    const role = document.getElementById('user-role').value;
+    
+    const formData = {
+        username: document.getElementById('user-username').value,
+        email: document.getElementById('user-email').value,
+        first_name: document.getElementById('user-firstname').value,
+        last_name: document.getElementById('user-lastname').value,
+        phone: document.getElementById('user-phone').value,
+        is_superadmin: role === 'superadmin',
+        is_active: document.getElementById('user-active').checked
+    };
+    
+    if (!userId) {
+        formData.password = document.getElementById('user-password').value;
+    }
+    
+    if (role === 'resident') {
+        const residenceId = document.getElementById('user-residence').value;
+        if (residenceId) {
+            formData.residence_id = parseInt(residenceId);
+        }
+    }
+    
+    try {
+        const url = userId ? `/api/admin/users/${userId}` : '/api/admin/users';
+        const method = userId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast(userId ? 'Utilisateur mis à jour' : 'Utilisateur créé', 'success');
+            MySindic.closeModal('userModal');
+            loadUsers();
+        } else {
+            MySindic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadResidences();
+    loadUsers();
+});
+</script>
+{% endblock %}

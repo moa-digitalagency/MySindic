@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Résidences - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Gestion des Résidences</h1>
+            <p class="mt-2 text-sm text-gray-700">Liste de toutes les copropriétés gérées</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button onclick="openCreateResidenceModal()" class="btn-primary">
+                Nouvelle Résidence
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="card">
+            <div id="residences-list" class="overflow-x-auto">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Créer/Éditer Résidence -->
+<div id="residenceModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="modal-title">Nouvelle Résidence</h2>
+                <button onclick="MySindic.closeModal('residenceModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="residenceForm" class="space-y-4">
+                <input type="hidden" id="residence-id">
+                
+                <div>
+                    <label class="label-field">Nom de la résidence *</label>
+                    <input type="text" id="residence-name" class="input-field" required>
+                </div>
+                
+                <div>
+                    <label class="label-field">Adresse *</label>
+                    <input type="text" id="residence-address" class="input-field" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Ville *</label>
+                        <input type="text" id="residence-city" class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="label-field">Code postal</label>
+                        <input type="text" id="residence-postal" class="input-field">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Nombre de lots *</label>
+                        <input type="number" id="residence-units" class="input-field" required min="1">
+                    </div>
+                    <div>
+                        <label class="label-field">Total tantièmes</label>
+                        <input type="number" id="residence-tantiemes" class="input-field" value="1000">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label-field">Description</label>
+                    <textarea id="residence-description" class="input-field" rows="3"></textarea>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <h3 class="font-medium text-gray-900 mb-3">Informations Syndic</h3>
+                    
+                    <div>
+                        <label class="label-field">Nom du syndic</label>
+                        <input type="text" id="syndic-name" class="input-field">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="label-field">Email</label>
+                            <input type="email" id="syndic-email" class="input-field">
+                        </div>
+                        <div>
+                            <label class="label-field">Téléphone</label>
+                            <input type="tel" id="syndic-phone" class="input-field">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="MySindic.closeModal('residenceModal')" class="btn-secondary">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails Résidence -->
+<div id="residenceDetailsModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="details-residence-name">Détails de la résidence</h2>
+                <button onclick="MySindic.closeModal('residenceDetailsModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="residence-details-content" class="space-y-4">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let residences = [];
+
+async function loadResidences() {
+    try {
+        const response = await fetch('/api/admin/residences');
+        const data = await response.json();
+        
+        if (data.success) {
+            residences = data.residences;
+            displayResidences(residences);
+        } else {
+            MySindic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function displayResidences(residencesList) {
+    const container = document.getElementById('residences-list');
+    
+    if (residencesList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucune résidence trouvée</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Ville</th>
+                    <th>Lots</th>
+                    <th>Syndic</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${residencesList.map(r => `
+                    <tr>
+                        <td>
+                            <div class="font-medium text-gray-900">${r.name}</div>
+                            <div class="text-sm text-gray-500">${r.address}</div>
+                        </td>
+                        <td>${r.city}</td>
+                        <td>${r.total_units}</td>
+                        <td>${r.syndic_name || '-'}</td>
+                        <td>
+                            <div class="flex space-x-2">
+                                <button onclick="viewResidence(${r.id})" class="text-indigo-600 hover:text-indigo-800">
+                                    Voir
+                                </button>
+                                <button onclick="editResidence(${r.id})" class="text-blue-600 hover:text-blue-800">
+                                    Éditer
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function openCreateResidenceModal() {
+    document.getElementById('modal-title').textContent = 'Nouvelle Résidence';
+    document.getElementById('residenceForm').reset();
+    document.getElementById('residence-id').value = '';
+    MySindic.openModal('residenceModal');
+}
+
+function editResidence(residenceId) {
+    const residence = residences.find(r => r.id === residenceId);
+    if (!residence) return;
+    
+    document.getElementById('modal-title').textContent = 'Éditer Résidence';
+    document.getElementById('residence-id').value = residence.id;
+    document.getElementById('residence-name').value = residence.name;
+    document.getElementById('residence-address').value = residence.address;
+    document.getElementById('residence-city').value = residence.city;
+    document.getElementById('residence-postal').value = residence.postal_code || '';
+    document.getElementById('residence-units').value = residence.total_units;
+    document.getElementById('residence-tantiemes').value = residence.total_tantiemes;
+    document.getElementById('residence-description').value = residence.description || '';
+    document.getElementById('syndic-name').value = residence.syndic_name || '';
+    document.getElementById('syndic-email').value = residence.syndic_email || '';
+    document.getElementById('syndic-phone').value = residence.syndic_phone || '';
+    
+    MySindic.openModal('residenceModal');
+}
+
+async function viewResidence(residenceId) {
+    const residence = residences.find(r => r.id === residenceId);
+    if (!residence) return;
+    
+    document.getElementById('details-residence-name').textContent = residence.name;
+    
+    const content = `
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-sm font-medium text-gray-500">Adresse</label>
+                <p class="mt-1 text-gray-900">${residence.address}</p>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-500">Ville</label>
+                <p class="mt-1 text-gray-900">${residence.city}</p>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-500">Nombre de lots</label>
+                <p class="mt-1 text-gray-900">${residence.total_units}</p>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-500">Total tantièmes</label>
+                <p class="mt-1 text-gray-900">${residence.total_tantiemes}</p>
+            </div>
+            ${residence.syndic_name ? `
+                <div class="col-span-2 border-t pt-4">
+                    <label class="text-sm font-medium text-gray-500">Syndic</label>
+                    <p class="mt-1 text-gray-900">${residence.syndic_name}</p>
+                    ${residence.syndic_email ? `<p class="text-sm text-gray-600">${residence.syndic_email}</p>` : ''}
+                    ${residence.syndic_phone ? `<p class="text-sm text-gray-600">${residence.syndic_phone}</p>` : ''}
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    document.getElementById('residence-details-content').innerHTML = content;
+    MySindic.openModal('residenceDetailsModal');
+}
+
+document.getElementById('residenceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const residenceId = document.getElementById('residence-id').value;
+    const formData = {
+        name: document.getElementById('residence-name').value,
+        address: document.getElementById('residence-address').value,
+        city: document.getElementById('residence-city').value,
+        postal_code: document.getElementById('residence-postal').value,
+        total_units: parseInt(document.getElementById('residence-units').value),
+        total_tantiemes: parseInt(document.getElementById('residence-tantiemes').value),
+        description: document.getElementById('residence-description').value,
+        syndic_name: document.getElementById('syndic-name').value,
+        syndic_email: document.getElementById('syndic-email').value,
+        syndic_phone: document.getElementById('syndic-phone').value
+    };
+    
+    try {
+        const url = residenceId ? `/api/admin/residences/${residenceId}` : '/api/admin/residences';
+        const method = residenceId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast(data.message, 'success');
+            MySindic.closeModal('residenceModal');
+            loadResidences();
+        } else {
+            MySindic.showToast(data.error || 'Erreur lors de l\'enregistrement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadResidences();
+});
+</script>
+{% endblock %}

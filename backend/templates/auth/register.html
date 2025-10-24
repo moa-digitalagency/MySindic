@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription - MySindic{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Créer un compte
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Ou
+                <a href="{{ url_for('auth.login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    connectez-vous à votre compte existant
+                </a>
+            </p>
+        </div>
+        <form class="mt-8 space-y-6" action="{{ url_for('auth.register') }}" method="POST">
+            <div class="rounded-md shadow-sm space-y-4">
+                <div>
+                    <label for="username" class="label-field">Nom d'utilisateur</label>
+                    <input id="username" name="username" type="text" required 
+                           class="input-field" 
+                           placeholder="Nom d'utilisateur">
+                </div>
+                
+                <div>
+                    <label for="email" class="label-field">Email</label>
+                    <input id="email" name="email" type="email" required 
+                           class="input-field" 
+                           placeholder="email@exemple.com">
+                </div>
+                
+                <div>
+                    <label for="password" class="label-field">Mot de passe</label>
+                    <input id="password" name="password" type="password" required 
+                           class="input-field" 
+                           placeholder="Mot de passe">
+                </div>
+                
+                <div>
+                    <label for="password_confirm" class="label-field">Confirmer le mot de passe</label>
+                    <input id="password_confirm" name="password_confirm" type="password" required 
+                           class="input-field" 
+                           placeholder="Confirmez le mot de passe">
+                </div>
+            </div>
+
+            <div class="flex items-center">
+                <input id="terms" name="terms" type="checkbox" required 
+                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                <label for="terms" class="ml-2 block text-sm text-gray-900">
+                    J'accepte les 
+                    <a href="#" class="text-indigo-600 hover:text-indigo-500">conditions d'utilisation</a> 
+                    et la 
+                    <a href="#" class="text-indigo-600 hover:text-indigo-500">politique de confidentialité</a>
+                </label>
+            </div>
+
+            <div>
+                <button type="submit" 
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                    </span>
+                    Créer mon compte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

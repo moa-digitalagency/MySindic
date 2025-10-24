@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Mon Tableau de Bord - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Mon Tableau de Bord</h1>
+            <p class="mt-2 text-sm text-gray-700" id="residence-name">Chargement...</p>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="stat-card">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-title">Mon solde</div>
+            <div class="stat-card-value" id="stat-balance">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">📋</div>
+            <div class="stat-card-title">Mes demandes</div>
+            <div class="stat-card-value" id="stat-requests">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">📰</div>
+            <div class="stat-card-title">Nouvelles actualités</div>
+            <div class="stat-card-value" id="stat-news">-</div>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Mes demandes de maintenance</h3>
+                <a href="{{ url_for('resident_maintenance') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    Voir tout
+                </a>
+            </div>
+            <div id="my-maintenance" class="space-y-3">
+                <div class="flex justify-center py-4">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button onclick="window.location.href='{{ url_for('resident_maintenance') }}#new'" class="btn-primary w-full">
+                    Nouvelle demande
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Actualités récentes</h3>
+                <a href="{{ url_for('resident_news') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    Voir tout
+                </a>
+            </div>
+            <div id="recent-news" class="space-y-3">
+                <div class="flex justify-center py-4">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="card">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Mes charges impayées</h3>
+            <div id="unpaid-charges" class="overflow-x-auto">
+                <div class="flex justify-center py-4">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function loadResidentDashboard() {
+    try {
+        const response = await fetch('/api/resident/dashboard');
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.data;
+            document.getElementById('residence-name').textContent = stats.residence_name || 'Ma résidence';
+            
+            const balance = stats.balance || 0;
+            const balanceEl = document.getElementById('stat-balance');
+            balanceEl.textContent = MySindic.formatCurrency(Math.abs(balance));
+            balanceEl.classList.add(balance < 0 ? 'text-red-600' : 'text-green-600');
+            
+            document.getElementById('stat-requests').textContent = stats.total_requests || 0;
+            document.getElementById('stat-news').textContent = stats.unread_news || 0;
+            
+            loadMyMaintenance(stats.recent_maintenance || []);
+            loadRecentNews(stats.recent_news || []);
+            loadUnpaidCharges(stats.unpaid_charges || []);
+        }
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function loadMyMaintenance(requests) {
+    const container = document.getElementById('my-maintenance');
+    if (requests.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune demande en cours</p>';
+        return;
+    }
+    
+    container.innerHTML = requests.map(req => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+                <p class="font-medium text-gray-900">${req.title}</p>
+                <p class="text-sm text-gray-500">${MySindic.formatDate(req.created_at)}</p>
+            </div>
+            <span class="badge ${req.status === 'pending' ? 'badge-warning' : req.status === 'in_progress' ? 'badge-info' : 'badge-success'}">
+                ${req.status}
+            </span>
+        </div>
+    `).join('');
+}
+
+function loadRecentNews(news) {
+    const container = document.getElementById('recent-news');
+    if (news.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune actualité récente</p>';
+        return;
+    }
+    
+    container.innerHTML = news.map(item => `
+        <div class="p-3 bg-gray-50 rounded-lg">
+            <p class="font-medium text-gray-900">${item.title}</p>
+            <p class="text-sm text-gray-500 mt-1">${item.content.substring(0, 100)}...</p>
+            <p class="text-xs text-gray-400 mt-2">${MySindic.formatDate(item.created_at)}</p>
+        </div>
+    `).join('');
+}
+
+function loadUnpaidCharges(charges) {
+    const container = document.getElementById('unpaid-charges');
+    if (charges.length === 0) {
+        container.innerHTML = '<p class="text-green-600 text-center py-4 font-medium">✓ Vous êtes à jour dans vos paiements</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Montant</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${charges.map(charge => `
+                    <tr>
+                        <td>${charge.description}</td>
+                        <td>${MySindic.formatDate(charge.due_date)}</td>
+                        <td class="text-red-600 font-semibold">${MySindic.formatCurrency(charge.amount)}</td>
+                        <td>
+                            <a href="{{ url_for('resident_finances') }}#charge-${charge.id}" class="text-indigo-600 hover:text-indigo-800">
+                                Déclarer paiement
+                            </a>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadResidentDashboard();
+});
+</script>
+{% endblock %}

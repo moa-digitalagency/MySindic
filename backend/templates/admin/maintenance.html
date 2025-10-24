@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion Maintenance - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Gestion de la Maintenance</h1>
+            <p class="mt-2 text-sm text-gray-700">Toutes les demandes de maintenance des résidences</p>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="card">
+            <div class="mb-4 flex space-x-4">
+                <div class="flex-1">
+                    <label class="label-field">Filtrer par statut</label>
+                    <select id="filter-status" class="input-field" onchange="filterRequests()">
+                        <option value="">Tous</option>
+                        <option value="pending">En attente</option>
+                        <option value="in_progress">En cours</option>
+                        <option value="completed">Terminé</option>
+                        <option value="cancelled">Annulé</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="label-field">Filtrer par priorité</label>
+                    <select id="filter-priority" class="input-field" onchange="filterRequests()">
+                        <option value="">Toutes</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="high">Haute</option>
+                        <option value="normal">Normale</option>
+                        <option value="low">Basse</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="maintenance-list" class="overflow-x-auto">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails & Mise à jour -->
+<div id="maintenanceModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="modal-title">Détails de la demande</h2>
+                <button onclick="MySindic.closeModal('maintenanceModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="maintenance-details" class="space-y-4">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+            
+            <form id="updateForm" class="space-y-4 mt-6 border-t pt-6">
+                <input type="hidden" id="request-id">
+                
+                <h3 class="font-medium text-gray-900">Mise à jour</h3>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Statut</label>
+                        <select id="update-status" class="input-field">
+                            <option value="pending">En attente</option>
+                            <option value="in_progress">En cours</option>
+                            <option value="completed">Terminé</option>
+                            <option value="cancelled">Annulé</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-field">Date intervention</label>
+                        <input type="datetime-local" id="update-scheduled" class="input-field">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label-field">Assigné à</label>
+                    <input type="text" id="update-assigned" class="input-field" placeholder="Nom du technicien/entreprise">
+                </div>
+                
+                <div>
+                    <label class="label-field">Notes administrateur</label>
+                    <textarea id="update-notes" class="input-field" rows="3"></textarea>
+                </div>
+                
+                <div>
+                    <label class="label-field">Notes de résolution</label>
+                    <textarea id="update-resolution" class="input-field" rows="3" placeholder="Travaux effectués, pièces remplacées..."></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="MySindic.closeModal('maintenanceModal')" class="btn-secondary">
+                        Fermer
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Mettre à jour
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allRequests = [];
+
+async function loadMaintenanceRequests() {
+    try {
+        const response = await fetch('/api/admin/maintenance');
+        const data = await response.json();
+        
+        if (data.success) {
+            allRequests = data.maintenance_requests;
+            filterRequests();
+        } else {
+            MySindic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function filterRequests() {
+    const statusFilter = document.getElementById('filter-status').value;
+    const priorityFilter = document.getElementById('filter-priority').value;
+    
+    let filtered = allRequests;
+    
+    if (statusFilter) {
+        filtered = filtered.filter(r => r.status === statusFilter);
+    }
+    
+    if (priorityFilter) {
+        filtered = filtered.filter(r => r.priority === priorityFilter);
+    }
+    
+    displayRequests(filtered);
+}
+
+function displayRequests(requestsList) {
+    const container = document.getElementById('maintenance-list');
+    
+    if (requestsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucune demande trouvée</p>';
+        return;
+    }
+    
+    const getPriorityColor = (priority) => {
+        switch(priority) {
+            case 'urgent': return 'badge-danger';
+            case 'high': return 'badge-warning';
+            case 'normal': return 'badge-info';
+            default: return 'badge-success';
+        }
+    };
+    
+    const getStatusColor = (status) => {
+        switch(status) {
+            case 'pending': return 'badge-warning';
+            case 'in_progress': return 'badge-info';
+            case 'completed': return 'badge-success';
+            default: return 'badge-danger';
+        }
+    };
+    
+    container.innerHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Résidence</th>
+                    <th>Demandeur</th>
+                    <th>Priorité</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${requestsList.map(r => `
+                    <tr>
+                        <td>
+                            <div class="font-medium text-gray-900">${r.title}</div>
+                            ${r.category ? `<div class="text-sm text-gray-500">${r.category}</div>` : ''}
+                        </td>
+                        <td>${r.residence_name || '-'}</td>
+                        <td>
+                            <div class="text-sm">${r.requester_name || '-'}</div>
+                            ${r.location ? `<div class="text-xs text-gray-500">${r.location}</div>` : ''}
+                        </td>
+                        <td><span class="badge ${getPriorityColor(r.priority)}">${r.priority}</span></td>
+                        <td><span class="badge ${getStatusColor(r.status)}">${r.status}</span></td>
+                        <td class="text-sm">${MySindic.formatDate(r.created_at)}</td>
+                        <td>
+                            <button onclick="viewRequest(${r.id})" class="text-indigo-600 hover:text-indigo-800">
+                                Gérer
+                            </button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+async function viewRequest(requestId) {
+    const request = allRequests.find(r => r.id === requestId);
+    if (!request) return;
+    
+    document.getElementById('modal-title').textContent = request.title;
+    document.getElementById('request-id').value = request.id;
+    
+    const details = `
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-sm font-medium text-gray-500">Résidence</label>
+                <p class="mt-1 text-gray-900">${request.residence_name || '-'}</p>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-500">Demandeur</label>
+                <p class="mt-1 text-gray-900">${request.requester_name || '-'}</p>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-500">Catégorie</label>
+                <p class="mt-1 text-gray-900">${request.category || '-'}</p>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-500">Localisation</label>
+                <p class="mt-1 text-gray-900">${request.location || '-'}</p>
+            </div>
+            <div class="col-span-2">
+                <label class="text-sm font-medium text-gray-500">Description</label>
+                <p class="mt-1 text-gray-900">${request.description}</p>
+            </div>
+            <div>
+                <label class="text-sm font-medium text-gray-500">Créée le</label>
+                <p class="mt-1 text-gray-900">${MySindic.formatDate(request.created_at)}</p>
+            </div>
+            ${request.assigned_to ? `
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Assignée à</label>
+                    <p class="mt-1 text-gray-900">${request.assigned_to}</p>
+                </div>
+            ` : ''}
+            ${request.scheduled_date ? `
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Intervention prévue</label>
+                    <p class="mt-1 text-gray-900">${MySindic.formatDate(request.scheduled_date)}</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    document.getElementById('maintenance-details').innerHTML = details;
+    
+    document.getElementById('update-status').value = request.status;
+    document.getElementById('update-assigned').value = request.assigned_to || '';
+    document.getElementById('update-notes').value = request.admin_notes || '';
+    document.getElementById('update-resolution').value = request.resolution_notes || '';
+    
+    if (request.scheduled_date) {
+        const date = new Date(request.scheduled_date);
+        document.getElementById('update-scheduled').value = date.toISOString().slice(0, 16);
+    } else {
+        document.getElementById('update-scheduled').value = '';
+    }
+    
+    MySindic.openModal('maintenanceModal');
+}
+
+document.getElementById('updateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const requestId = document.getElementById('request-id').value;
+    const formData = {
+        status: document.getElementById('update-status').value,
+        assigned_to: document.getElementById('update-assigned').value,
+        scheduled_date: document.getElementById('update-scheduled').value || null,
+        admin_notes: document.getElementById('update-notes').value,
+        resolution_notes: document.getElementById('update-resolution').value
+    };
+    
+    try {
+        const response = await fetch(`/api/admin/maintenance/${requestId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast('Demande mise à jour', 'success');
+            MySindic.closeModal('maintenanceModal');
+            loadMaintenanceRequests();
+        } else {
+            MySindic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadMaintenanceRequests();
+});
+</script>
+{% endblock %}

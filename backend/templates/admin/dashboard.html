@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Tableau de Bord Administrateur</h1>
+            <p class="mt-2 text-sm text-gray-700">Vue d'ensemble de toutes vos copropriétés</p>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="stat-card">
+            <div class="stat-card-icon">🏢</div>
+            <div class="stat-card-title">Résidences</div>
+            <div class="stat-card-value" id="stat-residences">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-title">Charges en attente</div>
+            <div class="stat-card-value" id="stat-charges">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">🔧</div>
+            <div class="stat-card-title">Demandes maintenance</div>
+            <div class="stat-card-value" id="stat-maintenance">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">📊</div>
+            <div class="stat-card-title">Taux recouvrement</div>
+            <div class="stat-card-value" id="stat-recovery">-</div>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="card">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Demandes de maintenance récentes</h3>
+            <div id="recent-maintenance" class="space-y-3">
+                <div class="flex justify-center py-4">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Paiements récents</h3>
+            <div id="recent-payments" class="space-y-3">
+                <div class="flex justify-center py-4">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="card">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Actions rapides</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="{{ url_for('admin_residences') }}" class="btn-primary text-center">
+                    Gérer les résidences
+                </a>
+                <a href="{{ url_for('admin_finances') }}" class="btn-primary text-center">
+                    Créer une charge
+                </a>
+                <a href="{{ url_for('admin_maintenance') }}" class="btn-primary text-center">
+                    Voir la maintenance
+                </a>
+                <a href="{{ url_for('admin_users') }}" class="btn-primary text-center">
+                    Gérer les utilisateurs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function loadDashboardStats() {
+    try {
+        const response = await fetch('/api/admin/dashboard');
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.data;
+            document.getElementById('stat-residences').textContent = stats.total_residences || 0;
+            document.getElementById('stat-charges').textContent = MySindic.formatCurrency(stats.pending_charges || 0);
+            document.getElementById('stat-maintenance').textContent = stats.pending_maintenance || 0;
+            document.getElementById('stat-recovery').textContent = (stats.recovery_rate || 0) + '%';
+            
+            loadRecentMaintenance(stats.recent_maintenance || []);
+            loadRecentPayments(stats.recent_payments || []);
+        }
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+        MySindic.showToast('Erreur lors du chargement des statistiques', 'error');
+    }
+}
+
+function loadRecentMaintenance(requests) {
+    const container = document.getElementById('recent-maintenance');
+    if (requests.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune demande récente</p>';
+        return;
+    }
+    
+    container.innerHTML = requests.map(req => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+                <p class="font-medium text-gray-900">${req.title}</p>
+                <p class="text-sm text-gray-500">${req.residence_name}</p>
+            </div>
+            <span class="badge ${req.status === 'pending' ? 'badge-warning' : req.status === 'in_progress' ? 'badge-info' : 'badge-success'}">
+                ${req.status}
+            </span>
+        </div>
+    `).join('');
+}
+
+function loadRecentPayments(payments) {
+    const container = document.getElementById('recent-payments');
+    if (payments.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucun paiement récent</p>';
+        return;
+    }
+    
+    container.innerHTML = payments.map(payment => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+                <p class="font-medium text-gray-900">${payment.unit_name}</p>
+                <p class="text-sm text-gray-500">${MySindic.formatDate(payment.date)}</p>
+            </div>
+            <span class="font-semibold text-green-600">${MySindic.formatCurrency(payment.amount)}</span>
+        </div>
+    `).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboardStats();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Mes Demandes de Maintenance - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Mes Demandes de Maintenance</h1>
+            <p class="mt-2 text-sm text-gray-700">Créez et suivez vos demandes d'intervention</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button onclick="MySindic.openModal('createRequestModal')" class="btn-primary">
+                Nouvelle Demande
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div class="stat-card">
+            <div class="stat-card-icon">⏳</div>
+            <div class="stat-card-title">En attente</div>
+            <div class="stat-card-value" id="stat-pending">0</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">🔧</div>
+            <div class="stat-card-title">En cours</div>
+            <div class="stat-card-value" id="stat-progress">0</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon">✅</div>
+            <div class="stat-card-title">Terminées</div>
+            <div class="stat-card-value" id="stat-completed">0</div>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="card">
+            <div id="requests-list" class="space-y-4">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nouvelle Demande -->
+<div id="createRequestModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Nouvelle Demande de Maintenance</h2>
+                <button onclick="MySindic.closeModal('createRequestModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="requestForm" class="space-y-4">
+                <div>
+                    <label class="label-field">Titre de la demande *</label>
+                    <input type="text" id="request-title" class="input-field" required placeholder="Ex: Fuite d'eau dans la salle de bain">
+                </div>
+                
+                <div>
+                    <label class="label-field">Description détaillée *</label>
+                    <textarea id="request-description" class="input-field" rows="4" required placeholder="Décrivez le problème en détail..."></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Catégorie</label>
+                        <select id="request-category" class="input-field">
+                            <option value="">Sélectionner</option>
+                            <option value="plumbing">Plomberie</option>
+                            <option value="electrical">Électricité</option>
+                            <option value="heating">Chauffage</option>
+                            <option value="structure">Structure</option>
+                            <option value="common_area">Parties communes</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-field">Priorité *</label>
+                        <select id="request-priority" class="input-field" required>
+                            <option value="normal">Normale</option>
+                            <option value="high">Haute</option>
+                            <option value="urgent">Urgente</option>
+                            <option value="low">Basse</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label-field">Localisation</label>
+                    <input type="text" id="request-location" class="input-field" placeholder="Ex: Appartement A101, Salle de bain">
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex">
+                        <svg class="h-5 w-5 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                Votre demande sera traitée par l'administration. Vous recevrez une notification dès qu'un technicien sera assigné.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="MySindic.closeModal('createRequestModal')" class="btn-secondary">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Créer la demande
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails Demande -->
+<div id="detailsModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="details-title">Détails de la demande</h2>
+                <button onclick="MySindic.closeModal('detailsModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="request-details" class="space-y-4">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let myRequests = [];
+
+async function loadMyRequests() {
+    try {
+        const response = await fetch('/api/resident/maintenance');
+        const data = await response.json();
+        
+        if (data.success) {
+            myRequests = data.maintenance_requests;
+            updateStats();
+            displayRequests();
+        } else {
+            MySindic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function updateStats() {
+    const pending = myRequests.filter(r => r.status === 'pending').length;
+    const inProgress = myRequests.filter(r => r.status === 'in_progress').length;
+    const completed = myRequests.filter(r => r.status === 'completed').length;
+    
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-progress').textContent = inProgress;
+    document.getElementById('stat-completed').textContent = completed;
+}
+
+function displayRequests() {
+    const container = document.getElementById('requests-list');
+    
+    if (myRequests.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune demande</h3>
+                <p class="mt-1 text-sm text-gray-500">Commencez par créer une nouvelle demande de maintenance.</p>
+                <div class="mt-6">
+                    <button onclick="MySindic.openModal('createRequestModal')" class="btn-primary">
+                        Nouvelle Demande
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    const getStatusColor = (status) => {
+        switch(status) {
+            case 'pending': return 'badge-warning';
+            case 'in_progress': return 'badge-info';
+            case 'completed': return 'badge-success';
+            default: return 'badge-danger';
+        }
+    };
+    
+    const getPriorityIcon = (priority) => {
+        switch(priority) {
+            case 'urgent': return '🔴';
+            case 'high': return '🟡';
+            case 'normal': return '🟢';
+            default: return '⚪';
+        }
+    };
+    
+    container.innerHTML = myRequests.map(request => `
+        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="viewRequestDetails(${request.id})">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">${getPriorityIcon(request.priority)}</span>
+                        <h3 class="text-lg font-medium text-gray-900">${request.title}</h3>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">${request.description.substring(0, 100)}${request.description.length > 100 ? '...' : ''}</p>
+                    
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        ${request.category ? `<span class="badge badge-info">${request.category}</span>` : ''}
+                        ${request.location ? `<span class="text-xs text-gray-500">📍 ${request.location}</span>` : ''}
+                    </div>
+                </div>
+                
+                <div class="ml-4 flex flex-col items-end space-y-2">
+                    <span class="badge ${getStatusColor(request.status)}">${request.status}</span>
+                    <span class="text-xs text-gray-500">${MySindic.formatDate(request.created_at)}</span>
+                </div>
+            </div>
+            
+            ${request.assigned_to ? `
+                <div class="mt-3 pt-3 border-t border-gray-100">
+                    <p class="text-sm text-gray-600">
+                        <span class="font-medium">Assigné à:</span> ${request.assigned_to}
+                    </p>
+                    ${request.scheduled_date ? `
+                        <p class="text-sm text-gray-600 mt-1">
+                            <span class="font-medium">Intervention prévue:</span> ${MySindic.formatDate(request.scheduled_date)}
+                        </p>
+                    ` : ''}
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+async function viewRequestDetails(requestId) {
+    const request = myRequests.find(r => r.id === requestId);
+    if (!request) return;
+    
+    document.getElementById('details-title').textContent = request.title;
+    
+    const getStatusColor = (status) => {
+        switch(status) {
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'in_progress': return 'bg-blue-100 text-blue-800';
+            case 'completed': return 'bg-green-100 text-green-800';
+            default: return 'bg-red-100 text-red-800';
+        }
+    };
+    
+    const details = `
+        <div class="space-y-4">
+            <div>
+                <label class="text-sm font-medium text-gray-500">Statut</label>
+                <div class="mt-1">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}">
+                        ${request.status}
+                    </span>
+                </div>
+            </div>
+            
+            <div>
+                <label class="text-sm font-medium text-gray-500">Description</label>
+                <p class="mt-1 text-gray-900">${request.description}</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                ${request.category ? `
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Catégorie</label>
+                        <p class="mt-1 text-gray-900">${request.category}</p>
+                    </div>
+                ` : ''}
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Priorité</label>
+                    <p class="mt-1 text-gray-900">${request.priority}</p>
+                </div>
+                ${request.location ? `
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Localisation</label>
+                        <p class="mt-1 text-gray-900">${request.location}</p>
+                    </div>
+                ` : ''}
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Créée le</label>
+                    <p class="mt-1 text-gray-900">${MySindic.formatDate(request.created_at)}</p>
+                </div>
+            </div>
+            
+            ${request.assigned_to || request.scheduled_date ? `
+                <div class="border-t pt-4">
+                    <h4 class="font-medium text-gray-900 mb-3">Suivi</h4>
+                    ${request.assigned_to ? `
+                        <div class="mb-2">
+                            <label class="text-sm font-medium text-gray-500">Assigné à</label>
+                            <p class="mt-1 text-gray-900">${request.assigned_to}</p>
+                        </div>
+                    ` : ''}
+                    ${request.scheduled_date ? `
+                        <div>
+                            <label class="text-sm font-medium text-gray-500">Intervention prévue</label>
+                            <p class="mt-1 text-gray-900">${MySindic.formatDate(request.scheduled_date)}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
+            
+            ${request.admin_notes ? `
+                <div class="border-t pt-4">
+                    <label class="text-sm font-medium text-gray-500">Notes administrateur</label>
+                    <p class="mt-1 text-gray-900">${request.admin_notes}</p>
+                </div>
+            ` : ''}
+            
+            ${request.resolution_notes ? `
+                <div class="border-t pt-4">
+                    <label class="text-sm font-medium text-gray-500">Résolution</label>
+                    <p class="mt-1 text-gray-900">${request.resolution_notes}</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    document.getElementById('request-details').innerHTML = details;
+    MySindic.openModal('detailsModal');
+}
+
+document.getElementById('requestForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        title: document.getElementById('request-title').value,
+        description: document.getElementById('request-description').value,
+        category: document.getElementById('request-category').value,
+        priority: document.getElementById('request-priority').value,
+        location: document.getElementById('request-location').value
+    };
+    
+    try {
+        const response = await fetch('/api/resident/maintenance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast('Demande créée avec succès', 'success');
+            MySindic.closeModal('createRequestModal');
+            document.getElementById('requestForm').reset();
+            loadMyRequests();
+        } else {
+            MySindic.showToast(data.error || 'Erreur lors de la création', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadMyRequests();
+    
+    if (window.location.hash === '#new') {
+        MySindic.openModal('createRequestModal');
+    }
+});
+</script>
+{% endblock %}

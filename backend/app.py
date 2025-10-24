@@ -14,9 +14,10 @@ import sys
 # Ajouter le répertoire parent au PYTHONPATH
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, redirect, url_for
 from flask_cors import CORS
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required, current_user
+from functools import wraps
 from dotenv import load_dotenv
 
 # Charger les variables d'environnement
@@ -65,11 +66,114 @@ def create_app():
     # Enregistrer les blueprints (routes)
     register_blueprints(app)
     
+    # Décorateur pour vérifier que l'utilisateur est superadmin
+    def superadmin_required(f):
+        @wraps(f)
+        @login_required
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_superadmin:
+                return redirect(url_for('resident_dashboard'))
+            return f(*args, **kwargs)
+        return decorated_function
+    
     # Routes de base
     @app.route('/')
     def index():
         """Page d'accueil"""
+        if current_user.is_authenticated:
+            if current_user.is_superadmin:
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return redirect(url_for('resident_dashboard'))
         return render_template('index.html')
+    
+    # Routes Admin (pages HTML)
+    @app.route('/admin/dashboard')
+    @superadmin_required
+    def admin_dashboard():
+        """Dashboard administrateur"""
+        return render_template('admin/dashboard.html')
+    
+    @app.route('/admin/residences')
+    @superadmin_required
+    def admin_residences():
+        """Gestion des résidences"""
+        return render_template('admin/residences.html')
+    
+    @app.route('/admin/finances')
+    @superadmin_required
+    def admin_finances():
+        """Gestion financière"""
+        return render_template('admin/finances.html')
+    
+    @app.route('/admin/maintenance')
+    @superadmin_required
+    def admin_maintenance():
+        """Gestion de la maintenance"""
+        return render_template('admin/maintenance.html')
+    
+    @app.route('/admin/users')
+    @superadmin_required
+    def admin_users():
+        """Gestion des utilisateurs"""
+        return render_template('admin/users.html')
+    
+    @app.route('/admin/maintenance-log')
+    @superadmin_required
+    def admin_maintenance_log():
+        """Carnet d'entretien"""
+        return render_template('admin/maintenance_log.html')
+    
+    @app.route('/admin/assemblies')
+    @superadmin_required
+    def admin_assemblies():
+        """Gestion des assemblées générales"""
+        return render_template('admin/assemblies.html')
+    
+    @app.route('/admin/documents')
+    @superadmin_required
+    def admin_documents():
+        """Gestion des documents"""
+        return render_template('admin/documents.html')
+    
+    # Routes Résidents (pages HTML)
+    @app.route('/resident/dashboard')
+    @login_required
+    def resident_dashboard():
+        """Dashboard résident"""
+        if current_user.is_superadmin:
+            return redirect(url_for('admin_dashboard'))
+        return render_template('resident/dashboard.html')
+    
+    @app.route('/resident/maintenance')
+    @login_required
+    def resident_maintenance():
+        """Demandes de maintenance"""
+        return render_template('resident/maintenance.html')
+    
+    @app.route('/resident/finances')
+    @login_required
+    def resident_finances():
+        """Mes finances"""
+        return render_template('resident/finances.html')
+    
+    @app.route('/resident/news')
+    @login_required
+    def resident_news():
+        """Actualités"""
+        return render_template('resident/news.html')
+    
+    @app.route('/resident/assemblies')
+    @login_required
+    def resident_assemblies():
+        """Consultation des assemblées générales"""
+        return render_template('resident/assemblies.html')
+    
+    @app.route('/resident/documents')
+    @login_required
+    def resident_documents():
+        """Accès aux documents"""
+        return render_template('resident/documents.html')
     
     @app.route('/health')
     def health():

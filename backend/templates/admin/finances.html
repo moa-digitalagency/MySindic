@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion Financière - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">Gestion Financière</h1>
+            <p class="mt-2 text-sm text-gray-700">Charges et paiements des copropriétés</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button onclick="openCreateChargeModal()" class="btn-primary">
+                Nouvelle Charge
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="tab-list">
+            <button onclick="switchTab('charges')" id="tab-charges" class="tab-button tab-button-active">
+                Charges
+            </button>
+            <button onclick="switchTab('payments')" id="tab-payments" class="tab-button tab-button-inactive">
+                Paiements
+            </button>
+        </div>
+
+        <div id="tab-content-charges" class="card mt-4">
+            <div class="mb-4">
+                <label class="label-field">Filtrer par résidence</label>
+                <select id="filter-residence" class="input-field" onchange="loadCharges()">
+                    <option value="">Toutes les résidences</option>
+                </select>
+            </div>
+            <div id="charges-list" class="overflow-x-auto">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-content-payments" class="card mt-4 hidden">
+            <div id="payments-list" class="overflow-x-auto">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Créer Charge -->
+<div id="chargeModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Nouvelle Charge</h2>
+                <button onclick="MySindic.closeModal('chargeModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="chargeForm" class="space-y-4">
+                <div>
+                    <label class="label-field">Résidence *</label>
+                    <select id="charge-residence" class="input-field" required>
+                        <option value="">Sélectionner une résidence</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="label-field">Titre *</label>
+                    <input type="text" id="charge-title" class="input-field" required>
+                </div>
+                
+                <div>
+                    <label class="label-field">Description</label>
+                    <textarea id="charge-description" class="input-field" rows="3"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Type de charge *</label>
+                        <select id="charge-type" class="input-field" required>
+                            <option value="regular">Charges régulières</option>
+                            <option value="extraordinary">Charges extraordinaires</option>
+                            <option value="work">Travaux</option>
+                            <option value="maintenance">Entretien</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-field">Montant total *</label>
+                        <input type="number" id="charge-amount" class="input-field" step="0.01" required>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Année *</label>
+                        <input type="number" id="charge-year" class="input-field" required value="2025">
+                    </div>
+                    <div>
+                        <label class="label-field">Mois</label>
+                        <select id="charge-month" class="input-field">
+                            <option value="">-</option>
+                            <option value="1">Janvier</option>
+                            <option value="2">Février</option>
+                            <option value="3">Mars</option>
+                            <option value="4">Avril</option>
+                            <option value="5">Mai</option>
+                            <option value="6">Juin</option>
+                            <option value="7">Juillet</option>
+                            <option value="8">Août</option>
+                            <option value="9">Septembre</option>
+                            <option value="10">Octobre</option>
+                            <option value="11">Novembre</option>
+                            <option value="12">Décembre</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label-field">Date d'échéance</label>
+                    <input type="date" id="charge-due-date" class="input-field">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="MySindic.closeModal('chargeModal')" class="btn-secondary">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Créer (Brouillon)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let residences = [];
+let charges = [];
+let payments = [];
+
+async function loadResidences() {
+    try {
+        const response = await fetch('/api/admin/residences');
+        const data = await response.json();
+        
+        if (data.success) {
+            residences = data.residences;
+            
+            const filterSelect = document.getElementById('filter-residence');
+            const chargeSelect = document.getElementById('charge-residence');
+            
+            residences.forEach(r => {
+                filterSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+                chargeSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error loading residences:', error);
+    }
+}
+
+async function loadCharges() {
+    try {
+        const residenceId = document.getElementById('filter-residence').value;
+        const url = residenceId ? `/api/admin/charges?residence_id=${residenceId}` : '/api/admin/charges';
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            charges = data.charges;
+            displayCharges(charges);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function displayCharges(chargesList) {
+    const container = document.getElementById('charges-list');
+    
+    if (chargesList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucune charge trouvée</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Résidence</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>Période</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${chargesList.map(c => `
+                    <tr>
+                        <td>
+                            <div class="font-medium text-gray-900">${c.title}</div>
+                            ${c.description ? `<div class="text-sm text-gray-500">${c.description.substring(0, 50)}...</div>` : ''}
+                        </td>
+                        <td>${c.residence_name || '-'}</td>
+                        <td><span class="badge badge-info">${c.charge_type}</span></td>
+                        <td class="font-semibold">${MySindic.formatCurrency(c.total_amount)}</td>
+                        <td>${c.period_month ? c.period_month + '/' : ''}${c.period_year}</td>
+                        <td>
+                            <span class="badge ${c.status === 'published' ? 'badge-success' : 'badge-warning'}">
+                                ${c.status}
+                            </span>
+                        </td>
+                        <td>
+                            ${c.status === 'draft' ? 
+                                `<button onclick="publishCharge(${c.id})" class="text-green-600 hover:text-green-800">Publier</button>` :
+                                `<button onclick="viewDistributions(${c.id})" class="text-indigo-600 hover:text-indigo-800">Répartition</button>`
+                            }
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+async function loadPayments() {
+    try {
+        const response = await fetch('/api/admin/payments');
+        const data = await response.json();
+        
+        if (data.success) {
+            payments = data.payments;
+            displayPayments(payments);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function displayPayments(paymentsList) {
+    const container = document.getElementById('payments-list');
+    
+    if (paymentsList.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucun paiement trouvé</p>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Lot</th>
+                    <th>Montant</th>
+                    <th>Méthode</th>
+                    <th>Référence</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${paymentsList.map(p => `
+                    <tr>
+                        <td>${MySindic.formatDate(p.payment_date)}</td>
+                        <td>${p.unit_number || '-'}</td>
+                        <td class="font-semibold text-green-600">${MySindic.formatCurrency(p.amount)}</td>
+                        <td><span class="badge badge-info">${p.payment_method}</span></td>
+                        <td class="text-sm">${p.reference || '-'}</td>
+                        <td>
+                            <span class="badge ${p.status === 'validated' ? 'badge-success' : p.status === 'pending' ? 'badge-warning' : 'badge-danger'}">
+                                ${p.status}
+                            </span>
+                        </td>
+                        <td>
+                            ${p.status === 'pending' ? 
+                                `<button onclick="validatePayment(${p.id})" class="text-green-600 hover:text-green-800">Valider</button>` :
+                                '-'
+                            }
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('tab-button-active');
+        btn.classList.add('tab-button-inactive');
+    });
+    
+    document.getElementById(`tab-${tab}`).classList.remove('tab-button-inactive');
+    document.getElementById(`tab-${tab}`).classList.add('tab-button-active');
+    
+    document.getElementById('tab-content-charges').classList.toggle('hidden', tab !== 'charges');
+    document.getElementById('tab-content-payments').classList.toggle('hidden', tab !== 'payments');
+    
+    if (tab === 'payments' && payments.length === 0) {
+        loadPayments();
+    }
+}
+
+function openCreateChargeModal() {
+    document.getElementById('chargeForm').reset();
+    document.getElementById('charge-year').value = new Date().getFullYear();
+    MySindic.openModal('chargeModal');
+}
+
+async function publishCharge(chargeId) {
+    if (!confirm('Voulez-vous publier cette charge et calculer la répartition ?')) return;
+    
+    try {
+        const response = await fetch(`/api/admin/charges/${chargeId}/publish`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast('Charge publiée avec succès', 'success');
+            loadCharges();
+        } else {
+            MySindic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+async function validatePayment(paymentId) {
+    if (!confirm('Voulez-vous valider ce paiement ?')) return;
+    
+    try {
+        const response = await fetch(`/api/admin/payments/${paymentId}/validate`, {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast('Paiement validé', 'success');
+            loadPayments();
+        } else {
+            MySindic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function viewDistributions(chargeId) {
+    window.open(`/admin/charges/${chargeId}/distributions`, '_blank');
+}
+
+document.getElementById('chargeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        residence_id: parseInt(document.getElementById('charge-residence').value),
+        title: document.getElementById('charge-title').value,
+        description: document.getElementById('charge-description').value,
+        charge_type: document.getElementById('charge-type').value,
+        total_amount: parseFloat(document.getElementById('charge-amount').value),
+        period_year: parseInt(document.getElementById('charge-year').value),
+        period_month: document.getElementById('charge-month').value ? parseInt(document.getElementById('charge-month').value) : null,
+        due_date: document.getElementById('charge-due-date').value || null
+    };
+    
+    try {
+        const response = await fetch('/api/admin/charges', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast('Charge créée (brouillon)', 'success');
+            MySindic.closeModal('chargeModal');
+            loadCharges();
+        } else {
+            MySindic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadResidences();
+    loadCharges();
+});
+</script>
+{% endblock %}

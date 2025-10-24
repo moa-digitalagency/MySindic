@@ -1,0 +1,486 @@
+{% extends "base.html" %}
+
+{% block title %}Carnet d'Entretien - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div class="sm:flex-auto">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">Carnet d'Entretien</h1>
+            <p class="mt-2 text-sm text-gray-700">Historique complet des interventions sur vos résidences</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button onclick="MySindic.openModal('addLogModal')" class="btn-primary w-full sm:w-auto">
+                <span class="hidden sm:inline">Nouvelle intervention</span>
+                <span class="sm:hidden">+ Ajouter</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">🔧</div>
+            <div class="stat-card-title text-xs sm:text-sm">Total interventions</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-total">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">📅</div>
+            <div class="stat-card-title text-xs sm:text-sm">Ce mois</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-month">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">💰</div>
+            <div class="stat-card-title text-xs sm:text-sm">Coût total</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-cost">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">⏰</div>
+            <div class="stat-card-title text-xs sm:text-sm">À venir</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-upcoming">-</div>
+        </div>
+    </div>
+
+    <div class="mt-8 card">
+        <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <select id="filter-residence" class="input-field text-sm">
+                    <option value="">Toutes les résidences</option>
+                </select>
+                <select id="filter-type" class="input-field text-sm">
+                    <option value="">Tous les types</option>
+                    <option value="maintenance_preventive">Maintenance préventive</option>
+                    <option value="maintenance_corrective">Maintenance corrective</option>
+                    <option value="reparation">Réparation</option>
+                    <option value="controle">Contrôle</option>
+                    <option value="autre">Autre</option>
+                </select>
+                <select id="filter-category" class="input-field text-sm">
+                    <option value="">Toutes les catégories</option>
+                    <option value="plomberie">Plomberie</option>
+                    <option value="electricite">Électricité</option>
+                    <option value="chauffage">Chauffage</option>
+                    <option value="ascenseur">Ascenseur</option>
+                    <option value="toiture">Toiture</option>
+                    <option value="facade">Façade</option>
+                    <option value="autre">Autre</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto -mx-4 sm:mx-0">
+            <div class="inline-block min-w-full align-middle">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="px-3 py-3 sm:px-6">Date</th>
+                            <th class="px-3 py-3 sm:px-6 hidden sm:table-cell">Résidence</th>
+                            <th class="px-3 py-3 sm:px-6">Intervention</th>
+                            <th class="px-3 py-3 sm:px-6 hidden md:table-cell">Catégorie</th>
+                            <th class="px-3 py-3 sm:px-6 hidden lg:table-cell">Intervenant</th>
+                            <th class="px-3 py-3 sm:px-6">Coût</th>
+                            <th class="px-3 py-3 sm:px-6">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-table-body">
+                        <tr>
+                            <td colspan="7" class="text-center py-8">
+                                <div class="loading-spinner border-indigo-600 mx-auto"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="addLogModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-full sm:max-w-2xl lg:max-w-4xl m-4 max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 sm:py-6 z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Nouvelle Intervention</h3>
+                <button onclick="MySindic.closeModal('addLogModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <form id="addLogForm" class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div class="sm:col-span-2">
+                    <label class="label-field">Résidence</label>
+                    <select name="residence_id" required class="input-field">
+                        <option value="">Sélectionner une résidence</option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="label-field">Titre de l'intervention</label>
+                    <input type="text" name="title" required class="input-field" placeholder="Ex: Réparation ascenseur">
+                </div>
+
+                <div>
+                    <label class="label-field">Type d'intervention</label>
+                    <select name="intervention_type" required class="input-field">
+                        <option value="maintenance_preventive">Maintenance préventive</option>
+                        <option value="maintenance_corrective">Maintenance corrective</option>
+                        <option value="reparation">Réparation</option>
+                        <option value="controle">Contrôle</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label-field">Catégorie</label>
+                    <select name="category" required class="input-field">
+                        <option value="plomberie">Plomberie</option>
+                        <option value="electricite">Électricité</option>
+                        <option value="chauffage">Chauffage</option>
+                        <option value="ascenseur">Ascenseur</option>
+                        <option value="toiture">Toiture</option>
+                        <option value="facade">Façade</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="label-field">Description</label>
+                    <textarea name="description" required rows="3" class="input-field" placeholder="Décrire l'intervention..."></textarea>
+                </div>
+
+                <div>
+                    <label class="label-field">Nom de l'intervenant</label>
+                    <input type="text" name="contractor_name" required class="input-field" placeholder="Nom de l'entreprise">
+                </div>
+
+                <div>
+                    <label class="label-field">Contact intervenant</label>
+                    <input type="text" name="contractor_contact" class="input-field" placeholder="Téléphone ou email">
+                </div>
+
+                <div>
+                    <label class="label-field">Date d'intervention</label>
+                    <input type="date" name="intervention_date" required class="input-field">
+                </div>
+
+                <div>
+                    <label class="label-field">Prochaine intervention (optionnel)</label>
+                    <input type="date" name="next_intervention_date" class="input-field">
+                </div>
+
+                <div>
+                    <label class="label-field">Coût (MAD)</label>
+                    <input type="number" name="cost" step="0.01" class="input-field" placeholder="0.00">
+                </div>
+
+                <div>
+                    <label class="label-field">N° Facture (optionnel)</label>
+                    <input type="text" name="invoice_number" class="input-field" placeholder="FACT-2025-001">
+                </div>
+
+                <div>
+                    <label class="label-field">Lieu</label>
+                    <input type="text" name="location" class="input-field" placeholder="Ex: Hall d'entrée">
+                </div>
+
+                <div>
+                    <label class="label-field">Fin de garantie (optionnel)</label>
+                    <input type="date" name="warranty_end_date" class="input-field">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="label-field">Notes complémentaires</label>
+                    <textarea name="notes" rows="2" class="input-field" placeholder="Notes additionnelles..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                <button type="button" onclick="MySindic.closeModal('addLogModal')" class="btn-secondary">
+                    Annuler
+                </button>
+                <button type="submit" class="btn-primary">
+                    Enregistrer l'intervention
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="viewLogModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-full sm:max-w-2xl m-4 max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900" id="view-log-title">Détails de l'intervention</h3>
+                <button onclick="MySindic.closeModal('viewLogModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="view-log-content" class="p-4 sm:p-6">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allLogs = [];
+let residences = [];
+
+async function loadMaintenanceLogs() {
+    try {
+        const [logsResponse, residencesResponse] = await Promise.all([
+            fetch('/api/admin/maintenance-logs'),
+            fetch('/api/admin/residences')
+        ]);
+        
+        const logsData = await logsResponse.json();
+        const residencesData = await residencesResponse.json();
+        
+        if (logsData.success && residencesData.success) {
+            allLogs = logsData.data || [];
+            residences = residencesData.data || [];
+            
+            updateStats();
+            populateResidenceFilters();
+            renderLogs(allLogs);
+        }
+    } catch (error) {
+        console.error('Error loading logs:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function updateStats() {
+    const now = new Date();
+    const thisMonth = allLogs.filter(log => {
+        const logDate = new Date(log.intervention_date);
+        return logDate.getMonth() === now.getMonth() && logDate.getFullYear() === now.getFullYear();
+    });
+    
+    const totalCost = allLogs.reduce((sum, log) => sum + (parseFloat(log.cost) || 0), 0);
+    const upcoming = allLogs.filter(log => log.next_intervention_date && new Date(log.next_intervention_date) > now);
+    
+    document.getElementById('stat-total').textContent = allLogs.length;
+    document.getElementById('stat-month').textContent = thisMonth.length;
+    document.getElementById('stat-cost').textContent = MySindic.formatCurrency(totalCost);
+    document.getElementById('stat-upcoming').textContent = upcoming.length;
+}
+
+function populateResidenceFilters() {
+    const selects = document.querySelectorAll('select[name="residence_id"], #filter-residence');
+    selects.forEach(select => {
+        const isFilter = select.id === 'filter-residence';
+        select.innerHTML = isFilter ? '<option value="">Toutes les résidences</option>' : '<option value="">Sélectionner une résidence</option>';
+        residences.forEach(res => {
+            select.innerHTML += `<option value="${res.id}">${res.name}</option>`;
+        });
+    });
+}
+
+function renderLogs(logs) {
+    const tbody = document.getElementById('logs-table-body');
+    
+    if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">Aucune intervention enregistrée</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = logs.map(log => {
+        const residence = residences.find(r => r.id === log.residence_id);
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm">${MySindic.formatDate(log.intervention_date)}</td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden sm:table-cell">${residence ? residence.name : '-'}</td>
+                <td class="px-3 py-4 sm:px-6">
+                    <div class="text-xs sm:text-sm font-medium text-gray-900">${log.title}</div>
+                    <div class="text-xs text-gray-500 sm:hidden">${residence ? residence.name : '-'}</div>
+                    <div class="text-xs text-gray-500 md:hidden mt-1">
+                        <span class="badge badge-info">${getCategoryLabel(log.category)}</span>
+                    </div>
+                </td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden md:table-cell">
+                    <span class="badge badge-info">${getCategoryLabel(log.category)}</span>
+                </td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden lg:table-cell">${log.contractor_name}</td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-900">
+                    ${log.cost ? MySindic.formatCurrency(log.cost) : '-'}
+                </td>
+                <td class="px-3 py-4 sm:px-6">
+                    <button onclick="viewLog(${log.id})" class="text-indigo-600 hover:text-indigo-800 text-xs sm:text-sm">
+                        Voir
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function getCategoryLabel(category) {
+    const labels = {
+        'plomberie': 'Plomberie',
+        'electricite': 'Électricité',
+        'chauffage': 'Chauffage',
+        'ascenseur': 'Ascenseur',
+        'toiture': 'Toiture',
+        'facade': 'Façade',
+        'autre': 'Autre'
+    };
+    return labels[category] || category;
+}
+
+function getTypeLabel(type) {
+    const labels = {
+        'maintenance_preventive': 'Maintenance préventive',
+        'maintenance_corrective': 'Maintenance corrective',
+        'reparation': 'Réparation',
+        'controle': 'Contrôle',
+        'autre': 'Autre'
+    };
+    return labels[type] || type;
+}
+
+async function viewLog(logId) {
+    const log = allLogs.find(l => l.id === logId);
+    if (!log) return;
+    
+    const residence = residences.find(r => r.id === log.residence_id);
+    
+    document.getElementById('view-log-title').textContent = log.title;
+    document.getElementById('view-log-content').innerHTML = `
+        <div class="space-y-4 text-sm sm:text-base">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Résidence</p>
+                    <p class="font-medium">${residence ? residence.name : '-'}</p>
+                </div>
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Date d'intervention</p>
+                    <p class="font-medium">${MySindic.formatDate(log.intervention_date)}</p>
+                </div>
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Type</p>
+                    <p class="font-medium">${getTypeLabel(log.intervention_type)}</p>
+                </div>
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Catégorie</p>
+                    <p class="font-medium">${getCategoryLabel(log.category)}</p>
+                </div>
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Intervenant</p>
+                    <p class="font-medium">${log.contractor_name}</p>
+                </div>
+                ${log.contractor_contact ? `
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Contact</p>
+                    <p class="font-medium">${log.contractor_contact}</p>
+                </div>
+                ` : ''}
+                ${log.location ? `
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Lieu</p>
+                    <p class="font-medium">${log.location}</p>
+                </div>
+                ` : ''}
+                ${log.cost ? `
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Coût</p>
+                    <p class="font-medium text-lg">${MySindic.formatCurrency(log.cost)}</p>
+                </div>
+                ` : ''}
+                ${log.invoice_number ? `
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">N° Facture</p>
+                    <p class="font-medium">${log.invoice_number}</p>
+                </div>
+                ` : ''}
+                ${log.next_intervention_date ? `
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Prochaine intervention</p>
+                    <p class="font-medium">${MySindic.formatDate(log.next_intervention_date)}</p>
+                </div>
+                ` : ''}
+                ${log.warranty_end_date ? `
+                <div>
+                    <p class="text-xs sm:text-sm text-gray-500">Fin de garantie</p>
+                    <p class="font-medium">${MySindic.formatDate(log.warranty_end_date)}</p>
+                </div>
+                ` : ''}
+            </div>
+            <div>
+                <p class="text-xs sm:text-sm text-gray-500 mb-2">Description</p>
+                <p class="text-gray-700">${log.description}</p>
+            </div>
+            ${log.notes ? `
+            <div>
+                <p class="text-xs sm:text-sm text-gray-500 mb-2">Notes</p>
+                <p class="text-gray-700">${log.notes}</p>
+            </div>
+            ` : ''}
+        </div>
+    `;
+    
+    MySindic.openModal('viewLogModal');
+}
+
+document.getElementById('addLogForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await fetch('/api/admin/maintenance-logs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            MySindic.showToast('Intervention enregistrée avec succès', 'success');
+            MySindic.closeModal('addLogModal');
+            e.target.reset();
+            loadMaintenanceLogs();
+        } else {
+            MySindic.showToast(result.message || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors de l\'enregistrement', 'error');
+    }
+});
+
+['filter-residence', 'filter-type', 'filter-category'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        let filtered = allLogs;
+        
+        const residenceId = document.getElementById('filter-residence').value;
+        if (residenceId) {
+            filtered = filtered.filter(log => log.residence_id == residenceId);
+        }
+        
+        const type = document.getElementById('filter-type').value;
+        if (type) {
+            filtered = filtered.filter(log => log.intervention_type === type);
+        }
+        
+        const category = document.getElementById('filter-category').value;
+        if (category) {
+            filtered = filtered.filter(log => log.category === category);
+        }
+        
+        renderLogs(filtered);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadMaintenanceLogs();
+});
+</script>
+{% endblock %}

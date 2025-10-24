@@ -1,0 +1,551 @@
+{% extends "base.html" %}
+
+{% block title %}Assemblées Générales - MySindic{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div class="sm:flex-auto">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-900">Assemblées Générales</h1>
+            <p class="mt-2 text-sm text-gray-700">Gestion des AG et des résolutions</p>
+        </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button onclick="MySindic.openModal('addAssemblyModal')" class="btn-primary w-full sm:w-auto">
+                <span class="hidden sm:inline">Nouvelle assemblée</span>
+                <span class="sm:hidden">+ Ajouter</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">📋</div>
+            <div class="stat-card-title text-xs sm:text-sm">Total AG</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-total">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">📅</div>
+            <div class="stat-card-title text-xs sm:text-sm">Planifiées</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-planned">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">✅</div>
+            <div class="stat-card-title text-xs sm:text-sm">Terminées</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-completed">-</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-card-icon text-2xl sm:text-4xl">🗳️</div>
+            <div class="stat-card-title text-xs sm:text-sm">Résolutions</div>
+            <div class="stat-card-value text-xl sm:text-3xl" id="stat-resolutions">-</div>
+        </div>
+    </div>
+
+    <div class="mt-8 card">
+        <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <select id="filter-residence" class="input-field text-sm">
+                    <option value="">Toutes les résidences</option>
+                </select>
+                <select id="filter-status" class="input-field text-sm">
+                    <option value="">Tous les statuts</option>
+                    <option value="planned">Planifiée</option>
+                    <option value="in_progress">En cours</option>
+                    <option value="completed">Terminée</option>
+                    <option value="cancelled">Annulée</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto -mx-4 sm:mx-0">
+            <div class="inline-block min-w-full align-middle">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="px-3 py-3 sm:px-6">Date</th>
+                            <th class="px-3 py-3 sm:px-6 hidden sm:table-cell">Résidence</th>
+                            <th class="px-3 py-3 sm:px-6">Assemblée</th>
+                            <th class="px-3 py-3 sm:px-6 hidden md:table-cell">Type</th>
+                            <th class="px-3 py-3 sm:px-6">Statut</th>
+                            <th class="px-3 py-3 sm:px-6 hidden lg:table-cell">Résolutions</th>
+                            <th class="px-3 py-3 sm:px-6">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assemblies-table-body">
+                        <tr>
+                            <td colspan="7" class="text-center py-8">
+                                <div class="loading-spinner border-indigo-600 mx-auto"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="addAssemblyModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-full sm:max-w-2xl lg:max-w-4xl m-4 max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Nouvelle Assemblée Générale</h3>
+                <button onclick="MySindic.closeModal('addAssemblyModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <form id="addAssemblyForm" class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div class="sm:col-span-2">
+                    <label class="label-field">Résidence</label>
+                    <select name="residence_id" required class="input-field">
+                        <option value="">Sélectionner une résidence</option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="label-field">Titre de l'assemblée</label>
+                    <input type="text" name="title" required class="input-field" placeholder="Ex: AG Ordinaire 2025">
+                </div>
+
+                <div>
+                    <label class="label-field">Type d'assemblée</label>
+                    <select name="assembly_type" required class="input-field">
+                        <option value="ordinaire">Ordinaire</option>
+                        <option value="extraordinaire">Extraordinaire</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label-field">Quorum requis (%)</label>
+                    <input type="number" name="quorum_required" value="50" min="0" max="100" required class="input-field">
+                </div>
+
+                <div>
+                    <label class="label-field">Date et heure</label>
+                    <input type="datetime-local" name="scheduled_date" required class="input-field">
+                </div>
+
+                <div>
+                    <label class="label-field">Lieu</label>
+                    <input type="text" name="location" class="input-field" placeholder="Ex: Salle des fêtes">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="label-field">Description / Ordre du jour</label>
+                    <textarea name="description" rows="4" class="input-field" placeholder="Décrire l'ordre du jour..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                <button type="button" onclick="MySindic.closeModal('addAssemblyModal')" class="btn-secondary">
+                    Annuler
+                </button>
+                <button type="submit" class="btn-primary">
+                    Créer l'assemblée
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="viewAssemblyModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-full sm:max-w-4xl m-4 max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900" id="view-assembly-title">Détails de l'assemblée</h3>
+                <button onclick="MySindic.closeModal('viewAssemblyModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="view-assembly-content" class="p-4 sm:p-6">
+        </div>
+    </div>
+</div>
+
+<div id="addResolutionModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-full sm:max-w-lg m-4 max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Nouvelle Résolution</h3>
+                <button onclick="MySindic.closeModal('addResolutionModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <form id="addResolutionForm" class="p-4 sm:p-6">
+            <input type="hidden" name="assembly_id" id="resolution-assembly-id">
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="label-field">Titre de la résolution</label>
+                    <input type="text" name="title" required class="input-field" placeholder="Ex: Approbation des comptes">
+                </div>
+
+                <div>
+                    <label class="label-field">Description</label>
+                    <textarea name="description" rows="3" class="input-field" placeholder="Décrire la résolution..."></textarea>
+                </div>
+
+                <div>
+                    <label class="label-field">Type de vote</label>
+                    <select name="vote_type" required class="input-field">
+                        <option value="simple">Majorité simple</option>
+                        <option value="double_majorite">Double majorité</option>
+                        <option value="unanimite">Unanimité</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label-field">Ordre dans l'ordre du jour</label>
+                    <input type="number" name="order" value="1" min="1" required class="input-field">
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                <button type="button" onclick="MySindic.closeModal('addResolutionModal')" class="btn-secondary">
+                    Annuler
+                </button>
+                <button type="submit" class="btn-primary">
+                    Ajouter la résolution
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allAssemblies = [];
+let residences = [];
+let currentAssembly = null;
+
+async function loadAssemblies() {
+    try {
+        const [assembliesResponse, residencesResponse] = await Promise.all([
+            fetch('/api/admin/assemblies'),
+            fetch('/api/admin/residences')
+        ]);
+        
+        const assembliesData = await assembliesResponse.json();
+        const residencesData = await residencesResponse.json();
+        
+        if (assembliesData.success && residencesData.success) {
+            allAssemblies = assembliesData.data || [];
+            residences = residencesData.data || [];
+            
+            updateStats();
+            populateResidenceFilters();
+            renderAssemblies(allAssemblies);
+        }
+    } catch (error) {
+        console.error('Error loading assemblies:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function updateStats() {
+    const planned = allAssemblies.filter(a => a.status === 'planned').length;
+    const completed = allAssemblies.filter(a => a.status === 'completed').length;
+    const totalResolutions = allAssemblies.reduce((sum, a) => sum + (a.resolutions?.length || 0), 0);
+    
+    document.getElementById('stat-total').textContent = allAssemblies.length;
+    document.getElementById('stat-planned').textContent = planned;
+    document.getElementById('stat-completed').textContent = completed;
+    document.getElementById('stat-resolutions').textContent = totalResolutions;
+}
+
+function populateResidenceFilters() {
+    const selects = document.querySelectorAll('select[name="residence_id"], #filter-residence');
+    selects.forEach(select => {
+        const isFilter = select.id === 'filter-residence';
+        select.innerHTML = isFilter ? '<option value="">Toutes les résidences</option>' : '<option value="">Sélectionner une résidence</option>';
+        residences.forEach(res => {
+            select.innerHTML += `<option value="${res.id}">${res.name}</option>`;
+        });
+    });
+}
+
+function renderAssemblies(assemblies) {
+    const tbody = document.getElementById('assemblies-table-body');
+    
+    if (assemblies.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">Aucune assemblée enregistrée</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = assemblies.map(assembly => {
+        const residence = residences.find(r => r.id === assembly.residence_id);
+        const resolutionCount = assembly.resolutions?.length || 0;
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm">${MySindic.formatDate(assembly.scheduled_date)}</td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden sm:table-cell">${residence ? residence.name : '-'}</td>
+                <td class="px-3 py-4 sm:px-6">
+                    <div class="text-xs sm:text-sm font-medium text-gray-900">${assembly.title}</div>
+                    <div class="text-xs text-gray-500 sm:hidden">${residence ? residence.name : '-'}</div>
+                    <div class="text-xs text-gray-500 md:hidden mt-1">
+                        <span class="badge badge-info">${getTypeLabel(assembly.assembly_type)}</span>
+                    </div>
+                </td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden md:table-cell">
+                    <span class="badge badge-info">${getTypeLabel(assembly.assembly_type)}</span>
+                </td>
+                <td class="px-3 py-4 sm:px-6">
+                    ${getStatusBadge(assembly.status)}
+                </td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden lg:table-cell">
+                    ${resolutionCount}
+                </td>
+                <td class="px-3 py-4 sm:px-6">
+                    <button onclick="viewAssembly(${assembly.id})" class="text-indigo-600 hover:text-indigo-800 text-xs sm:text-sm">
+                        Voir
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function getTypeLabel(type) {
+    const labels = {
+        'ordinaire': 'Ordinaire',
+        'extraordinaire': 'Extraordinaire'
+    };
+    return labels[type] || type;
+}
+
+function getStatusBadge(status) {
+    const badges = {
+        'planned': '<span class="badge badge-warning text-xs">Planifiée</span>',
+        'in_progress': '<span class="badge badge-info text-xs">En cours</span>',
+        'completed': '<span class="badge badge-success text-xs">Terminée</span>',
+        'cancelled': '<span class="badge badge-danger text-xs">Annulée</span>'
+    };
+    return badges[status] || status;
+}
+
+async function viewAssembly(assemblyId) {
+    try {
+        const response = await fetch(`/api/admin/assemblies/${assemblyId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            currentAssembly = data.data;
+            const residence = residences.find(r => r.id === currentAssembly.residence_id);
+            const resolutions = currentAssembly.resolutions || [];
+            
+            document.getElementById('view-assembly-title').textContent = currentAssembly.title;
+            document.getElementById('view-assembly-content').innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Résidence</p>
+                            <p class="font-medium">${residence ? residence.name : '-'}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Date</p>
+                            <p class="font-medium">${MySindic.formatDate(currentAssembly.scheduled_date)}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Type</p>
+                            <p class="font-medium">${getTypeLabel(currentAssembly.assembly_type)}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Statut</p>
+                            ${getStatusBadge(currentAssembly.status)}
+                        </div>
+                        ${currentAssembly.location ? `
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Lieu</p>
+                            <p class="font-medium">${currentAssembly.location}</p>
+                        </div>
+                        ` : ''}
+                        <div>
+                            <p class="text-xs sm:text-sm text-gray-500">Quorum requis</p>
+                            <p class="font-medium">${currentAssembly.quorum_required}%</p>
+                        </div>
+                    </div>
+                    
+                    ${currentAssembly.description ? `
+                    <div>
+                        <p class="text-xs sm:text-sm text-gray-500 mb-2">Ordre du jour</p>
+                        <p class="text-gray-700 text-sm sm:text-base">${currentAssembly.description}</p>
+                    </div>
+                    ` : ''}
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-base sm:text-lg font-semibold">Résolutions (${resolutions.length})</h4>
+                            ${currentAssembly.status !== 'completed' ? `
+                            <button onclick="openAddResolution(${currentAssembly.id})" class="btn-primary text-xs sm:text-sm px-3 py-1.5">
+                                + Ajouter
+                            </button>
+                            ` : ''}
+                        </div>
+                        
+                        ${resolutions.length === 0 ? `
+                        <p class="text-gray-500 text-center py-4 text-sm">Aucune résolution ajoutée</p>
+                        ` : `
+                        <div class="space-y-3">
+                            ${resolutions.map((res, index) => `
+                                <div class="border rounded-lg p-3 sm:p-4 bg-gray-50">
+                                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                                        <div class="flex-1">
+                                            <p class="font-medium text-sm sm:text-base">${index + 1}. ${res.title}</p>
+                                            ${res.description ? `<p class="text-xs sm:text-sm text-gray-600 mt-1">${res.description}</p>` : ''}
+                                            <p class="text-xs text-gray-500 mt-2">Type: ${getVoteTypeLabel(res.vote_type)}</p>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            ${getResolutionStatusBadge(res.status)}
+                                        </div>
+                                    </div>
+                                    ${res.status === 'approved' || res.status === 'rejected' ? `
+                                    <div class="mt-3 pt-3 border-t text-xs sm:text-sm">
+                                        <div class="grid grid-cols-3 gap-2 sm:gap-4">
+                                            <div class="text-center">
+                                                <p class="text-green-600 font-semibold">${res.votes_for || 0}</p>
+                                                <p class="text-gray-500">Pour</p>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-red-600 font-semibold">${res.votes_against || 0}</p>
+                                                <p class="text-gray-500">Contre</p>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-gray-600 font-semibold">${res.votes_abstain || 0}</p>
+                                                <p class="text-gray-500">Abstention</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        `}
+                    </div>
+                </div>
+            `;
+            
+            MySindic.openModal('viewAssemblyModal');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors du chargement', 'error');
+    }
+}
+
+function getVoteTypeLabel(type) {
+    const labels = {
+        'simple': 'Majorité simple',
+        'double_majorite': 'Double majorité',
+        'unanimite': 'Unanimité'
+    };
+    return labels[type] || type;
+}
+
+function getResolutionStatusBadge(status) {
+    const badges = {
+        'pending': '<span class="badge badge-warning text-xs">En attente</span>',
+        'voting': '<span class="badge badge-info text-xs">Vote en cours</span>',
+        'approved': '<span class="badge badge-success text-xs">Approuvée</span>',
+        'rejected': '<span class="badge badge-danger text-xs">Rejetée</span>'
+    };
+    return badges[status] || status;
+}
+
+function openAddResolution(assemblyId) {
+    document.getElementById('resolution-assembly-id').value = assemblyId;
+    MySindic.closeModal('viewAssemblyModal');
+    MySindic.openModal('addResolutionModal');
+}
+
+document.getElementById('addAssemblyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await fetch('/api/admin/assemblies', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            MySindic.showToast('Assemblée créée avec succès', 'success');
+            MySindic.closeModal('addAssemblyModal');
+            e.target.reset();
+            loadAssemblies();
+        } else {
+            MySindic.showToast(result.message || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors de la création', 'error');
+    }
+});
+
+document.getElementById('addResolutionForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await fetch('/api/admin/resolutions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            MySindic.showToast('Résolution ajoutée avec succès', 'success');
+            MySindic.closeModal('addResolutionModal');
+            e.target.reset();
+            loadAssemblies();
+            if (currentAssembly) {
+                viewAssembly(currentAssembly.id);
+            }
+        } else {
+            MySindic.showToast(result.message || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors de l\'ajout', 'error');
+    }
+});
+
+['filter-residence', 'filter-status'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        let filtered = allAssemblies;
+        
+        const residenceId = document.getElementById('filter-residence').value;
+        if (residenceId) {
+            filtered = filtered.filter(a => a.residence_id == residenceId);
+        }
+        
+        const status = document.getElementById('filter-status').value;
+        if (status) {
+            filtered = filtered.filter(a => a.status === status);
+        }
+        
+        renderAssemblies(filtered);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadAssemblies();
+});
+</script>
+{% endblock %}
