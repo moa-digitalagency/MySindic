@@ -623,22 +623,25 @@
             </div>
             
             <div id="division-config" class="division-config" style="display: none;">
-                <h3 class="division-config-title">Configuration de la découpe</h3>
+                <h3 class="division-config-title">📋 Configuration de la découpe</h3>
+                <p class="text-gray-600 mb-4 text-sm">Personnalisez le nombre et la nomenclature de vos divisions</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">Nombre de <span id="division-label">divisions</span> <span class="required">*</span></label>
-                        <input type="number" id="division_count" class="form-input" min="1" max="50" value="1" onchange="updateDivisionPreview()">
+                        <input type="number" id="division_count" class="form-input" min="1" max="50" value="3" onchange="updateDivisionPreview()">
+                        <p class="form-hint">Combien de divisions dans votre résidence ?</p>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Préfixe de nomenclature</label>
-                        <input type="text" id="division_prefix" class="form-input" placeholder="Ex: A, B, C..." value="A" onchange="updateDivisionPreview()">
+                        <input type="text" id="division_prefix" class="form-input" placeholder="Ex: IMM, BAT..." value="A" onchange="updateDivisionPreview()">
+                        <p class="form-hint">Préfixe pour nommer vos divisions</p>
                     </div>
                 </div>
                 
                 <div class="nomenclature-preview">
-                    <p class="preview-label">Aperçu de la nomenclature :</p>
-                    <p class="preview-text" id="nomenclature-preview"></p>
+                    <p class="preview-label">📝 Aperçu de la nomenclature :</p>
+                    <p class="preview-text" id="nomenclature-preview">A1, A2, A3</p>
                 </div>
             </div>
         </div>
@@ -808,9 +811,19 @@ function saveStepData(step) {
             break;
             
         case 2:
-            const divCount = parseInt(document.getElementById('division_count').value);
-            const prefix = document.getElementById('division_prefix').value;
+            const divCountEl = document.getElementById('division_count');
+            const prefixEl = document.getElementById('division_prefix');
+            
+            if (!divCountEl || !prefixEl) {
+                console.error('Division count or prefix element not found');
+                return;
+            }
+            
+            const divCount = parseInt(divCountEl.value) || 1;
+            const prefix = prefixEl.value || 'A';
             wizardData.divisions = [];
+            
+            console.log('Saving divisions:', { divCount, prefix, divisionType: wizardData.divisionType });
             
             for (let i = 0; i < divCount; i++) {
                 wizardData.divisions.push({
@@ -818,6 +831,8 @@ function saveStepData(step) {
                     type: wizardData.divisionType
                 });
             }
+            
+            console.log('Divisions saved:', wizardData.divisions);
             break;
     }
 }
@@ -843,7 +858,38 @@ function selectDivisionType(type) {
     };
     document.getElementById('division-label').textContent = labels[type] || 'divisions';
     
+    // Set default values based on type
+    const divCountEl = document.getElementById('division_count');
+    const prefixEl = document.getElementById('division_prefix');
+    
+    if (divCountEl && !divCountEl.value) {
+        divCountEl.value = 3; // Default to 3 divisions
+    }
+    
+    // Set appropriate prefix based on type
+    if (prefixEl) {
+        switch(type) {
+            case 'lot':
+                prefixEl.value = 'LOT';
+                break;
+            case 'immeuble':
+                prefixEl.value = 'IMM';
+                break;
+            case 'batiment':
+                prefixEl.value = 'BAT';
+                break;
+            case 'zone':
+                prefixEl.value = 'ZONE';
+                break;
+        }
+    }
+    
     updateDivisionPreview();
+    
+    // Scroll to configuration
+    setTimeout(() => {
+        config.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
 }
 
 function updateDivisionPreview() {
@@ -866,8 +912,10 @@ function updateDivisionPreview() {
 function loadUnitsConfiguration() {
     const container = document.getElementById('units-configuration');
     
+    console.log('Loading units configuration. Divisions:', wizardData.divisions);
+    
     if (wizardData.divisions.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune division configurée</p>';
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune division configurée. Veuillez retourner à l\'étape 2.</p>';
         return;
     }
     
