@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends "admin/admin_base.html" %}
 
 {% block title %}Gestion des Utilisateurs - MySindic{% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -144,7 +144,7 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block admin_extra_js %}
 <script>
 let allUsers = [];
 let residences = [];
