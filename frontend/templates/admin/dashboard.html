@@ -369,8 +369,8 @@
                 <span class="badge" id="notification-count">0</span>
             </button>
             <button class="user-profile-btn">
-                <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
-                <span class="user-name">{{ current_user.username }}</span>
+                <div class="user-avatar">{{ current_user.first_name[0].upper() }}</div>
+                <span class="user-name">{{ current_user.first_name }} {{ current_user.last_name }}</span>
             </button>
         </div>
     </div>
