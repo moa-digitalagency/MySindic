@@ -2,28 +2,81 @@
 
 {% block title %}Créer une Résidence - MySindic{% endblock %}
 
-{% block extra_head %}
+{% block extra_css %}
 <style>
-    .wizard-container {
-        max-width: 900px;
-        margin: 0 auto;
+    body {
+        background: #f5f7fa;
     }
     
+    /* Modern Header */
+    .wizard-header {
+        background: white;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .wizard-header-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .back-link:hover {
+        gap: 0.75rem;
+    }
+    
+    .wizard-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .wizard-subtitle {
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+    
+    /* Wizard Container */
+    .wizard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem 3rem;
+    }
+    
+    /* Steps Indicator */
     .wizard-steps {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 48px;
+        margin-bottom: 2.5rem;
         position: relative;
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
     .wizard-steps::before {
         content: '';
         position: absolute;
-        top: 20px;
-        left: 0;
-        right: 0;
+        top: 45px;
+        left: 8%;
+        right: 8%;
         height: 2px;
-        background: #E5E7EB;
+        background: #e5e7eb;
         z-index: 0;
     }
     
@@ -34,57 +87,69 @@
         position: relative;
         z-index: 1;
         flex: 1;
+        background: white;
     }
     
     .step-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #E5E7EB;
-        color: #9CA3AF;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: #f3f4f6;
+        color: #9ca3af;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600;
-        margin-bottom: 8px;
+        font-weight: 700;
+        font-size: 1.125rem;
+        margin-bottom: 0.75rem;
         transition: all 0.3s ease;
+        border: 2px solid transparent;
     }
     
     .wizard-step.active .step-circle {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #2563eb;
         color: white;
-        transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+        border-color: #2563eb;
     }
     
     .wizard-step.completed .step-circle {
-        background: #10B981;
+        background: #10b981;
         color: white;
+        border-color: #10b981;
     }
     
     .step-label {
-        font-size: 13px;
-        color: #6B7280;
+        font-size: 0.875rem;
+        color: #6b7280;
         text-align: center;
-        max-width: 120px;
+        max-width: 140px;
+        font-weight: 500;
     }
     
     .wizard-step.active .step-label {
-        color: #667eea;
+        color: #2563eb;
         font-weight: 600;
     }
     
+    .wizard-step.completed .step-label {
+        color: #10b981;
+        font-weight: 600;
+    }
+    
+    /* Wizard Content */
     .wizard-content {
         background: white;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        min-height: 500px;
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        min-height: 550px;
     }
     
     .wizard-panel {
         display: none;
-        animation: fadeIn 0.3s ease;
+        animation: fadeIn 0.4s ease;
     }
     
     .wizard-panel.active {
@@ -94,7 +159,7 @@
     @keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(15px);
         }
         to {
             opacity: 1;
@@ -102,42 +167,75 @@
         }
     }
     
+    .panel-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .panel-description {
+        color: #6b7280;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Form Elements */
     .form-group {
-        margin-bottom: 24px;
+        margin-bottom: 1.5rem;
     }
     
     .form-label {
         display: block;
-        font-size: 14px;
+        font-size: 0.875rem;
         font-weight: 600;
         color: #374151;
-        margin-bottom: 8px;
+        margin-bottom: 0.5rem;
     }
     
-    .form-input {
+    .form-label .required {
+        color: #ef4444;
+    }
+    
+    .form-input, .form-select {
         width: 100%;
-        padding: 12px 16px;
-        border: 2px solid #E5E7EB;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
         border-radius: 8px;
-        font-size: 14px;
+        font-size: 0.9rem;
         transition: all 0.2s ease;
+        background: white;
     }
     
-    .form-input:focus {
+    .form-input:focus, .form-select:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
     
     .form-textarea {
         min-height: 100px;
         resize: vertical;
+        font-family: inherit;
+    }
+    
+    .form-hint {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.375rem;
+    }
+    
+    /* Division Type Cards */
+    .division-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
     }
     
     .division-type-card {
-        border: 2px solid #E5E7EB;
+        border: 2px solid #e5e7eb;
         border-radius: 12px;
-        padding: 20px;
+        padding: 1.75rem;
         text-align: center;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -145,299 +243,438 @@
     }
     
     .division-type-card:hover {
-        border-color: #667eea;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #2563eb;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(37, 99, 235, 0.12);
     }
     
     .division-type-card.selected {
-        border-color: #667eea;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        border-color: #2563eb;
+        background: linear-gradient(to bottom, rgba(37, 99, 235, 0.05), white);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
     }
     
     .division-type-icon {
-        font-size: 48px;
-        margin-bottom: 12px;
+        font-size: 3rem;
+        margin-bottom: 1rem;
     }
     
     .division-type-name {
-        font-weight: 600;
-        color: #1F2937;
-        margin-bottom: 4px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
     }
     
     .division-type-desc {
-        font-size: 13px;
-        color: #6B7280;
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.4;
     }
     
-    .unit-config-item {
-        background: #F9FAFB;
+    /* Division Config */
+    .division-config {
+        background: #f9fafb;
         border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-        border: 2px solid transparent;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .division-config-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 1.25rem;
+    }
+    
+    .nomenclature-preview {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        margin-top: 0.75rem;
+    }
+    
+    .preview-label {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+    
+    .preview-text {
+        font-weight: 600;
+        color: #2563eb;
+        font-size: 0.95rem;
+    }
+    
+    /* Unit Configuration */
+    .unit-config-item {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+        border: 1px solid #e5e7eb;
         transition: all 0.2s ease;
     }
     
     .unit-config-item:hover {
-        border-color: #667eea;
+        border-color: #2563eb;
+        background: white;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+    
+    .unit-config-title {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+    
+    /* Admin Selection */
+    .admin-select-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
         background: white;
     }
     
+    .admin-select-card:hover {
+        border-color: #2563eb;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+    
+    .admin-select-card.selected {
+        border-color: #2563eb;
+        background: linear-gradient(to right, rgba(37, 99, 235, 0.05), white);
+    }
+    
+    .admin-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .admin-info {
+        flex: 1;
+    }
+    
+    .admin-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+    }
+    
+    .admin-email {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+    
+    .checkbox-custom {
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        accent-color: #2563eb;
+    }
+    
+    /* Wizard Actions */
     .wizard-actions {
         display: flex;
         justify-content: space-between;
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 2px solid #F3F4F6;
+        align-items: center;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
     }
     
     .btn-wizard {
-        padding: 12px 32px;
-        border-radius: 8px;
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
         font-weight: 600;
+        font-size: 0.95rem;
         transition: all 0.2s ease;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     
     .btn-wizard-prev {
         background: white;
-        border: 2px solid #E5E7EB;
-        color: #6B7280;
+        border: 1px solid #e5e7eb;
+        color: #6b7280;
     }
     
     .btn-wizard-prev:hover {
-        border-color: #667eea;
-        color: #667eea;
+        border-color: #2563eb;
+        color: #2563eb;
+        background: #f9fafb;
     }
     
     .btn-wizard-next {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #2563eb;
         color: white;
         border: none;
     }
     
-    .btn-wizard-next:hover {
+    .btn-wizard-next:hover:not(:disabled) {
+        background: #1d4ed8;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
     
     .btn-wizard-next:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        transform: none;
     }
     
-    .admin-select-card {
-        border: 2px solid #E5E7EB;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        cursor: pointer;
-        transition: all 0.2s ease;
+    /* Loading */
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
     }
     
-    .admin-select-card:hover {
-        border-color: #667eea;
-        background: #F9FAFB;
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
     
-    .admin-select-card.selected {
-        border-color: #667eea;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-    }
-    
-    .admin-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-    
-    .checkbox-custom {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
+    /* Responsive */
+    @media (max-width: 768px) {
+        .wizard-header {
+            padding: 1rem 0;
+        }
+        
+        .wizard-title {
+            font-size: 1.5rem;
+        }
+        
+        .wizard-steps {
+            padding: 1.5rem 1rem;
+        }
+        
+        .step-circle {
+            width: 42px;
+            height: 42px;
+            font-size: 1rem;
+        }
+        
+        .step-label {
+            font-size: 0.75rem;
+        }
+        
+        .wizard-content {
+            padding: 1.75rem;
+        }
+        
+        .division-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .wizard-actions {
+            flex-direction: column-reverse;
+            gap: 0.75rem;
+        }
+        
+        .btn-wizard {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="px-4 sm:px-6 lg:px-8 py-6">
-    <div class="wizard-container">
-        <!-- Header -->
-        <div class="mb-8">
-            <a href="{{ url_for('admin_residences') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-flex items-center gap-2">
-                <i data-feather="arrow-left" class="w-4 h-4"></i>
-                Retour aux résidences
-            </a>
-            <h1 class="text-3xl font-bold text-gray-900 mt-4">Créer une Nouvelle Résidence</h1>
-            <p class="text-gray-600 mt-2">Suivez les étapes pour configurer votre copropriété</p>
+<!-- Modern Header -->
+<div class="wizard-header">
+    <div class="wizard-header-container">
+        <a href="{{ url_for('admin_residences') }}" class="back-link">
+            <i data-feather="arrow-left" class="w-4 h-4"></i>
+            Retour aux résidences
+        </a>
+        <h1 class="wizard-title">Créer une Nouvelle Résidence</h1>
+        <p class="wizard-subtitle">Suivez les étapes pour configurer votre copropriété en quelques minutes</p>
+    </div>
+</div>
+
+<div class="wizard-container">
+    <!-- Steps Indicator -->
+    <div class="wizard-steps">
+        <div class="wizard-step active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Informations de base</div>
         </div>
-
-        <!-- Wizard Steps Indicator -->
-        <div class="wizard-steps">
-            <div class="wizard-step active" data-step="1">
-                <div class="step-circle">1</div>
-                <div class="step-label">Informations de base</div>
-            </div>
-            <div class="wizard-step" data-step="2">
-                <div class="step-circle">2</div>
-                <div class="step-label">Type de découpe</div>
-            </div>
-            <div class="wizard-step" data-step="3">
-                <div class="step-circle">3</div>
-                <div class="step-label">Configuration unités</div>
-            </div>
-            <div class="wizard-step" data-step="4">
-                <div class="step-circle">4</div>
-                <div class="step-label">Assignation admins</div>
-            </div>
+        <div class="wizard-step" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Type de découpe</div>
         </div>
+        <div class="wizard-step" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Configuration unités</div>
+        </div>
+        <div class="wizard-step" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Assignation admins</div>
+        </div>
+    </div>
 
-        <!-- Wizard Content -->
-        <div class="wizard-content">
-            <!-- Step 1: Basic Information -->
-            <div class="wizard-panel active" data-panel="1">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Informations de la Résidence</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="form-group md:col-span-2">
-                        <label class="form-label">Nom de la résidence *</label>
-                        <input type="text" id="residence_name" class="form-input" placeholder="Ex: Résidence Les Jardins" required>
-                    </div>
-                    
-                    <div class="form-group md:col-span-2">
-                        <label class="form-label">Adresse *</label>
-                        <input type="text" id="residence_address" class="form-input" placeholder="Ex: 123 Avenue Mohammed V" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Ville *</label>
-                        <input type="text" id="residence_city" class="form-input" placeholder="Ex: Casablanca" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Code postal</label>
-                        <input type="text" id="residence_postal" class="form-input" placeholder="Ex: 20000">
-                    </div>
-                    
-                    <div class="form-group md:col-span-2">
-                        <label class="form-label">Description</label>
-                        <textarea id="residence_description" class="form-input form-textarea" placeholder="Description de la résidence..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Nom du syndic</label>
-                        <input type="text" id="syndic_name" class="form-input" placeholder="Ex: MySindic">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Email du syndic</label>
-                        <input type="email" id="syndic_email" class="form-input" placeholder="contact@mysindic.ma">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Téléphone du syndic</label>
-                        <input type="tel" id="syndic_phone" class="form-input" placeholder="+212522000000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Total tantièmes</label>
-                        <input type="number" id="residence_tantiemes" class="form-input" value="1000">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Division Type -->
-            <div class="wizard-panel" data-panel="2">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Type de Découpe</h2>
-                <p class="text-gray-600 mb-8">Choisissez comment votre résidence est organisée</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="division-types">
-                    <div class="division-type-card" data-type="lot" onclick="selectDivisionType('lot')">
-                        <div class="division-type-icon">📦</div>
-                        <div class="division-type-name">Lots Simples</div>
-                        <div class="division-type-desc">Numérotation directe des lots (A101, A102...)</div>
-                    </div>
-                    
-                    <div class="division-type-card" data-type="immeuble" onclick="selectDivisionType('immeuble')">
-                        <div class="division-type-icon">🏢</div>
-                        <div class="division-type-name">Immeubles</div>
-                        <div class="division-type-desc">Organisation par immeubles (Imm. A, B, C...)</div>
-                    </div>
-                    
-                    <div class="division-type-card" data-type="batiment" onclick="selectDivisionType('batiment')">
-                        <div class="division-type-icon">🏗️</div>
-                        <div class="division-type-name">Bâtiments</div>
-                        <div class="division-type-desc">Organisation par bâtiments (Bât. 1, 2, 3...)</div>
-                    </div>
-                    
-                    <div class="division-type-card" data-type="zone" onclick="selectDivisionType('zone')">
-                        <div class="division-type-icon">🗺️</div>
-                        <div class="division-type-name">Zones</div>
-                        <div class="division-type-desc">Organisation par zones (Zone Nord, Sud...)</div>
-                    </div>
+    <!-- Wizard Content -->
+    <div class="wizard-content">
+        <!-- Step 1: Basic Information -->
+        <div class="wizard-panel active" data-panel="1">
+            <h2 class="panel-title">Informations de la Résidence</h2>
+            <p class="panel-description">Renseignez les informations principales de votre copropriété</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group md:col-span-2">
+                    <label class="form-label">Nom de la résidence <span class="required">*</span></label>
+                    <input type="text" id="residence_name" class="form-input" placeholder="Ex: Résidence Les Jardins de l'Atlas" required>
                 </div>
                 
-                <div id="division-config" class="mt-8" style="display: none;">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Configuration de la découpe</h3>
+                <div class="form-group md:col-span-2">
+                    <label class="form-label">Adresse <span class="required">*</span></label>
+                    <input type="text" id="residence_address" class="form-input" placeholder="Ex: 123 Avenue Mohammed V" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Ville <span class="required">*</span></label>
+                    <input type="text" id="residence_city" class="form-input" placeholder="Ex: Casablanca" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Code postal</label>
+                    <input type="text" id="residence_postal" class="form-input" placeholder="Ex: 20000">
+                </div>
+                
+                <div class="form-group md:col-span-2">
+                    <label class="form-label">Description</label>
+                    <textarea id="residence_description" class="form-input form-textarea" placeholder="Description de la résidence, ses équipements, son emplacement..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nom du syndic</label>
+                    <input type="text" id="syndic_name" class="form-input" placeholder="Ex: MySindic">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email du syndic</label>
+                    <input type="email" id="syndic_email" class="form-input" placeholder="contact@mysindic.ma">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Téléphone du syndic</label>
+                    <input type="tel" id="syndic_phone" class="form-input" placeholder="+212 522 000 000">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Total tantièmes</label>
+                    <input type="number" id="residence_tantiemes" class="form-input" value="1000" min="1">
+                    <p class="form-hint">Total des millièmes pour la répartition des charges</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Division Type -->
+        <div class="wizard-panel" data-panel="2">
+            <h2 class="panel-title">Type de Découpe</h2>
+            <p class="panel-description">Choisissez comment votre résidence est organisée</p>
+            
+            <div class="division-grid" id="division-types">
+                <div class="division-type-card" data-type="lot" onclick="selectDivisionType('lot')">
+                    <div class="division-type-icon">📦</div>
+                    <div class="division-type-name">Lots Simples</div>
+                    <div class="division-type-desc">Numérotation directe des lots (A101, A102...)</div>
+                </div>
+                
+                <div class="division-type-card" data-type="immeuble" onclick="selectDivisionType('immeuble')">
+                    <div class="division-type-icon">🏢</div>
+                    <div class="division-type-name">Immeubles</div>
+                    <div class="division-type-desc">Organisation par immeubles (Imm. A, B, C...)</div>
+                </div>
+                
+                <div class="division-type-card" data-type="batiment" onclick="selectDivisionType('batiment')">
+                    <div class="division-type-icon">🏗️</div>
+                    <div class="division-type-name">Bâtiments</div>
+                    <div class="division-type-desc">Organisation par bâtiments (Bât. 1, 2, 3...)</div>
+                </div>
+                
+                <div class="division-type-card" data-type="zone" onclick="selectDivisionType('zone')">
+                    <div class="division-type-icon">🗺️</div>
+                    <div class="division-type-name">Zones</div>
+                    <div class="division-type-desc">Organisation par zones géographiques</div>
+                </div>
+            </div>
+            
+            <div id="division-config" class="division-config" style="display: none;">
+                <h3 class="division-config-title">Configuration de la découpe</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
-                        <label class="form-label">Nombre de <span id="division-label">divisions</span> *</label>
+                        <label class="form-label">Nombre de <span id="division-label">divisions</span> <span class="required">*</span></label>
                         <input type="number" id="division_count" class="form-input" min="1" max="50" value="1" onchange="updateDivisionPreview()">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Préfixe de nomenclature</label>
                         <input type="text" id="division_prefix" class="form-input" placeholder="Ex: A, B, C..." value="A" onchange="updateDivisionPreview()">
-                        <p class="text-sm text-gray-500 mt-2">Les divisions seront nommées: <span id="nomenclature-preview" class="font-semibold text-indigo-600"></span></p>
                     </div>
                 </div>
-            </div>
-
-            <!-- Step 3: Units Configuration -->
-            <div class="wizard-panel" data-panel="3">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Configuration des Unités</h2>
-                <p class="text-gray-600 mb-8">Définissez les types d'unités pour chaque division</p>
                 
-                <div id="units-configuration">
-                    <!-- Will be populated dynamically -->
+                <div class="nomenclature-preview">
+                    <p class="preview-label">Aperçu de la nomenclature :</p>
+                    <p class="preview-text" id="nomenclature-preview"></p>
                 </div>
             </div>
+        </div>
 
-            <!-- Step 4: Admin Assignment -->
-            <div class="wizard-panel" data-panel="4">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Assignation des Administrateurs</h2>
-                <p class="text-gray-600 mb-8">Sélectionnez les administrateurs pour gérer cette résidence</p>
-                
-                <div id="admin-list">
-                    <div class="flex justify-center py-8">
-                        <div class="loading-spinner border-indigo-600"></div>
-                    </div>
+        <!-- Step 3: Units Configuration -->
+        <div class="wizard-panel" data-panel="3">
+            <h2 class="panel-title">Configuration des Unités</h2>
+            <p class="panel-description">Définissez les types d'unités pour chaque division</p>
+            
+            <div id="units-configuration">
+                <!-- Will be populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Step 4: Admin Assignment -->
+        <div class="wizard-panel" data-panel="4">
+            <h2 class="panel-title">Assignation des Administrateurs</h2>
+            <p class="panel-description">Sélectionnez les administrateurs qui géreront cette résidence</p>
+            
+            <div id="admin-list">
+                <div class="flex justify-center py-12">
+                    <div class="loading-spinner"></div>
                 </div>
             </div>
+        </div>
 
-            <!-- Wizard Actions -->
-            <div class="wizard-actions">
-                <button type="button" class="btn-wizard btn-wizard-prev" onclick="previousStep()" style="display: none;">
-                    <i data-feather="arrow-left" class="w-4 h-4 inline"></i>
-                    Précédent
-                </button>
-                <button type="button" class="btn-wizard btn-wizard-next" onclick="nextStep()">
-                    Suivant
-                    <i data-feather="arrow-right" class="w-4 h-4 inline"></i>
-                </button>
-            </div>
+        <!-- Wizard Actions -->
+        <div class="wizard-actions">
+            <button type="button" class="btn-wizard btn-wizard-prev" onclick="previousStep()" style="display: none;">
+                <i data-feather="arrow-left" class="w-4 h-4"></i>
+                Précédent
+            </button>
+            <button type="button" class="btn-wizard btn-wizard-next" onclick="nextStep()">
+                Suivant
+                <i data-feather="arrow-right" class="w-4 h-4"></i>
+            </button>
         </div>
     </div>
 </div>
@@ -497,12 +734,12 @@ function updateWizard() {
     });
     
     // Update buttons
-    document.querySelector('.btn-wizard-prev').style.display = currentStep > 1 ? 'block' : 'none';
+    document.querySelector('.btn-wizard-prev').style.display = currentStep > 1 ? 'inline-flex' : 'none';
     const nextBtn = document.querySelector('.btn-wizard-next');
     if (currentStep === 4) {
-        nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4 inline mr-2"></i>Créer la résidence';
+        nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4"></i> Créer la résidence';
     } else {
-        nextBtn.innerHTML = 'Suivant <i data-feather="arrow-right" class="w-4 h-4 inline ml-2"></i>';
+        nextBtn.innerHTML = 'Suivant <i data-feather="arrow-right" class="w-4 h-4"></i>';
     }
     
     feather.replace();
@@ -630,7 +867,7 @@ function loadUnitsConfiguration() {
     const container = document.getElementById('units-configuration');
     
     if (wizardData.divisions.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center">Aucune division configurée</p>';
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune division configurée</p>';
         return;
     }
     
@@ -647,29 +884,29 @@ function loadUnitsConfiguration() {
     wizardData.divisions.forEach((division, divIndex) => {
         html += `
             <div class="unit-config-item">
-                <h4 class="font-semibold text-gray-900 mb-4">${division.name}</h4>
+                <h4 class="unit-config-title">${division.name}</h4>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">Type d'unités</label>
-                        <select id="unit_type_${divIndex}" class="form-input">
+                        <select id="unit_type_${divIndex}" class="form-input form-select">
                             ${unitTypes.map(type => `<option value="${type.value}">${type.icon} ${type.label}</option>`).join('')}
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Nombre d'unités</label>
-                        <input type="number" id="unit_count_${divIndex}" class="form-input" min="1" value="10">
+                        <label class="form-label">Nombre d'unités <span class="required">*</span></label>
+                        <input type="number" id="unit_count_${divIndex}" class="form-input" min="1" value="5">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Nombre d'étages</label>
-                        <input type="number" id="floor_count_${divIndex}" class="form-input" min="1" value="5">
+                        <label class="form-label">Numéro de départ</label>
+                        <input type="number" id="unit_start_${divIndex}" class="form-input" value="1">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Unités par étage</label>
-                        <input type="number" id="units_per_floor_${divIndex}" class="form-input" min="1" value="2">
+                        <label class="form-label">Tantièmes par défaut</label>
+                        <input type="number" id="unit_tantiemes_${divIndex}" class="form-input" value="50">
                     </div>
                 </div>
             </div>
@@ -677,129 +914,136 @@ function loadUnitsConfiguration() {
     });
     
     container.innerHTML = html;
+    
+    // Save units on change
+    wizardData.divisions.forEach((division, divIndex) => {
+        ['unit_type', 'unit_count', 'unit_start', 'unit_tantiemes'].forEach(field => {
+            const element = document.getElementById(`${field}_${divIndex}`);
+            if (element) {
+                element.addEventListener('change', () => saveUnitsConfiguration());
+            }
+        });
+    });
+    
+    saveUnitsConfiguration();
+}
+
+function saveUnitsConfiguration() {
+    wizardData.units = [];
+    
+    wizardData.divisions.forEach((division, divIndex) => {
+        const type = document.getElementById(`unit_type_${divIndex}`)?.value || 'appartement';
+        const count = parseInt(document.getElementById(`unit_count_${divIndex}`)?.value) || 0;
+        const start = parseInt(document.getElementById(`unit_start_${divIndex}`)?.value) || 1;
+        const tantiemes = parseInt(document.getElementById(`unit_tantiemes_${divIndex}`)?.value) || 50;
+        
+        for (let i = 0; i < count; i++) {
+            wizardData.units.push({
+                division: division.name,
+                unit_number: `${division.name}${start + i}`,
+                unit_type: type,
+                tantiemes: tantiemes
+            });
+        }
+    });
 }
 
 async function loadAdmins() {
     const container = document.getElementById('admin-list');
+    container.innerHTML = '<div class="flex justify-center py-12"><div class="loading-spinner"></div></div>';
     
     try {
-        const response = await fetch('/api/admin/users');
+        const response = await fetch('/api/admin/users?role=admin');
         const data = await response.json();
         
-        if (data.success && data.users) {
-            const admins = data.users.filter(u => u.role === 'admin' || u.role === 'superadmin');
-            
-            if (admins.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucun administrateur disponible</p>';
-                return;
-            }
-            
-            container.innerHTML = admins.map(admin => {
-                const initials = (admin.first_name?.charAt(0) || '') + (admin.last_name?.charAt(0) || '');
-                return `
-                    <div class="admin-select-card" onclick="toggleAdmin(${admin.id})">
-                        <input type="checkbox" id="admin_${admin.id}" class="checkbox-custom" onclick="event.stopPropagation();">
-                        <div class="admin-avatar">${initials}</div>
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-900">${admin.first_name} ${admin.last_name}</div>
-                            <div class="text-sm text-gray-600">${admin.email}</div>
-                            <span class="badge badge-${admin.role === 'superadmin' ? 'purple' : 'blue'} mt-1">${admin.role_display || admin.role}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        if (!data.success || !data.users || data.users.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucun administrateur disponible</p>';
+            return;
         }
+        
+        let html = '';
+        data.users.forEach(admin => {
+            const initials = (admin.first_name[0] + admin.last_name[0]).toUpperCase();
+            html += `
+                <div class="admin-select-card" onclick="toggleAdmin(${admin.id})">
+                    <div class="admin-avatar">${initials}</div>
+                    <div class="admin-info">
+                        <div class="admin-name">${admin.first_name} ${admin.last_name}</div>
+                        <div class="admin-email">${admin.email}</div>
+                    </div>
+                    <input type="checkbox" id="admin_${admin.id}" class="checkbox-custom" onchange="updateAdminSelection(${admin.id})">
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
     } catch (error) {
         console.error('Error loading admins:', error);
-        container.innerHTML = '<p class="text-red-500 text-center py-4">Erreur de chargement</p>';
+        container.innerHTML = '<p class="text-red-500 text-center py-8">Erreur lors du chargement des administrateurs</p>';
     }
 }
 
 function toggleAdmin(adminId) {
     const checkbox = document.getElementById(`admin_${adminId}`);
-    checkbox.checked = !checkbox.checked;
-    
+    if (checkbox) {
+        checkbox.checked = !checkbox.checked;
+        updateAdminSelection(adminId);
+    }
+}
+
+function updateAdminSelection(adminId) {
+    const checkbox = document.getElementById(`admin_${adminId}`);
     const card = checkbox.closest('.admin-select-card');
-    card.classList.toggle('selected', checkbox.checked);
     
     if (checkbox.checked) {
+        card.classList.add('selected');
         if (!wizardData.admins.includes(adminId)) {
             wizardData.admins.push(adminId);
         }
     } else {
+        card.classList.remove('selected');
         wizardData.admins = wizardData.admins.filter(id => id !== adminId);
     }
 }
 
 async function submitResidence() {
+    const nextBtn = document.querySelector('.btn-wizard-next');
+    nextBtn.disabled = true;
+    nextBtn.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Création en cours...';
+    
     try {
-        // Collect units data from step 3
-        wizardData.units = [];
-        let totalUnits = 0;
-        
-        wizardData.divisions.forEach((division, divIndex) => {
-            const unitType = document.getElementById(`unit_type_${divIndex}`).value;
-            const unitCount = parseInt(document.getElementById(`unit_count_${divIndex}`).value) || 0;
-            const floorCount = parseInt(document.getElementById(`floor_count_${divIndex}`).value) || 1;
-            const unitsPerFloor = parseInt(document.getElementById(`units_per_floor_${divIndex}`).value) || 1;
-            
-            totalUnits += unitCount;
-            
-            // Generate units for this division
-            let unitNum = 1;
-            for (let floor = 1; floor <= floorCount && unitNum <= unitCount; floor++) {
-                for (let u = 1; u <= unitsPerFloor && unitNum <= unitCount; u++) {
-                    wizardData.units.push({
-                        division: division.name,
-                        unit_number: `${division.name}${floor}${String(u).padStart(2, '0')}`,
-                        floor: floor,
-                        unit_type: unitType
-                    });
-                    unitNum++;
-                }
-            }
-        });
-        
-        // Update total units
-        wizardData.residence.total_units = totalUnits;
-        
-        // Create residence with wizard endpoint (includes units and admin assignments)
-        const payload = {
-            ...wizardData.residence,
-            units: wizardData.units.map(unit => ({
-                unit_number: unit.unit_number,
-                floor: unit.floor,
-                building: unit.division,
-                unit_type: unit.unit_type,
-                tantiemes: Math.floor(wizardData.residence.total_tantiemes / totalUnits)
-            })),
-            admin_ids: wizardData.admins
-        };
-        
-        const residenceResponse = await fetch('/api/admin/residences/wizard', {
+        const response = await fetch('/api/admin/residences', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(wizardData)
         });
         
-        const residenceData = await residenceResponse.json();
+        const data = await response.json();
         
-        if (!residenceData.success) {
-            throw new Error(residenceData.error || 'Erreur lors de la création de la résidence');
+        if (data.success) {
+            MySindic.showToast('Résidence créée avec succès !', 'success');
+            setTimeout(() => {
+                window.location.href = '/admin/residences';
+            }, 1500);
+        } else {
+            MySindic.showToast(data.message || 'Erreur lors de la création', 'error');
+            nextBtn.disabled = false;
+            nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4"></i> Créer la résidence';
+            feather.replace();
         }
-        
-        MySindic.showToast('Résidence créée avec succès!', 'success');
-        setTimeout(() => {
-            window.location.href = '{{ url_for("admin_residences") }}';
-        }, 1500);
-        
     } catch (error) {
         console.error('Error creating residence:', error);
-        MySindic.showToast(error.message || 'Erreur lors de la création', 'error');
+        MySindic.showToast('Erreur lors de la création de la résidence', 'error');
+        nextBtn.disabled = false;
+        nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4"></i> Créer la résidence';
+        feather.replace();
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize feather icons
+document.addEventListener('DOMContentLoaded', function() {
     feather.replace();
 });
 </script>
