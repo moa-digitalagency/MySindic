@@ -37,6 +37,11 @@ Le projet est organisé en deux dossiers principaux:
   - Desktop: Layout à 2 colonnes (feed + sidebar)
   - Mobile: Navigation en bas de page avec onglets
 - **Modern Design System:** Rounded corners, soft shadows, gradient buttons, smooth transitions, pastel colors, and card-based layouts with hover animations.
+- **Button Design Standards (Oct 2025):** 
+  - All clickable buttons use solid borders (2px) with consistent border-radius (8-10px)
+  - Informational/decorative blocks retain dashed borders for visual hierarchy
+  - Primary actions: Indigo buttons, secondary actions: green/orange variants
+  - Hover effects with background color transitions and subtle transforms
 
 ### Technical Implementations
 
@@ -44,7 +49,7 @@ Le projet est organisé en deux dossiers principaux:
 - **Frontend Architecture:** Template inheritance system with reusable base templates:
   - `admin_base.html`: Unified admin shell with persistent sidebar, header, and quick actions
   - Block structure: `admin_content`, `admin_extra_css`, `admin_extra_js` for page-specific content
-  - Eliminates code duplication across all 8 admin pages
+  - Eliminates code duplication across all 9 admin pages (including news management)
 - **Data Models:** 17 core data models cover users, residences, residence-admin assignments, financial management, maintenance, communication, documents, general assemblies, and litigation.
 - **Business Services:**
     - **ChargeCalculator:** Automates charge distribution.
@@ -53,6 +58,7 @@ Le projet est organisé en deux dossiers principaux:
     - **Admin Routes (`/api/admin/*`):** Comprehensive CRUD operations and dashboards for superadmins.
       - **Residence Creation Wizard (`/api/admin/residences/wizard`):** Transactional endpoint that creates residence, units, and admin assignments in a single commit with rollback on failure.
       - **Admin Assignment Routes:** CRUD operations for managing many-to-many admin-residence assignments.
+      - **News Management (`/admin/news`):** Superadmin interface for viewing and publishing actualités (Oct 2025)
     - **Resident Routes (`/api/resident/*`):** Secure, personalized dashboards for residents.
 - **Role Management System:** Supports `superadmin`, `admin`, `owner`, `resident` roles with dedicated management interfaces and permission checks.
 
