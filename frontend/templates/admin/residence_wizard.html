@@ -811,35 +811,12 @@ function saveStepData(step) {
             break;
             
         case 2:
-            const divCountEl = document.getElementById('division_count');
-            const prefixEl = document.getElementById('division_prefix');
-            
-            console.log('saveStepData(2) - Elements found:', {
-                divCountEl: !!divCountEl,
-                prefixEl: !!prefixEl,
-                divCountValue: divCountEl?.value,
-                prefixValue: prefixEl?.value,
-                divisionType: wizardData.divisionType
-            });
-            
-            // Utiliser des valeurs par défaut si les éléments ne sont pas trouvés
-            const divCount = divCountEl ? (parseInt(divCountEl.value) || 3) : 3;
-            const prefix = prefixEl ? (prefixEl.value || 'A') : 'A';
-            
-            // Toujours réinitialiser le tableau
-            wizardData.divisions = [];
-            
-            console.log('Saving divisions:', { divCount, prefix, divisionType: wizardData.divisionType });
-            
-            // Créer les divisions
-            for (let i = 0; i < divCount; i++) {
-                wizardData.divisions.push({
-                    name: `${prefix}${i + 1}`,
-                    type: wizardData.divisionType
-                });
+            // S'assurer que les divisions sont créées
+            if (!wizardData.divisions || wizardData.divisions.length === 0) {
+                createDivisionsFromCurrentValues();
             }
             
-            console.log('Divisions saved successfully:', wizardData.divisions);
+            console.log('saveStepData(2) - Divisions finales:', wizardData.divisions);
             
             // Afficher une notification de succès visuelle
             if (wizardData.divisions.length > 0 && typeof MySindic !== 'undefined') {
@@ -898,10 +875,33 @@ function selectDivisionType(type) {
     
     updateDivisionPreview();
     
+    // Sauvegarder immédiatement les divisions avec les valeurs par défaut
+    createDivisionsFromCurrentValues();
+    
     // Scroll to configuration
     setTimeout(() => {
         config.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 100);
+}
+
+function createDivisionsFromCurrentValues() {
+    const divCountEl = document.getElementById('division_count');
+    const prefixEl = document.getElementById('division_prefix');
+    
+    const divCount = divCountEl ? (parseInt(divCountEl.value) || 3) : 3;
+    const prefix = prefixEl ? (prefixEl.value || 'A') : 'A';
+    
+    // Réinitialiser et créer les divisions
+    wizardData.divisions = [];
+    
+    for (let i = 0; i < divCount; i++) {
+        wizardData.divisions.push({
+            name: `${prefix}${i + 1}`,
+            type: wizardData.divisionType
+        });
+    }
+    
+    console.log('Divisions créées:', wizardData.divisions);
 }
 
 function updateDivisionPreview() {
@@ -919,6 +919,11 @@ function updateDivisionPreview() {
     }
     
     document.getElementById('nomenclature-preview').textContent = text;
+    
+    // Recréer les divisions avec les nouvelles valeurs
+    if (wizardData.divisionType) {
+        createDivisionsFromCurrentValues();
+    }
 }
 
 function loadUnitsConfiguration() {
