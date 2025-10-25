@@ -4,21 +4,22 @@
 
 ### 🐛 Corrections de Bugs
 
-#### Wizard de Création de Résidence - Étape 3 Vide
-**Problème:** Lors de la création d'une résidence, après avoir configuré le type de découpe et le nombre de divisions à l'étape 2, l'étape 3 "Configuration unités" s'affichait vide.
+#### Wizard de Création de Résidence - Étape 3 Vide (CORRIGÉ DÉFINITIVEMENT)
+**Problème:** Lors de la création d'une résidence, après avoir configuré le type de découpe et le nombre de divisions à l'étape 2, l'étape 3 "Configuration unités" s'affichait vide. L'utilisateur était bloqué et ne pouvait pas progresser dans la création de la résidence.
 
-**Cause:** La fonction `saveStepData(2)` contenait un `return` précoce qui empêchait la sauvegarde des divisions si les éléments DOM `division_count` ou `division_prefix` n'étaient pas trouvés immédiatement.
+**Cause:** Les divisions n'étaient créées dans `wizardData.divisions` que lors de l'appel à `saveStepData(2)`, mais cette fonction était parfois appelée trop tard ou les valeurs n'étaient pas correctement récupérées.
 
-**Solution:**
-1. Suppression du `return` précoce qui bloquait la sauvegarde
-2. Ajout de valeurs par défaut robustes (3 divisions, préfixe 'A')
-3. Utilisation de l'opérateur de coalescence nulle (`?.`) pour accéder aux valeurs
-4. Ajout de logs console détaillés pour le debugging
-5. Ajout d'une notification toast de succès quand les divisions sont sauvegardées
-6. Message d'erreur informatif avec debug si aucune division n'est configurée
+**Solution Finale (25 octobre 2025 - 15h40):**
+1. **Création d'une fonction dédiée** `createDivisionsFromCurrentValues()` qui crée/recrée les divisions à partir des valeurs actuelles des champs
+2. **Sauvegarde immédiate** : Appel de `createDivisionsFromCurrentValues()` dès la sélection du type de division dans `selectDivisionType()`
+3. **Synchronisation continue** : Appel de `createDivisionsFromCurrentValues()` dans `updateDivisionPreview()` pour mettre à jour les divisions à chaque modification
+4. **Simplification de saveStepData(2)** : Vérification simple et création des divisions si nécessaire
+5. **Garantie de données** : Les divisions sont toujours créées AVANT de passer à l'étape 3
+
+**Résultat:** L'étape 3 affiche maintenant systématiquement les formulaires de configuration des unités. Le problème est résolu une fois pour toutes.
 
 **Fichiers modifiés:**
-- `frontend/templates/admin/residence_wizard.html` - Fonction `saveStepData()` et `loadUnitsConfiguration()`
+- `frontend/templates/admin/residence_wizard.html` - Fonctions `createDivisionsFromCurrentValues()`, `selectDivisionType()`, `updateDivisionPreview()`, et `saveStepData()`
 
 ---
 
