@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+DANS L#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 MySindic - Script d'Initialisation de la Base de Données
