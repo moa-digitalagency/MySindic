@@ -604,27 +604,27 @@
 <div class="dashboard-layout">
     <aside class="left-sidebar">
         <div class="nav-tabs-card">
-            <a href="/resident/dashboard" class="nav-tab active">
+            <a href="#actualite" class="nav-tab active" data-tab="actualite" onclick="switchTab(event, 'actualite')">
                 <span class="nav-tab-icon">📰</span>
                 <span>Actualité</span>
             </a>
-            <a href="/resident/maintenance" class="nav-tab">
+            <a href="#maintenance" class="nav-tab" data-tab="maintenance" onclick="switchTab(event, 'maintenance')">
                 <span class="nav-tab-icon">🔧</span>
                 <span>Maintenance</span>
             </a>
-            <a href="/resident/assemblies" class="nav-tab">
+            <a href="#assemblies" class="nav-tab" data-tab="assemblies" onclick="switchTab(event, 'assemblies')">
                 <span class="nav-tab-icon">🗳️</span>
                 <span>Assemblées Générales</span>
             </a>
-            <a href="/resident/finances" class="nav-tab">
+            <a href="#finances" class="nav-tab" data-tab="finances" onclick="switchTab(event, 'finances')">
                 <span class="nav-tab-icon">💰</span>
                 <span>Finances</span>
             </a>
-            <a href="/resident/documents" class="nav-tab">
+            <a href="#documents" class="nav-tab" data-tab="documents" onclick="switchTab(event, 'documents')">
                 <span class="nav-tab-icon">📄</span>
                 <span>Documents</span>
             </a>
-            <a href="/resident/profile" class="nav-tab">
+            <a href="#profile" class="nav-tab" data-tab="profile" onclick="switchTab(event, 'profile')">
                 <span class="nav-tab-icon">👤</span>
                 <span>Mon Profil</span>
             </a>
@@ -657,7 +657,8 @@
         </div>
     </aside>
     
-    <main class="main-content">
+    <main class="main-content" id="main-content">
+        <div id="tab-actualite" class="tab-content active">
         <div class="content-card">
             <div class="card-header">
                 <div>
@@ -666,10 +667,33 @@
                 </div>
             </div>
             
-            <div style="padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6; margin-bottom: 1rem;">
-                <textarea id="new-post-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; min-height: 80px; outline: none;"></textarea>
-                <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
-                    <button onclick="publishPost()" style="padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+            <div class="publish-box" style="padding: 1rem; background: #f9fafb; border-radius: 12px; margin-bottom: 1rem;">
+                <textarea id="new-post-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; min-height: 100px; outline: none; background: white;"></textarea>
+                
+                <div id="media-preview" style="margin-top: 0.75rem; display: none;">
+                    <div style="position: relative; display: inline-block;">
+                        <img id="preview-image" style="max-width: 200px; max-height: 200px; border-radius: 8px; display: none;">
+                        <button onclick="removeMedia()" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none;" id="remove-media-btn">✕</button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <label for="image-upload" style="cursor: pointer; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                            🖼️ <span>Photo</span>
+                        </label>
+                        <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                        
+                        <button onclick="insertEmoji()" style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                            😊 Emoji
+                        </button>
+                        
+                        <button onclick="toggleFormatting()" style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                            ✨ Format
+                        </button>
+                    </div>
+                    
+                    <button onclick="publishPost()" style="padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         Publier
                     </button>
                 </div>
@@ -682,21 +706,85 @@
                 </div>
             </div>
         </div>
+        </div>
         
-        <div class="content-card">
-            <div class="card-header">
-                <div>
-                    <h2 class="card-title">🔧 Demandes de Maintenance</h2>
-                    <p class="card-subtitle">Vos demandes et celles de la résidence</p>
+        <div id="tab-maintenance" class="tab-content" style="display: none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">🔧 Demandes de Maintenance</h2>
+                        <p class="card-subtitle">Vos demandes et celles de la résidence</p>
+                    </div>
                 </div>
-            </div>
-            <div id="maintenance-feed">
-                <div class="empty-state">
-                    <div class="empty-icon">✨</div>
-                    <p class="empty-text">Aucune demande de maintenance</p>
+                <div id="maintenance-feed">
+                    <div class="empty-state">
+                        <div class="empty-icon">✨</div>
+                        <p class="empty-text">Aucune demande de maintenance</p>
+                    </div>
                 </div>
             </div>
         </div>
+        
+        <div id="tab-assemblies" class="tab-content" style="display: none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">🗳️ Assemblées Générales</h2>
+                        <p class="card-subtitle">Participez aux décisions de votre résidence</p>
+                    </div>
+                </div>
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p class="empty-text">Aucune assemblée prévue</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-finances" class="tab-content" style="display: none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">💰 Mes Finances</h2>
+                        <p class="card-subtitle">Charges et paiements</p>
+                    </div>
+                </div>
+                <div class="empty-state">
+                    <div class="empty-icon">💳</div>
+                    <p class="empty-text">Aucune charge en attente</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-documents" class="tab-content" style="display: none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">📄 Documents</h2>
+                        <p class="card-subtitle">Accédez aux documents de votre résidence</p>
+                    </div>
+                </div>
+                <div class="empty-state">
+                    <div class="empty-icon">📁</div>
+                    <p class="empty-text">Aucun document disponible</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-profile" class="tab-content" style="display: none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">👤 Mon Profil</h2>
+                        <p class="card-subtitle">Gérez vos informations personnelles</p>
+                    </div>
+                </div>
+                <div class="empty-state">
+                    <div class="empty-icon">⚙️</div>
+                    <p class="empty-text">Chargement du profil...</p>
+                </div>
+            </div>
+        </div>
+        
     </main>
     
     <aside class="right-sidebar">
@@ -735,6 +823,67 @@
 
 {% block extra_js %}
 <script>
+let uploadedImage = null;
+
+function switchTab(event, tabName) {
+    event.preventDefault();
+    
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.getElementById('tab-' + tabName).style.display = 'block';
+    event.currentTarget.classList.add('active');
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+        MySindic.showToast('Veuillez sélectionner une image', 'error');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        uploadedImage = e.target.result;
+        document.getElementById('preview-image').src = e.target.result;
+        document.getElementById('preview-image').style.display = 'block';
+        document.getElementById('remove-media-btn').style.display = 'block';
+        document.getElementById('media-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeMedia() {
+    uploadedImage = null;
+    document.getElementById('preview-image').style.display = 'none';
+    document.getElementById('remove-media-btn').style.display = 'none';
+    document.getElementById('media-preview').style.display = 'none';
+    document.getElementById('image-upload').value = '';
+}
+
+function insertEmoji() {
+    const emojis = ['😊', '❤️', '👍', '🎉', '🔥', '✨', '💪', '🙏', '👏', '🎊', '🌟', '💯', '🏆', '🎯'];
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const textarea = document.getElementById('new-post-content');
+    const cursorPos = textarea.selectionStart;
+    const textBefore = textarea.value.substring(0, cursorPos);
+    const textAfter = textarea.value.substring(cursorPos);
+    textarea.value = textBefore + emoji + textAfter;
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = cursorPos + emoji.length;
+}
+
+function toggleFormatting() {
+    MySindic.showToast('Fonctionnalité de formatage bientôt disponible', 'info');
+}
+
 async function loadResidentDashboard() {
     try {
         const response = await fetch('/api/resident/dashboard');
