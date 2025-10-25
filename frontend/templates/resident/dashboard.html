@@ -6,7 +6,44 @@
 <style>
     body {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding-bottom: 80px;
+    }
+    
+    /* Navigation horizontale desktop */
+    .desktop-nav {
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+    
+    .desktop-nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+    
+    .desktop-nav-item {
+        padding: 1rem 1.5rem;
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .desktop-nav-item:hover {
+        color: #4f46e5;
+        border-bottom-color: #e0e7ff;
+    }
+    
+    .desktop-nav-item.active {
+        color: #4f46e5;
+        border-bottom-color: #4f46e5;
     }
     
     /* Layout principal */
@@ -288,17 +325,9 @@
         font-weight: 600;
     }
     
-    /* Bottom Mobile Navigation */
+    /* Bottom Mobile Navigation - Hidden on desktop */
     .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-top: 1px solid #e5e7eb;
-        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        padding: 0.5rem 0;
+        display: none;
     }
     
     .bottom-nav-container {
@@ -350,9 +379,18 @@
         .sidebar-left {
             position: static;
         }
+        
+        /* Hide desktop nav on tablets */
+        .desktop-nav {
+            display: none;
+        }
     }
     
     @media (max-width: 768px) {
+        body {
+            padding-bottom: 80px;
+        }
+        
         .main-layout {
             padding: 1rem;
         }
@@ -367,6 +405,20 @@
             border-radius: 1.5rem;
         }
         
+        /* Show bottom nav on mobile */
+        .bottom-nav {
+            display: block;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 0.5rem 0;
+        }
+        
         .bottom-nav-icon {
             font-size: 1.25rem;
         }
@@ -379,6 +431,27 @@
 {% endblock %}
 
 {% block content %}
+<!-- Navigation Desktop -->
+<nav class="desktop-nav">
+    <div class="desktop-nav-container">
+        <a href="/resident/dashboard" class="desktop-nav-item active">
+            📰 Actualité
+        </a>
+        <a href="/resident/maintenance" class="desktop-nav-item">
+            🔧 Maintenance
+        </a>
+        <a href="/resident/assemblies" class="desktop-nav-item">
+            🗳️ Assemblées Générales
+        </a>
+        <a href="/resident/finances" class="desktop-nav-item">
+            💰 Finances
+        </a>
+        <a href="/resident/documents" class="desktop-nav-item">
+            📄 Documents
+        </a>
+    </div>
+</nav>
+
 <div class="min-h-screen py-6">
     <div class="main-layout">
         <!-- Sidebar gauche - Profil complet -->
