@@ -112,7 +112,7 @@ html {
 
 .stat-card {
     background: rgba(248, 249, 255, 0.4);
-    border: 2px solid #667eea;
+    border: 2px dashed #667eea;
     border-radius: 1.5rem;
     padding: 1.5rem;
     transition: all 0.3s ease;
@@ -311,35 +311,35 @@ html {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Stat Card Color Variants with Solid Borders */
+/* Stat Card Color Variants with Dashed Borders */
 .stat-card.blue {
     background: rgba(59, 130, 246, 0.08);
-    border: 2px solid #3B82F6;
+    border: 2px dashed #3B82F6;
 }
 
 .stat-card.green {
     background: rgba(16, 185, 129, 0.08);
-    border: 2px solid #10B981;
+    border: 2px dashed #10B981;
 }
 
 .stat-card.purple {
     background: rgba(139, 92, 246, 0.08);
-    border: 2px solid #8B5CF6;
+    border: 2px dashed #8B5CF6;
 }
 
 .stat-card.orange {
     background: rgba(245, 158, 11, 0.08);
-    border: 2px solid #F59E0B;
+    border: 2px dashed #F59E0B;
 }
 
 .stat-card.red {
     background: rgba(239, 68, 68, 0.08);
-    border: 2px solid #EF4444;
+    border: 2px dashed #EF4444;
 }
 
 .stat-card.indigo {
     background: rgba(99, 102, 241, 0.08);
-    border: 2px solid #6366F1;
+    border: 2px dashed #6366F1;
 }
 
 /* Button Color Variants with Solid Borders */
