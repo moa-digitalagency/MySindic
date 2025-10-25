@@ -10,10 +10,9 @@
         padding: 0;
     }
     
-    /* Header moderne */
     .modern-header {
         background: white;
-        padding: 1rem 2rem;
+        padding: 0.75rem 1.5rem;
         border-bottom: 1px solid #e5e7eb;
         position: sticky;
         top: 0;
@@ -26,33 +25,27 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 2rem;
-    }
-    
-    .logo-section {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+        gap: 1.5rem;
     }
     
     .logo {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 800;
         color: #2563eb;
     }
     
     .search-bar {
         flex: 1;
-        max-width: 400px;
+        max-width: 350px;
         position: relative;
     }
     
     .search-input {
         width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
         border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        font-size: 0.875rem;
+        border-radius: 10px;
+        font-size: 0.8rem;
         outline: none;
         transition: all 0.3s;
         background: #f9fafb;
@@ -66,22 +59,23 @@
     
     .search-icon {
         position: absolute;
-        left: 0.875rem;
+        left: 0.625rem;
         top: 50%;
         transform: translateY(-50%);
         color: #9ca3af;
+        font-size: 0.875rem;
     }
     
     .header-actions {
         display: flex;
         align-items: center;
-        gap: 1.5rem;
+        gap: 0.75rem;
     }
     
     .icon-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -90,7 +84,7 @@
         cursor: pointer;
         transition: all 0.3s;
         position: relative;
-        font-size: 1.25rem;
+        font-size: 1rem;
     }
     
     .icon-btn:hover {
@@ -104,22 +98,22 @@
     
     .badge {
         position: absolute;
-        top: -4px;
-        right: -4px;
+        top: -3px;
+        right: -3px;
         background: #ef4444;
         color: white;
-        font-size: 0.7rem;
-        padding: 0.125rem 0.375rem;
-        border-radius: 10px;
+        font-size: 0.625rem;
+        padding: 0.075rem 0.25rem;
+        border-radius: 8px;
         font-weight: 600;
     }
     
     .user-profile-btn {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        padding: 0.5rem;
-        border-radius: 12px;
+        gap: 0.5rem;
+        padding: 0.375rem;
+        border-radius: 10px;
         border: none;
         background: #f9fafb;
         cursor: pointer;
@@ -131,95 +125,92 @@
     }
     
     .user-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
         background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: 700;
-        font-size: 0.875rem;
+        font-size: 0.75rem;
     }
     
     .user-name {
         font-weight: 600;
         color: #111827;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
     }
     
-    /* Main layout - 3 colonnes */
     .dashboard-layout {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 2rem;
+        padding: 1.25rem;
         display: grid;
-        grid-template-columns: 280px 1fr 320px;
-        gap: 2rem;
+        grid-template-columns: 260px 1fr 280px;
+        gap: 1.25rem;
     }
     
-    /* Sidebar gauche - Profil */
     .left-sidebar {
         position: sticky;
-        top: 100px;
+        top: 85px;
         height: fit-content;
     }
     
     .profile-card {
         background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
+        border-radius: 12px;
+        padding: 1rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
     
     .profile-header-img {
-        height: 100px;
+        height: 70px;
         background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-        border-radius: 12px;
-        margin: -1.5rem -1.5rem 0;
+        border-radius: 10px;
+        margin: -1rem -1rem 0;
         position: relative;
     }
     
     .profile-avatar-large {
-        width: 70px;
-        height: 70px;
-        border-radius: 14px;
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
         background: white;
-        border: 4px solid white;
+        border: 3px solid white;
         position: absolute;
-        bottom: -35px;
-        left: 1.5rem;
+        bottom: -25px;
+        left: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.75rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        font-size: 1.25rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     .profile-info {
-        margin-top: 45px;
-        padding-top: 0.5rem;
+        margin-top: 35px;
     }
     
     .profile-name {
-        font-size: 1.125rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #111827;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.125rem;
     }
     
     .profile-role {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         color: #6b7280;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     
     .stats-row {
         display: flex;
-        gap: 1.5rem;
-        padding: 1rem 0;
+        gap: 1rem;
+        padding: 0.75rem 0;
         border-top: 1px solid #f3f4f6;
     }
     
@@ -229,87 +220,82 @@
     }
     
     .stat-value {
-        font-size: 1.25rem;
+        font-size: 1rem;
         font-weight: 700;
         color: #111827;
         display: block;
     }
     
     .stat-label {
-        font-size: 0.75rem;
+        font-size: 0.65rem;
         color: #6b7280;
         display: block;
-        margin-top: 0.25rem;
-    }
-    
-    .info-section {
-        margin-top: 1rem;
+        margin-top: 0.125rem;
     }
     
     .section-title {
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         font-weight: 700;
         color: #111827;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.625rem;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 0.375rem;
     }
     
     .info-item {
         display: flex;
         justify-content: space-between;
-        padding: 0.75rem;
+        padding: 0.5rem;
         background: #f9fafb;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
+        border-radius: 6px;
+        margin-bottom: 0.375rem;
     }
     
     .info-label {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #6b7280;
     }
     
     .info-value {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 600;
         color: #111827;
     }
     
-    /* Main content area */
     .main-content {
-        min-height: 600px;
+        min-height: 500px;
     }
     
     .content-card {
         background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
+        border-radius: 12px;
+        padding: 1.125rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
     
     .card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
     
     .card-title {
-        font-size: 1.125rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #111827;
     }
     
     .card-subtitle {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         color: #6b7280;
-        margin-top: 0.25rem;
+        margin-top: 0.125rem;
     }
     
     .post-item {
-        padding: 1.5rem 0;
+        padding: 1rem 0;
         border-bottom: 1px solid #f3f4f6;
     }
     
@@ -320,20 +306,21 @@
     
     .post-header {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 0.75rem;
+        margin-bottom: 0.625rem;
     }
     
     .post-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
         background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1.25rem;
+        font-size: 1rem;
+        flex-shrink: 0;
     }
     
     .post-info {
@@ -343,27 +330,27 @@
     .post-author {
         font-weight: 600;
         color: #111827;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
     }
     
     .post-date {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #9ca3af;
-        margin-top: 0.125rem;
+        margin-top: 0.075rem;
     }
     
     .post-content {
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         color: #374151;
-        line-height: 1.6;
-        margin-bottom: 1rem;
+        line-height: 1.5;
+        margin-bottom: 0.625rem;
     }
     
     .post-badge {
         display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 8px;
-        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
         font-weight: 600;
     }
     
@@ -384,57 +371,93 @@
     
     .empty-state {
         text-align: center;
-        padding: 3rem 1rem;
+        padding: 2rem 1rem;
     }
     
     .empty-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
         opacity: 0.5;
     }
     
     .empty-text {
         color: #9ca3af;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
     }
     
-    /* Right sidebar */
     .right-sidebar {
         position: sticky;
-        top: 100px;
+        top: 85px;
         height: fit-content;
+    }
+    
+    .nav-tabs-card {
+        background: white;
+        border-radius: 12px;
+        padding: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
+    }
+    
+    .nav-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding: 0.625rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #6b7280;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-tab:hover {
+        background: #f9fafb;
+        color: #111827;
+    }
+    
+    .nav-tab.active {
+        background: #dbeafe;
+        color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .nav-tab-icon {
+        font-size: 1.125rem;
     }
     
     .calendar-card {
         background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
+        border-radius: 12px;
+        padding: 1rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
     
     .calendar-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     
     .calendar-month {
         font-weight: 700;
         color: #111827;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
     }
     
     .calendar-nav {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.375rem;
     }
     
     .calendar-nav-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
         border: none;
         background: #f9fafb;
         cursor: pointer;
@@ -442,6 +465,7 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
+        font-size: 0.875rem;
     }
     
     .calendar-nav-btn:hover {
@@ -451,16 +475,16 @@
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 0.5rem;
-        margin-bottom: 0.5rem;
+        gap: 0.25rem;
+        margin-bottom: 0.375rem;
     }
     
     .calendar-day-label {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         color: #9ca3af;
         text-align: center;
         font-weight: 600;
-        padding: 0.25rem;
+        padding: 0.125rem;
     }
     
     .calendar-day {
@@ -468,8 +492,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
-        font-size: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
         cursor: pointer;
         transition: all 0.2s;
         color: #6b7280;
@@ -485,79 +509,28 @@
         font-weight: 700;
     }
     
-    .schedule-card {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
-    }
-    
-    .schedule-item {
-        display: flex;
-        gap: 1rem;
-        padding: 1rem;
-        background: #f9fafb;
-        border-radius: 10px;
-        margin-bottom: 0.75rem;
-        border-left: 3px solid #2563eb;
-    }
-    
-    .schedule-date {
-        text-align: center;
-        min-width: 40px;
-    }
-    
-    .schedule-day {
-        font-size: 0.7rem;
-        color: #6b7280;
-        text-transform: uppercase;
-    }
-    
-    .schedule-num {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #111827;
-    }
-    
-    .schedule-info {
-        flex: 1;
-    }
-    
-    .schedule-title {
-        font-weight: 600;
-        color: #111827;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-    
-    .schedule-time {
-        font-size: 0.75rem;
-        color: #9ca3af;
-    }
-    
     .poll-card {
         background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
+        border-radius: 12px;
+        padding: 1rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
     .poll-question {
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         color: #374151;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
         font-weight: 500;
     }
     
     .poll-option {
-        padding: 0.875rem 1rem;
+        padding: 0.625rem 0.75rem;
         background: #f9fafb;
-        border-radius: 10px;
-        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        margin-bottom: 0.375rem;
         cursor: pointer;
         transition: all 0.3s;
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         color: #374151;
         border: 2px solid transparent;
     }
@@ -568,7 +541,6 @@
         color: #1e40af;
     }
     
-    /* Mobile responsiveness */
     @media (max-width: 1024px) {
         .dashboard-layout {
             grid-template-columns: 1fr;
@@ -586,7 +558,7 @@
     
     @media (max-width: 768px) {
         .dashboard-layout {
-            padding: 1rem;
+            padding: 0.75rem;
         }
         
         .header-container {
@@ -594,7 +566,7 @@
         }
         
         .header-actions {
-            gap: 0.5rem;
+            gap: 0.375rem;
         }
         
         .user-name {
@@ -605,12 +577,9 @@
 {% endblock %}
 
 {% block content %}
-<!-- Modern Header -->
 <div class="modern-header">
     <div class="header-container">
-        <div class="logo-section">
-            <div class="logo">🏢 MySindic</div>
-        </div>
+        <div class="logo">🏢 MySindic</div>
         
         <div class="search-bar">
             <span class="search-icon">🔍</span>
@@ -618,12 +587,8 @@
         </div>
         
         <div class="header-actions">
-            <button class="icon-btn active" title="Accueil">
-                🏠
-            </button>
-            <button class="icon-btn" title="Messages">
-                💬
-            </button>
+            <button class="icon-btn active" title="Accueil">🏠</button>
+            <button class="icon-btn" title="Messages">💬</button>
             <button class="icon-btn" title="Notifications">
                 🔔
                 <span class="badge">3</span>
@@ -636,9 +601,7 @@
     </div>
 </div>
 
-<!-- Dashboard Layout -->
 <div class="dashboard-layout">
-    <!-- Left Sidebar - Profile -->
     <aside class="left-sidebar">
         <div class="profile-card">
             <div class="profile-header-img">
@@ -666,9 +629,7 @@
         </div>
         
         <div class="profile-card">
-            <div class="section-title">
-                🏢 Ma Résidence
-            </div>
+            <div class="section-title">🏢 Ma Résidence</div>
             <div id="residence-info">
                 <div class="info-item">
                     <span class="info-label">Résidence</span>
@@ -694,9 +655,7 @@
         </div>
     </aside>
     
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- News Feed -->
         <div class="content-card">
             <div class="card-header">
                 <div>
@@ -712,7 +671,6 @@
             </div>
         </div>
         
-        <!-- Maintenance Requests -->
         <div class="content-card">
             <div class="card-header">
                 <div>
@@ -729,9 +687,34 @@
         </div>
     </main>
     
-    <!-- Right Sidebar -->
     <aside class="right-sidebar">
-        <!-- Calendar -->
+        <div class="nav-tabs-card">
+            <a href="/resident/dashboard" class="nav-tab active">
+                <span class="nav-tab-icon">📰</span>
+                <span>Actualité</span>
+            </a>
+            <a href="/resident/maintenance" class="nav-tab">
+                <span class="nav-tab-icon">🔧</span>
+                <span>Maintenance</span>
+            </a>
+            <a href="/resident/assemblies" class="nav-tab">
+                <span class="nav-tab-icon">🗳️</span>
+                <span>Assemblées Générales</span>
+            </a>
+            <a href="/resident/finances" class="nav-tab">
+                <span class="nav-tab-icon">💰</span>
+                <span>Finances</span>
+            </a>
+            <a href="/resident/documents" class="nav-tab">
+                <span class="nav-tab-icon">📄</span>
+                <span>Documents</span>
+            </a>
+            <a href="/resident/profile" class="nav-tab">
+                <span class="nav-tab-icon">👤</span>
+                <span>Mon Profil</span>
+            </a>
+        </div>
+        
         <div class="calendar-card">
             <div class="calendar-header">
                 <span class="calendar-month" id="calendar-month">Octobre 2025</span>
@@ -752,24 +735,8 @@
             <div class="calendar-grid" id="calendar-days"></div>
         </div>
         
-        <!-- Upcoming Schedule -->
-        <div class="schedule-card">
-            <div class="section-title">
-                📅 Prochains Événements
-            </div>
-            <div id="schedule-list">
-                <div class="empty-state">
-                    <div class="empty-icon">📅</div>
-                    <p class="empty-text">Aucun événement prévu</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Active Polls -->
         <div class="poll-card">
-            <div class="section-title">
-                🗳️ Sondages Actifs
-            </div>
+            <div class="section-title">🗳️ Sondage Actif</div>
             <div id="polls-container">
                 <p class="poll-question">Êtes-vous favorable à l'installation de panneaux solaires ?</p>
                 <div class="poll-option">👍 Oui</div>
