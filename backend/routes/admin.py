@@ -444,6 +444,24 @@ def update_news(news_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/news/<int:news_id>', methods=['DELETE'])
+@login_required
+@superadmin_required
+def delete_news(news_id):
+    """Supprime une actualité"""
+    try:
+        news = News.query.get(news_id)
+        if not news:
+            return jsonify({'success': False, 'error': 'Actualité non trouvée'}), 404
+        
+        db.session.delete(news)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Actualité supprimée'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== MAINTENANCE ====================
 
 @admin_bp.route('/maintenance', methods=['GET'])

@@ -1,212 +1,84 @@
 {% extends "admin/admin_base.html" %}
 
-{% block title %}Gestion des Actualités - MySindic{% endblock %}
+{% block title %}Actualités - MySindic{% endblock %}
 
 {% block admin_content %}
 <div class="content-card">
     <div class="card-header">
         <div>
-            <h1 class="page-title">📰 Gestion des Actualités</h1>
-            <p class="page-subtitle">Publiez et gérez les actualités de toutes les résidences</p>
+            <h1 class="page-title">📰 Fil d'Actualité</h1>
+            <p class="page-subtitle">Dernières nouvelles de toutes les résidences</p>
         </div>
-        <button onclick="openCreateModal()" class="btn-primary">
-            ➕ Nouvelle Actualité
-        </button>
     </div>
 
-    <!-- Filters -->
-    <div class="mb-4">
-        <div class="flex flex-wrap gap-2">
-            <button onclick="filterByCategory('')" id="filter-all" class="btn-filter btn-filter-active">
+    <!-- Zone de publication -->
+    <div style="padding: 1rem; background: #f9fafb; border-radius: 12px; margin-bottom: 1.5rem;">
+        <select id="residence_id" required style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; margin-bottom: 0.75rem; background: white; outline: none;">
+            <option value="">Sélectionner une résidence...</option>
+        </select>
+        
+        <input type="text" id="news-title" placeholder="Titre de l'actualité..." style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; margin-bottom: 0.75rem; background: white; outline: none;">
+        
+        <textarea id="news-content" placeholder="Contenu de l'actualité..." style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; min-height: 100px; outline: none; background: white;"></textarea>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 0.375rem; cursor: pointer;">
+                    <input type="checkbox" id="is_important" style="border-radius: 4px;">
+                    <span style="font-size: 0.875rem; font-weight: 500;">★ Important</span>
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 0.375rem; cursor: pointer;">
+                    <input type="checkbox" id="is_pinned" style="border-radius: 4px;">
+                    <span style="font-size: 0.875rem; font-weight: 500;">📌 Épingler</span>
+                </label>
+            </div>
+            
+            <button onclick="publishNews()" class="btn-primary" style="padding: 0.625rem 1.5rem;">
+                Publier
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div style="margin-bottom: 1.5rem;">
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <button onclick="filterByCategory('')" id="filter-all" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #667eea; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: #667eea; color: white; transition: all 0.2s;">
                 Toutes
             </button>
-            <button onclick="filterByCategory('info')" id="filter-info" class="btn-filter">
+            <button onclick="filterByCategory('info')" id="filter-info" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
                 Info
             </button>
-            <button onclick="filterByCategory('announcement')" id="filter-announcement" class="btn-filter">
+            <button onclick="filterByCategory('announcement')" id="filter-announcement" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
                 Annonce
             </button>
-            <button onclick="filterByCategory('warning')" id="filter-warning" class="btn-filter">
+            <button onclick="filterByCategory('warning')" id="filter-warning" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
                 Alerte
             </button>
-            <button onclick="filterByCategory('maintenance')" id="filter-maintenance" class="btn-filter">
+            <button onclick="filterByCategory('maintenance')" id="filter-maintenance" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
                 Travaux
             </button>
         </div>
     </div>
 
-    <div id="news-list" class="space-y-4">
-        <div class="flex justify-center py-8">
-            <div class="loading-spinner"></div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Créer/Éditer Actualité -->
-<div id="newsModal" class="modal-backdrop hidden">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold" id="modal-title">Nouvelle Actualité</h2>
-                <button onclick="closeModal()" class="icon-btn">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
-            <form id="newsForm" class="space-y-4">
-                <input type="hidden" id="newsId">
-                
-                <div>
-                    <label class="label-field">Résidence *</label>
-                    <select id="residence_id" required class="input-field">
-                        <option value="">Sélectionner une résidence</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="label-field">Titre *</label>
-                    <input type="text" id="title" required class="input-field" placeholder="Titre de l'actualité">
-                </div>
-                
-                <div>
-                    <label class="label-field">Catégorie *</label>
-                    <select id="category" required class="input-field">
-                        <option value="info">Info</option>
-                        <option value="announcement">Annonce</option>
-                        <option value="warning">Alerte</option>
-                        <option value="maintenance">Travaux</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label class="label-field">Contenu *</label>
-                    <textarea id="content" required rows="6" class="input-field" placeholder="Contenu de l'actualité"></textarea>
-                </div>
-                
-                <div class="flex gap-4">
-                    <label class="flex items-center">
-                        <input type="checkbox" id="is_important" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm font-medium text-gray-700">★ Important</span>
-                    </label>
-                    
-                    <label class="flex items-center">
-                        <input type="checkbox" id="is_pinned" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm font-medium text-gray-700">📌 Épingler</span>
-                    </label>
-                    
-                    <label class="flex items-center">
-                        <input type="checkbox" id="is_published" checked class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm font-medium text-gray-700">Publier</span>
-                    </label>
-                </div>
-                
-                <div class="flex gap-3 pt-4">
-                    <button type="submit" class="btn-primary flex-1">
-                        <span id="submit-text">Créer</span>
-                    </button>
-                    <button type="button" onclick="closeModal()" class="btn-secondary flex-1">
-                        Annuler
-                    </button>
-                </div>
-            </form>
+    <!-- Fil d'actualités -->
+    <div id="news-feed">
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+            <p style="color: #9ca3af;">Aucune actualité pour le moment</p>
         </div>
     </div>
 </div>
 
 <style>
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    background: #4F46E5;
-    color: white;
-    border: 2px solid #4F46E5;
-    border-radius: 10px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-primary:hover {
-    background: #4338CA;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-}
-
-.btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    background: white;
-    color: #6B7280;
-    border: 2px solid #E5E7EB;
-    border-radius: 10px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-secondary:hover {
-    background: #F9FAFB;
-    border-color: #D1D5DB;
-}
-
-.btn-filter {
-    padding: 0.5rem 1rem;
-    background: white;
-    color: #6B7280;
-    border: 2px solid #E5E7EB;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
 .btn-filter:hover {
-    border-color: #4F46E5;
-    color: #4F46E5;
+    background: #f3f4f6 !important;
 }
 
-.btn-filter-active {
-    background: #4F46E5;
-    color: white;
-    border-color: #4F46E5;
-}
-
-.btn-action {
-    padding: 0.5rem 0.875rem;
-    background: white;
-    border: 2px solid #E5E7EB;
-    border-radius: 8px;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-}
-
-.btn-action:hover {
-    background: #F9FAFB;
-}
-
-.btn-action.danger {
-    color: #DC2626;
-    border-color: #FCA5A5;
-}
-
-.btn-action.danger:hover {
-    background: #FEE2E2;
+.btn-filter.active {
+    background: #667eea !important;
+    color: white !important;
+    border-color: #667eea !important;
 }
 </style>
 {% endblock %}
@@ -215,7 +87,6 @@
 <script>
 let allNews = [];
 let currentCategory = '';
-let editingNewsId = null;
 
 async function loadResidences() {
     try {
@@ -224,7 +95,7 @@ async function loadResidences() {
         
         if (data.success) {
             const select = document.getElementById('residence_id');
-            select.innerHTML = '<option value="">Sélectionner une résidence</option>';
+            select.innerHTML = '<option value="">Sélectionner une résidence...</option>';
             data.residences.forEach(res => {
                 select.innerHTML += `<option value="${res.id}">${res.name}</option>`;
             });
@@ -242,8 +113,6 @@ async function loadNews() {
         if (data.success) {
             allNews = data.news || [];
             filterByCategory(currentCategory);
-        } else {
-            MySindic.showToast('Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -254,13 +123,13 @@ async function loadNews() {
 function filterByCategory(category) {
     currentCategory = category;
     
-    document.querySelectorAll('[id^="filter-"]').forEach(btn => {
-        btn.classList.remove('btn-filter-active');
+    document.querySelectorAll('.btn-filter').forEach(btn => {
+        btn.classList.remove('active');
     });
     
     const activeBtn = category ? document.getElementById(`filter-${category}`) : document.getElementById('filter-all');
     if (activeBtn) {
-        activeBtn.classList.add('btn-filter-active');
+        activeBtn.classList.add('active');
     }
     
     const filtered = category ? allNews.filter(n => n.category === category) : allNews;
@@ -268,130 +137,109 @@ function filterByCategory(category) {
 }
 
 function displayNews(newsList) {
-    const container = document.getElementById('news-list');
+    const container = document.getElementById('news-feed');
     
     if (newsList.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-12">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune actualité</h3>
-                <p class="mt-1 text-sm text-gray-500">Aucune actualité n'est disponible pour le moment.</p>
+            <div style="text-align: center; padding: 3rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                <p style="color: #9ca3af;">Aucune actualité dans cette catégorie</p>
             </div>
         `;
         return;
     }
     
-    const getCategoryIcon = (category) => {
-        switch(category) {
-            case 'info': return 'ℹ️';
-            case 'announcement': return '📢';
-            case 'warning': return '⚠️';
-            case 'maintenance': return '🔧';
-            default: return '📄';
-        }
-    };
-    
-    const getCategoryColor = (category) => {
-        switch(category) {
-            case 'info': return 'bg-blue-100 text-blue-700';
-            case 'announcement': return 'bg-green-100 text-green-700';
-            case 'warning': return 'bg-yellow-100 text-yellow-700';
-            case 'maintenance': return 'bg-red-100 text-red-700';
-            default: return 'bg-gray-100 text-gray-700';
-        }
-    };
-    
-    let html = newsList.map(news => `
-        <div class="card">
-            <div class="flex items-start">
-                <div class="flex-shrink-0 text-3xl mr-4">
-                    ${getCategoryIcon(news.category)}
-                </div>
-                <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2">
-                                ${news.is_important ? '<span class="text-red-500 font-bold">★</span>' : ''}
-                                ${news.is_pinned ? '<span class="text-indigo-500">📌</span>' : ''}
-                                <h3 class="text-lg font-semibold text-gray-900">${news.title}</h3>
-                            </div>
-                            <p class="mt-1 text-sm text-gray-500">Résidence: ${news.residence_name || 'N/A'}</p>
-                            <p class="mt-2 text-gray-600 line-clamp-2">${news.content}</p>
-                        </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(news.category)} ml-4">
-                            ${news.category}
-                        </span>
-                    </div>
-                    
-                    <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                        <div class="flex items-center space-x-4">
-                            <span>📅 ${MySindic.formatDate(news.published_at || news.created_at)}</span>
-                            ${news.author_name ? `<span>✍️ ${news.author_name}</span>` : ''}
-                            <span class="inline-flex items-center px-2 py-1 rounded text-xs ${news.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">
-                                ${news.is_published ? '✓ Publié' : '🔒 Brouillon'}
+    container.innerHTML = newsList.map(news => {
+        const categoryEmoji = {
+            'info': 'ℹ️',
+            'announcement': '📢',
+            'warning': '⚠️',
+            'maintenance': '🔧'
+        };
+        
+        return `
+            <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            ${news.is_pinned ? '<span style="font-size: 1.125rem;">📌</span>' : ''}
+                            ${news.is_important ? '<span style="font-size: 1.125rem;">★</span>' : ''}
+                            <span style="background: #f3f4f6; padding: 0.25rem 0.625rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+                                ${categoryEmoji[news.category] || 'ℹ️'} ${news.category}
                             </span>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="editNews(${news.id})" class="btn-action">
-                                ✏️ Éditer
-                            </button>
-                            <button onclick="deleteNews(${news.id})" class="btn-action danger">
-                                🗑️ Supprimer
-                            </button>
-                        </div>
+                        <h3 style="font-size: 1.125rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">${news.title}</h3>
+                        <p style="color: #6b7280; font-size: 0.875rem; line-height: 1.5;">${news.content}</p>
                     </div>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+                    <div style="font-size: 0.75rem; color: #9ca3af;">
+                        ${news.residence_name || 'Toutes les résidences'} • ${new Date(news.published_at || news.created_at).toLocaleDateString('fr-FR')}
+                    </div>
+                    <button onclick="deleteNews(${news.id})" style="padding: 0.375rem 0.75rem; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; font-size: 0.8125rem; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">
+                        🗑️ Supprimer
+                    </button>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+async function publishNews() {
+    const residenceId = document.getElementById('residence_id').value;
+    const title = document.getElementById('news-title').value.trim();
+    const content = document.getElementById('news-content').value.trim();
+    const isImportant = document.getElementById('is_important').checked;
+    const isPinned = document.getElementById('is_pinned').checked;
     
-    container.innerHTML = html;
-}
-
-function openCreateModal() {
-    editingNewsId = null;
-    document.getElementById('modal-title').textContent = 'Nouvelle Actualité';
-    document.getElementById('submit-text').textContent = 'Créer';
-    document.getElementById('newsForm').reset();
-    document.getElementById('is_published').checked = true;
-    document.getElementById('newsModal').classList.remove('hidden');
-}
-
-async function editNews(id) {
+    if (!residenceId) {
+        MySindic.showToast('Veuillez sélectionner une résidence', 'error');
+        return;
+    }
+    
+    if (!title || !content) {
+        MySindic.showToast('Veuillez remplir le titre et le contenu', 'error');
+        return;
+    }
+    
     try {
-        const news = allNews.find(n => n.id === id);
-        if (!news) return;
+        const response = await fetch('/api/admin/news', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                residence_id: parseInt(residenceId),
+                title,
+                content,
+                category: 'info',
+                is_important: isImportant,
+                is_pinned: isPinned,
+                is_published: true
+            })
+        });
         
-        editingNewsId = id;
-        document.getElementById('modal-title').textContent = 'Éditer l\'Actualité';
-        document.getElementById('submit-text').textContent = 'Mettre à jour';
+        const data = await response.json();
         
-        document.getElementById('residence_id').value = news.residence_id;
-        document.getElementById('title').value = news.title;
-        document.getElementById('category').value = news.category;
-        document.getElementById('content').value = news.content;
-        document.getElementById('is_important').checked = news.is_important;
-        document.getElementById('is_pinned').checked = news.is_pinned;
-        document.getElementById('is_published').checked = news.is_published;
-        
-        document.getElementById('newsModal').classList.remove('hidden');
+        if (data.success) {
+            MySindic.showToast('Actualité publiée!', 'success');
+            document.getElementById('news-title').value = '';
+            document.getElementById('news-content').value = '';
+            document.getElementById('is_important').checked = false;
+            document.getElementById('is_pinned').checked = false;
+            loadNews();
+        } else {
+            MySindic.showToast(data.error || 'Erreur lors de la publication', 'error');
+        }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur lors du chargement', 'error');
+        MySindic.showToast('Erreur de connexion', 'error');
     }
 }
 
-function closeModal() {
-    document.getElementById('newsModal').classList.add('hidden');
-}
-
-async function deleteNews(id) {
-    if (!confirm('Voulez-vous vraiment supprimer cette actualité ?')) return;
+async function deleteNews(newsId) {
+    if (!confirm('Supprimer cette actualité?')) return;
     
     try {
-        const response = await fetch(`/api/admin/news/${id}`, {
+        const response = await fetch(`/api/admin/news/${newsId}`, {
             method: 'DELETE'
         });
         
@@ -409,47 +257,7 @@ async function deleteNews(id) {
     }
 }
 
-document.getElementById('newsForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        residence_id: document.getElementById('residence_id').value,
-        title: document.getElementById('title').value,
-        category: document.getElementById('category').value,
-        content: document.getElementById('content').value,
-        is_important: document.getElementById('is_important').checked,
-        is_pinned: document.getElementById('is_pinned').checked,
-        is_published: document.getElementById('is_published').checked
-    };
-    
-    try {
-        const url = editingNewsId ? `/api/admin/news/${editingNewsId}` : '/api/admin/news';
-        const method = editingNewsId ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            MySindic.showToast(editingNewsId ? 'Actualité mise à jour' : 'Actualité créée', 'success');
-            closeModal();
-            loadNews();
-        } else {
-            MySindic.showToast(data.error || 'Erreur', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        MySindic.showToast('Erreur de connexion', 'error');
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     loadResidences();
     loadNews();
 });
