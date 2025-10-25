@@ -629,65 +629,6 @@
                 <span>Mon Profil</span>
             </a>
         </div>
-    </aside>
-    
-    <main class="main-content">
-        <div class="content-card">
-            <div class="card-header">
-                <div>
-                    <h2 class="card-title">📰 Fil d'Actualité</h2>
-                    <p class="card-subtitle">Dernières nouvelles de votre résidence</p>
-                </div>
-            </div>
-            <div id="news-feed">
-                <div class="empty-state">
-                    <div class="empty-icon">📭</div>
-                    <p class="empty-text">Aucune actualité pour le moment</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="content-card">
-            <div class="card-header">
-                <div>
-                    <h2 class="card-title">🔧 Demandes de Maintenance</h2>
-                    <p class="card-subtitle">Vos demandes et celles de la résidence</p>
-                </div>
-            </div>
-            <div id="maintenance-feed">
-                <div class="empty-state">
-                    <div class="empty-icon">✨</div>
-                    <p class="empty-text">Aucune demande de maintenance</p>
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <aside class="right-sidebar">
-        <div class="profile-card">
-            <div class="profile-header-img">
-                <div class="profile-avatar-large" id="profile-avatar-large">👤</div>
-            </div>
-            <div class="profile-info">
-                <div class="profile-name" id="profile-name">Chargement...</div>
-                <div class="profile-role" id="profile-email"></div>
-                
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <span class="stat-value" id="balance-stat">0</span>
-                        <span class="stat-label">Solde</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" id="requests-stat">0</span>
-                        <span class="stat-label">Demandes</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" id="docs-stat">0</span>
-                        <span class="stat-label">Documents</span>
-                    </div>
-                </div>
-            </div>
-        </div>
         
         <div class="profile-card">
             <div class="section-title">🏢 Ma Résidence</div>
@@ -714,7 +655,51 @@
                 </div>
             </div>
         </div>
+    </aside>
+    
+    <main class="main-content">
+        <div class="content-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">📰 Fil d'Actualité</h2>
+                    <p class="card-subtitle">Dernières nouvelles de votre résidence</p>
+                </div>
+            </div>
+            
+            <div style="padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6; margin-bottom: 1rem;">
+                <textarea id="new-post-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; min-height: 80px; outline: none;"></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                    <button onclick="publishPost()" style="padding: 0.5rem 1.5rem; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        Publier
+                    </button>
+                </div>
+            </div>
+            
+            <div id="news-feed">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p class="empty-text">Aucune actualité pour le moment</p>
+                </div>
+            </div>
+        </div>
         
+        <div class="content-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">🔧 Demandes de Maintenance</h2>
+                    <p class="card-subtitle">Vos demandes et celles de la résidence</p>
+                </div>
+            </div>
+            <div id="maintenance-feed">
+                <div class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <p class="empty-text">Aucune demande de maintenance</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <aside class="right-sidebar">
         <div class="calendar-card">
             <div class="calendar-header">
                 <span class="calendar-month" id="calendar-month">Octobre 2025</span>
@@ -766,19 +751,57 @@ async function loadResidentDashboard() {
     }
 }
 
+async function publishPost() {
+    const content = document.getElementById('new-post-content').value.trim();
+    
+    if (!content) {
+        MySindic.showToast('Veuillez saisir du contenu', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/resident/news', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                content: content
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('new-post-content').value = '';
+            MySindic.showToast('Publication envoyée avec succès', 'success');
+            loadResidentDashboard();
+        } else {
+            MySindic.showToast(data.message || 'Erreur lors de la publication', 'error');
+        }
+    } catch (error) {
+        console.error('Error publishing post:', error);
+        MySindic.showToast('Erreur lors de la publication', 'error');
+    }
+}
+
 function updateProfile(data) {
     const user = data.user || {};
     const residence = data.residence || {};
     const unit = data.unit || {};
     
     const fullName = user.full_name || user.first_name || 'Utilisateur';
-    document.getElementById('profile-name').textContent = fullName;
-    document.getElementById('header-name').textContent = fullName;
+    const headerName = document.getElementById('header-name');
+    if (headerName) {
+        headerName.textContent = fullName;
+    }
     document.getElementById('profile-email').textContent = user.email || '';
     
     const initials = fullName.substring(0, 2).toUpperCase();
-    document.getElementById('profile-avatar-large').textContent = initials;
-    document.getElementById('header-avatar').textContent = initials;
+    const headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) {
+        headerAvatar.textContent = initials;
+    }
     
     if (residence.name) {
         document.getElementById('residence-name').textContent = residence.name;
@@ -803,13 +826,6 @@ function updateProfile(data) {
         document.getElementById('unit-type-row').style.display = 'block';
         document.getElementById('unit-type').textContent = unit.unit_type;
     }
-    
-    const balance = data.balance || 0;
-    const balanceText = MySindic.formatCurrency(Math.abs(balance));
-    document.getElementById('balance-stat').textContent = balanceText;
-    
-    document.getElementById('requests-stat').textContent = data.maintenance_requests?.length || 0;
-    document.getElementById('docs-stat').textContent = data.documents_count || 0;
 }
 
 function loadNewsFeed(news) {
