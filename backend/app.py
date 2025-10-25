@@ -165,6 +165,12 @@ def create_app():
         """Gestion des documents"""
         return render_template('admin/documents.html')
     
+    @app.route('/admin/news')
+    @superadmin_required
+    def admin_news():
+        """Gestion des actualités"""
+        return render_template('admin/news.html')
+    
     # Routes Résidents (pages HTML)
     @app.route('/resident/dashboard')
     @login_required
