@@ -105,11 +105,41 @@ def init_demo_data(app, db):
         db.session.commit()
         print(f"✅ {len(units_data)} unités créées\n")
         
-        # 4. Créer des utilisateurs résidents
-        print("👥 Création des comptes résidents...")
+        # 4. Créer des utilisateurs avec différents rôles
+        print("👥 Création des comptes utilisateurs...")
+        
+        # Administrateur (Bureau Syndic)
+        admin_user = User(
+            email="admin.syndic@mysindic.ma",
+            first_name="Hassan",
+            last_name="Tazi",
+            phone="+212600000001",
+            role="admin",
+            is_active=True,
+            email_verified=True,
+            residence_id=residence.id
+        )
+        admin_user.set_password("Admin123!")
+        db.session.add(admin_user)
+        
+        # Propriétaire
+        owner = User(
+            email="owner@mysindic.ma",
+            first_name="Ahmed",
+            last_name="Alami",
+            phone="+212600000002",
+            role="owner",
+            is_active=True,
+            email_verified=True,
+            residence_id=residence.id,
+            unit_id=units[0].id
+        )
+        owner.set_password("Owner123!")
+        db.session.add(owner)
+        
+        # Résidents
         residents_data = [
-            {"email": "resident@mysindic.ma", "first_name": "Ahmed", "last_name": "Alami", "unit_idx": 0},
-            {"email": "fatima@mysindic.ma", "first_name": "Fatima", "last_name": "El Amrani", "unit_idx": 1},
+            {"email": "resident@mysindic.ma", "first_name": "Fatima", "last_name": "El Amrani", "unit_idx": 1},
             {"email": "karim@mysindic.ma", "first_name": "Karim", "last_name": "Bennani", "unit_idx": 2},
         ]
         
@@ -119,7 +149,7 @@ def init_demo_data(app, db):
                 email=resident_data["email"],
                 first_name=resident_data["first_name"],
                 last_name=resident_data["last_name"],
-                phone=f"+21260000000{idx+1}",
+                phone=f"+21260000000{idx+3}",
                 role="resident",
                 is_active=True,
                 email_verified=True,
@@ -131,7 +161,7 @@ def init_demo_data(app, db):
             residents.append(resident)
         
         db.session.commit()
-        print(f"✅ {len(residents_data)} résidents créés\n")
+        print(f"✅ 1 admin syndic, 1 propriétaire et {len(residents_data)} résidents créés\n")
         
         # 5. Créer des charges (appels de fonds)
         print("💰 Création des charges...")
@@ -165,7 +195,7 @@ def init_demo_data(app, db):
         print("💳 Création des paiements de démonstration...")
         payment1 = Payment(
             unit_id=units[0].id,
-            user_id=residents[0].id,
+            user_id=owner.id,
             amount=2500.00,
             payment_date=datetime.now() - timedelta(days=5),
             payment_method="virement",
@@ -280,20 +310,23 @@ def init_demo_data(app, db):
         print("=" * 70)
         print("🎉 Initialisation terminée avec succès!")
         print("=" * 70)
-        print("\n📝 Comptes créés:")
-        print(f"   Superadmin: admin@mysindic.ma / Admin123!")
-        print(f"   Résident 1: resident@mysindic.ma / Resident123!")
-        print(f"   Résident 2: fatima@mysindic.ma / Resident123!")
-        print(f"   Résident 3: karim@mysindic.ma / Resident123!")
+        print("\n📝 Comptes créés (4 rôles différents):")
+        print(f"   🔑 Super Admin: admin@mysindic.ma / Admin123!")
+        print(f"   👔 Admin Syndic: admin.syndic@mysindic.ma / Admin123!")
+        print(f"   🏠 Propriétaire: owner@mysindic.ma / Owner123!")
+        print(f"   👤 Résident 1: resident@mysindic.ma / Resident123!")
+        print(f"   👤 Résident 2: karim@mysindic.ma / Resident123!")
         print(f"\n📊 Données créées:")
         print(f"   • 1 résidence (Les Jardins)")
         print(f"   • 5 unités")
-        print(f"   • 4 utilisateurs (1 admin + 3 résidents)")
+        print(f"   • 5 utilisateurs (1 superadmin, 1 admin syndic, 1 propriétaire, 2 résidents)")
         print(f"   • 1 appel de fonds avec répartition")
         print(f"   • 2 paiements validés")
         print(f"   • 2 demandes de maintenance")
         print(f"   • 2 entrées du carnet d'entretien")
         print(f"   • 2 actualités")
+        print("\n💡 Système de gestion de rôles:")
+        print(f"   Le superadmin peut attribuer les rôles via la page Utilisateurs")
         print("\n🌐 Accédez à l'application et connectez-vous!")
         print("=" * 70)
 

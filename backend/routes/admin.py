@@ -797,3 +797,48 @@ def update_user(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/users/<int:user_id>/role', methods=['PUT'])
+@login_required
+@superadmin_required
+def update_user_role(user_id):
+    """Met à jour le rôle d'un utilisateur (réservé au superadmin)"""
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'error': 'Utilisateur non trouvé'}), 404
+        
+        data = request.get_json()
+        new_role = data.get('role')
+        
+        # Validation du rôle
+        valid_roles = ['superadmin', 'admin', 'owner', 'resident']
+        if new_role not in valid_roles:
+            return jsonify({
+                'success': False, 
+                'error': f'Rôle invalide. Rôles autorisés: {", ".join(valid_roles)}'
+            }), 400
+        
+        # Empêcher de modifier son propre rôle
+        if user.id == current_user.id:
+            return jsonify({
+                'success': False, 
+                'error': 'Vous ne pouvez pas modifier votre propre rôle'
+            }), 403
+        
+        old_role = user.role
+        user.role = new_role
+        user.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Rôle mis à jour de {old_role} vers {new_role}',
+            'user': user.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500

@@ -30,7 +30,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20))
     
-    # Rôle : 'superadmin' ou 'resident'
+    # Rôle : 'superadmin', 'admin' (bureau syndic), 'owner' (propriétaire), 'resident' (résident)
     role = db.Column(db.String(20), nullable=False, default='resident')
     
     # Statut du compte
@@ -77,9 +77,21 @@ class User(UserMixin, db.Model):
         """Vérifie si l'utilisateur est un superadmin"""
         return self.role == 'superadmin'
     
+    def is_admin(self):
+        """Vérifie si l'utilisateur est un administrateur (bureau syndic)"""
+        return self.role == 'admin'
+    
+    def is_owner(self):
+        """Vérifie si l'utilisateur est un propriétaire"""
+        return self.role == 'owner'
+    
     def is_resident(self):
         """Vérifie si l'utilisateur est un résident"""
         return self.role == 'resident'
+    
+    def has_admin_rights(self):
+        """Vérifie si l'utilisateur a des droits d'administration (superadmin ou admin)"""
+        return self.role in ['superadmin', 'admin']
     
     def get_full_name(self):
         """Retourne le nom complet de l'utilisateur"""

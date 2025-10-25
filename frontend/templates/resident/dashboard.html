@@ -593,7 +593,7 @@
                 🔔
                 <span class="badge">3</span>
             </button>
-            <button class="user-profile-btn" onclick="MySindic.logout()">
+            <button class="user-profile-btn" onclick="switchTab(event, 'profile')">
                 <div class="user-avatar" id="header-avatar">👤</div>
                 <span class="user-name" id="header-name">Chargement...</span>
             </button>
@@ -628,6 +628,12 @@
                 <span class="nav-tab-icon">👤</span>
                 <span>Mon Profil</span>
             </a>
+            <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
+                <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
+                    <span class="nav-tab-icon">🚪</span>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
         </div>
         
         <div class="profile-card">
@@ -782,6 +788,34 @@
         </div>
         
         <div id="tab-profile" class="tab-content" style="display: none;">
+            <div class="content-card" style="margin-bottom: 1rem;">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">📊 Statistiques de Mon Compte</h2>
+                        <p class="card-subtitle">Aperçu de votre activité</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; padding: 1rem 0;">
+                    <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 1rem; border-radius: 10px;">
+                        <div style="font-size: 0.7rem; color: #1e40af; margin-bottom: 0.25rem; font-weight: 600;">Demandes Maintenance</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #1e3a8a;" id="stat-user-maintenance">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 1rem; border-radius: 10px;">
+                        <div style="font-size: 0.7rem; color: #065f46; margin-bottom: 0.25rem; font-weight: 600;">Paiements Effectués</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #064e3b;" id="stat-user-payments">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1rem; border-radius: 10px;">
+                        <div style="font-size: 0.7rem; color: #92400e; margin-bottom: 0.25rem; font-weight: 600;">Jours d'Activité</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #78350f;" id="stat-user-days">-</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); padding: 1rem; border-radius: 10px;">
+                        <div style="font-size: 0.7rem; color: #3730a3; margin-bottom: 0.25rem; font-weight: 600;">Rôle</div>
+                        <div style="font-size: 1.125rem; font-weight: 700; color: #312e81; text-transform: capitalize;" id="stat-user-role">-</div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="content-card">
                 <div class="card-header">
                     <div>

@@ -27,7 +27,9 @@
                     <label class="label-field">Filtrer par rôle</label>
                     <select id="filter-role" class="input-field" onchange="filterUsers()">
                         <option value="">Tous</option>
-                        <option value="superadmin">Super Admin</option>
+                        <option value="superadmin">Super Administrateur</option>
+                        <option value="admin">Administrateur (Bureau Syndic)</option>
+                        <option value="owner">Propriétaire</option>
                         <option value="resident">Résident</option>
                     </select>
                 </div>
@@ -99,8 +101,13 @@
                         <select id="user-role" class="input-field" required onchange="toggleResidenceFields()">
                             <option value="">Sélectionner un rôle</option>
                             <option value="superadmin">Super Administrateur</option>
+                            <option value="admin">Administrateur (Bureau Syndic)</option>
+                            <option value="owner">Propriétaire</option>
                             <option value="resident">Résident</option>
                         </select>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Super Admin: Accès complet | Admin: Bureau syndic | Propriétaire: Possède un lot | Résident: Locataire
+                        </p>
                     </div>
                     
                     <div id="residence-fields" class="mt-4 space-y-4 hidden">
@@ -176,6 +183,17 @@ async function loadUsers() {
     }
 }
 
+function getRoleBadge(role) {
+    const roles = {
+        'superadmin': { label: 'Super Admin', class: 'badge-danger' },
+        'admin': { label: 'Admin Syndic', class: 'badge-warning' },
+        'owner': { label: 'Propriétaire', class: 'badge-info' },
+        'resident': { label: 'Résident', class: 'badge-success' }
+    };
+    const roleInfo = roles[role] || { label: role, class: 'badge-secondary' };
+    return `<span class="badge ${roleInfo.class}">${roleInfo.label}</span>`;
+}
+
 function filterUsers() {
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
     const roleFilter = document.getElementById('filter-role').value;
@@ -184,7 +202,6 @@ function filterUsers() {
     
     if (searchTerm) {
         filtered = filtered.filter(u => 
-            (u.username && u.username.toLowerCase().includes(searchTerm)) ||
             (u.email && u.email.toLowerCase().includes(searchTerm)) ||
             (u.first_name && u.first_name.toLowerCase().includes(searchTerm)) ||
             (u.last_name && u.last_name.toLowerCase().includes(searchTerm))
@@ -192,14 +209,42 @@ function filterUsers() {
     }
     
     if (roleFilter) {
-        filtered = filtered.filter(u => {
-            if (roleFilter === 'superadmin') return u.is_superadmin;
-            if (roleFilter === 'resident') return !u.is_superadmin;
-            return true;
-        });
+        filtered = filtered.filter(u => u.role === roleFilter);
     }
     
     displayUsers(filtered);
+}
+
+async function changeUserRole(userId, currentRole) {
+    const newRole = prompt(`Changer le rôle de l'utilisateur.\nRôle actuel: ${currentRole}\n\nEntrez le nouveau rôle:\n- superadmin (Super Administrateur)\n- admin (Bureau Syndic)\n- owner (Propriétaire)\n- resident (Résident)`, currentRole);
+    
+    if (!newRole || newRole === currentRole) return;
+    
+    const validRoles = ['superadmin', 'admin', 'owner', 'resident'];
+    if (!validRoles.includes(newRole)) {
+        MySindic.showToast('Rôle invalide', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/admin/users/${userId}/role`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: newRole })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast(data.message, 'success');
+            loadUsers();
+        } else {
+            MySindic.showToast(data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur lors du changement de rôle', 'error');
+    }
 }
 
 function displayUsers(usersList) {
@@ -227,24 +272,27 @@ function displayUsers(usersList) {
                 ${usersList.map(u => `
                     <tr>
                         <td>
-                            <div class="font-medium text-gray-900">${u.username}</div>
-                            ${u.first_name || u.last_name ? `<div class="text-sm text-gray-500">${u.first_name || ''} ${u.last_name || ''}</div>` : ''}
+                            <div class="font-medium text-gray-900">${u.full_name || u.email}</div>
+                            ${u.first_name || u.last_name ? `<div class="text-sm text-gray-500">${u.email}</div>` : ''}
                         </td>
-                        <td>${u.email}</td>
+                        <td class="text-sm">${u.phone || '-'}</td>
                         <td>
-                            <span class="badge ${u.is_superadmin ? 'badge-danger' : 'badge-info'}">
-                                ${u.is_superadmin ? 'Super Admin' : 'Résident'}
-                            </span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                ${getRoleBadge(u.role)}
+                                <button onclick="changeUserRole(${u.id}, '${u.role}')" class="text-xs text-blue-600 hover:text-blue-800" title="Changer le rôle">
+                                    ✏️
+                                </button>
+                            </div>
                         </td>
-                        <td>${u.residence_name || '-'}</td>
-                        <td>${u.unit_number || '-'}</td>
+                        <td class="text-sm">${u.residence_name || '-'}</td>
+                        <td class="text-sm">${u.unit_number || '-'}</td>
                         <td>
                             <span class="badge ${u.is_active ? 'badge-success' : 'badge-warning'}">
                                 ${u.is_active ? 'Actif' : 'Inactif'}
                             </span>
                         </td>
                         <td>
-                            <button onclick="editUser(${u.id})" class="text-indigo-600 hover:text-indigo-800">
+                            <button onclick="editUser(${u.id})" class="text-indigo-600 hover:text-indigo-800 text-sm">
                                 Éditer
                             </button>
                         </td>
@@ -272,18 +320,17 @@ function editUser(userId) {
     
     document.getElementById('modal-title').textContent = 'Éditer Utilisateur';
     document.getElementById('user-id').value = user.id;
-    document.getElementById('user-username').value = user.username;
     document.getElementById('user-email').value = user.email;
     document.getElementById('user-firstname').value = user.first_name || '';
     document.getElementById('user-lastname').value = user.last_name || '';
     document.getElementById('user-phone').value = user.phone || '';
-    document.getElementById('user-role').value = user.is_superadmin ? 'superadmin' : 'resident';
+    document.getElementById('user-role').value = user.role || 'resident';
     document.getElementById('user-active').checked = user.is_active;
     
     document.getElementById('password-section').style.display = 'none';
     document.getElementById('user-password').required = false;
     
-    if (!user.is_superadmin) {
+    if (user.role !== 'superadmin') {
         document.getElementById('residence-fields').classList.remove('hidden');
         document.getElementById('user-residence').value = user.residence_id || '';
         document.getElementById('user-unit').value = user.unit_number || '';
@@ -296,7 +343,8 @@ function toggleResidenceFields() {
     const role = document.getElementById('user-role').value;
     const residenceFields = document.getElementById('residence-fields');
     
-    if (role === 'resident') {
+    // Afficher les champs de résidence pour tous sauf superadmin
+    if (role !== 'superadmin') {
         residenceFields.classList.remove('hidden');
     } else {
         residenceFields.classList.add('hidden');
@@ -310,12 +358,11 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
     const role = document.getElementById('user-role').value;
     
     const formData = {
-        username: document.getElementById('user-username').value,
         email: document.getElementById('user-email').value,
         first_name: document.getElementById('user-firstname').value,
         last_name: document.getElementById('user-lastname').value,
         phone: document.getElementById('user-phone').value,
-        is_superadmin: role === 'superadmin',
+        role: role,
         is_active: document.getElementById('user-active').checked
     };
     
@@ -323,7 +370,7 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
         formData.password = document.getElementById('user-password').value;
     }
     
-    if (role === 'resident') {
+    if (role !== 'superadmin') {
         const residenceId = document.getElementById('user-residence').value;
         if (residenceId) {
             formData.residence_id = parseInt(residenceId);
