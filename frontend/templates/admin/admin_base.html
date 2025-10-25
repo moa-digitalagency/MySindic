@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #f5f7fa;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .modern-header {
+        background: white;
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .header-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+    
+    .logo {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #2563eb;
+    }
+    
+    .search-bar {
+        flex: 1;
+        max-width: 350px;
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        outline: none;
+        transition: all 0.3s;
+        background: #f9fafb;
+    }
+    
+    .search-input:focus {
+        background: white;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 0.625rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+    
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f9fafb;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        font-size: 1rem;
+    }
+    
+    .icon-btn:hover {
+        background: #e5e7eb;
+    }
+    
+    .icon-btn.active {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .badge {
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        background: #ef4444;
+        color: white;
+        font-size: 0.625rem;
+        padding: 0.075rem 0.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    
+    .user-profile-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem;
+        border-radius: 10px;
+        border: none;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .user-profile-btn:hover {
+        background: #e5e7eb;
+    }
+    
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #111827;
+        font-size: 0.8rem;
+    }
+    
+    .admin-layout {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.25rem;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 1.25rem;
+    }
+    
+    .left-sidebar {
+        position: sticky;
+        top: 85px;
+        height: fit-content;
+    }
+    
+    .nav-tabs-card {
+        background: white;
+        border-radius: 12px;
+        padding: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
+    }
+    
+    .nav-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding: 0.625rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #6b7280;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-tab:hover {
+        background: #f9fafb;
+        color: #111827;
+    }
+    
+    .nav-tab.active {
+        background: #dbeafe;
+        color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .nav-tab-icon {
+        font-size: 1.125rem;
+    }
+    
+    .main-content {
+        min-height: 500px;
+    }
+    
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        width: 100%;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .quick-action-btn.green {
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    }
+    
+    .quick-action-btn.orange {
+        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    }
+    
+    @media (max-width: 1024px) {
+        .admin-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .left-sidebar {
+            position: static;
+        }
+    }
+</style>
+{% block admin_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="modern-header">
+    <div class="header-container">
+        <div class="logo">🏢 MySindic Admin</div>
+        
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Rechercher résidences, utilisateurs...">
+        </div>
+        
+        <div class="header-actions">
+            <button class="icon-btn" onclick="window.location.reload()" title="Actualiser">
+                🔄
+            </button>
+            <button class="icon-btn" title="Notifications">
+                🔔
+                <span class="badge" id="notification-count">0</span>
+            </button>
+            <button class="user-profile-btn">
+                <div class="user-avatar">{{ current_user.first_name[0].upper() if current_user.first_name else 'A' }}</div>
+                <span class="user-name">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="admin-layout">
+    <aside class="left-sidebar">
+        <div class="nav-tabs-card">
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-tab {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                <span class="nav-tab-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin_residences') }}" class="nav-tab {% if request.endpoint == 'admin_residences' or request.endpoint == 'admin_residence_wizard' %}active{% endif %}">
+                <span class="nav-tab-icon">🏢</span>
+                <span>Résidences</span>
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="nav-tab {% if request.endpoint == 'admin_users' %}active{% endif %}">
+                <span class="nav-tab-icon">👥</span>
+                <span>Utilisateurs</span>
+            </a>
+            <a href="{{ url_for('admin_finances') }}" class="nav-tab {% if request.endpoint == 'admin_finances' %}active{% endif %}">
+                <span class="nav-tab-icon">💰</span>
+                <span>Finances</span>
+            </a>
+            <a href="{{ url_for('admin_maintenance') }}" class="nav-tab {% if request.endpoint == 'admin_maintenance' %}active{% endif %}">
+                <span class="nav-tab-icon">🔧</span>
+                <span>Maintenance</span>
+            </a>
+            <a href="{{ url_for('admin_maintenance_log') }}" class="nav-tab {% if request.endpoint == 'admin_maintenance_log' %}active{% endif %}">
+                <span class="nav-tab-icon">📝</span>
+                <span>Carnet d'Entretien</span>
+            </a>
+            <a href="{{ url_for('admin_assemblies') }}" class="nav-tab {% if request.endpoint == 'admin_assemblies' %}active{% endif %}">
+                <span class="nav-tab-icon">🗳️</span>
+                <span>Assemblées</span>
+            </a>
+            <a href="{{ url_for('admin_documents') }}" class="nav-tab {% if request.endpoint == 'admin_documents' %}active{% endif %}">
+                <span class="nav-tab-icon">📄</span>
+                <span>Documents</span>
+            </a>
+            <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
+                <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
+                    <span class="nav-tab-icon">🚪</span>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="content-card" style="background: white; border-radius: 12px; padding: 1.125rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+            <h3 style="font-size: 0.8rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem;">⚡ Actions Rapides</h3>
+            <a href="{{ url_for('admin_residence_wizard') }}" class="quick-action-btn">
+                <span style="font-size: 1.5rem;">🏗️</span>
+                <span>Nouvelle Résidence</span>
+            </a>
+            <a href="{{ url_for('admin_users') }}#create" class="quick-action-btn green">
+                <span style="font-size: 1.5rem;">👤</span>
+                <span>Nouvel Utilisateur</span>
+            </a>
+            <a href="{{ url_for('admin_finances') }}#create" class="quick-action-btn orange">
+                <span style="font-size: 1.5rem;">💳</span>
+                <span>Appel de Fonds</span>
+            </a>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        {% block admin_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% block admin_extra_js %}{% endblock %}
+{% endblock %}
