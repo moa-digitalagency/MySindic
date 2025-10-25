@@ -4,357 +4,528 @@
 
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block extra_css %}
 <style>
-    .stat-card-modern {
+    body {
+        background: #f5f7fa;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .modern-header {
         background: white;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        transition: all 0.3s ease;
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .header-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+    
+    .logo {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #2563eb;
+    }
+    
+    .search-bar {
+        flex: 1;
+        max-width: 350px;
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        outline: none;
+        transition: all 0.3s;
+        background: #f9fafb;
+    }
+    
+    .search-input:focus {
+        background: white;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 0.625rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+    
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f9fafb;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        font-size: 1rem;
+    }
+    
+    .icon-btn:hover {
+        background: #e5e7eb;
+    }
+    
+    .icon-btn.active {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .badge {
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        background: #ef4444;
+        color: white;
+        font-size: 0.625rem;
+        padding: 0.075rem 0.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    
+    .user-profile-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem;
+        border-radius: 10px;
+        border: none;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .user-profile-btn:hover {
+        background: #e5e7eb;
+    }
+    
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #111827;
+        font-size: 0.8rem;
+    }
+    
+    .dashboard-layout {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.25rem;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 1.25rem;
+    }
+    
+    .left-sidebar {
+        position: sticky;
+        top: 85px;
+        height: fit-content;
+    }
+    
+    .nav-tabs-card {
+        background: white;
+        border-radius: 12px;
+        padding: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
+    }
+    
+    .nav-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding: 0.625rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #6b7280;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-tab:hover {
+        background: #f9fafb;
+        color: #111827;
+    }
+    
+    .nav-tab.active {
+        background: #dbeafe;
+        color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .nav-tab-icon {
+        font-size: 1.125rem;
+    }
+    
+    .main-content {
+        min-height: 500px;
+    }
+    
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.125rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         position: relative;
         overflow: hidden;
+        transition: all 0.3s ease;
     }
     
-    .stat-card-modern:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     
-    .stat-card-modern::before {
+    .stat-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, var(--gradient-from), var(--gradient-to));
     }
     
-    .stat-card-modern.blue::before {
-        --gradient-from: #3B82F6;
-        --gradient-to: #60A5FA;
-    }
-    
-    .stat-card-modern.green::before {
-        --gradient-from: #10B981;
-        --gradient-to: #34D399;
-    }
-    
-    .stat-card-modern.purple::before {
-        --gradient-from: #8B5CF6;
-        --gradient-to: #A78BFA;
-    }
-    
-    .stat-card-modern.orange::before {
-        --gradient-from: #F59E0B;
-        --gradient-to: #FBBF24;
-    }
-    
-    .stat-card-modern.red::before {
-        --gradient-from: #EF4444;
-        --gradient-to: #F87171;
-    }
-    
-    .stat-card-modern.indigo::before {
-        --gradient-from: #6366F1;
-        --gradient-to: #818CF8;
-    }
+    .stat-card.blue::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+    .stat-card.green::before { background: linear-gradient(90deg, #10B981, #34D399); }
+    .stat-card.purple::before { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+    .stat-card.orange::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+    .stat-card.red::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+    .stat-card.indigo::before { background: linear-gradient(90deg, #6366F1, #818CF8); }
     
     .stat-icon {
-        width: 64px;
-        height: 64px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        margin-bottom: 16px;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
     }
     
-    .stat-icon.blue { background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); }
-    .stat-icon.green { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); }
-    .stat-icon.purple { background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%); }
-    .stat-icon.orange { background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); }
-    .stat-icon.red { background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); }
-    .stat-icon.indigo { background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%); }
-    
     .stat-value {
-        font-size: 32px;
+        font-size: 1.75rem;
         font-weight: 700;
-        color: #1F2937;
-        margin-bottom: 4px;
+        color: #111827;
+        margin-bottom: 0.25rem;
     }
     
     .stat-label {
-        font-size: 14px;
-        color: #6B7280;
+        font-size: 0.75rem;
+        color: #6b7280;
         font-weight: 500;
     }
     
-    .stat-trend {
-        margin-top: 12px;
-        display: flex;
-        align-items: center;
-        font-size: 13px;
-        gap: 4px;
-    }
-    
-    .stat-trend.up {
-        color: #10B981;
-    }
-    
-    .stat-trend.down {
-        color: #EF4444;
-    }
-    
-    .chart-card {
+    .chart-container {
         background: white;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        height: 400px;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1rem;
     }
     
-    .quick-action-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 16px;
-        padding: 24px;
-        color: white;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        text-align: center;
-    }
-    
-    .quick-action-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(102, 126, 234, 0.4);
-    }
-    
-    .quick-action-icon {
-        font-size: 48px;
-        margin-bottom: 12px;
-    }
-    
-    .quick-action-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
-    }
-    
-    .quick-action-desc {
-        font-size: 14px;
-        opacity: 0.9;
+    .chart-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
     }
     
     .activity-item {
         display: flex;
         align-items: start;
-        gap: 16px;
-        padding: 16px;
-        border-radius: 12px;
-        background: #F9FAFB;
-        margin-bottom: 12px;
-        transition: all 0.2s ease;
+        gap: 0.75rem;
+        padding: 0.875rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
     }
     
     .activity-item:hover {
-        background: #F3F4F6;
+        background: #f3f4f6;
     }
     
     .activity-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 1.125rem;
         flex-shrink: 0;
     }
     
-    .pulse-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #10B981;
-        animation: pulse 2s infinite;
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        margin-bottom: 0.5rem;
     }
     
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .quick-action-btn.green {
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    }
+    
+    .quick-action-btn.orange {
+        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    }
+    
+    @media (max-width: 1024px) {
+        .dashboard-layout {
+            grid-template-columns: 1fr;
         }
-        50% {
-            opacity: 0.5;
+        
+        .left-sidebar {
+            position: static;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="px-4 sm:px-6 lg:px-8 py-6">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <span class="pulse-dot"></span>
-                    Dashboard SuperAdmin
-                </h1>
-                <p class="mt-2 text-gray-600">Vue d'ensemble complète de toutes vos copropriétés</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="refreshDashboard()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-                    <i data-feather="refresh-cw" class="w-4 h-4 mr-2"></i>
-                    Actualiser
-                </button>
-            </div>
+<div class="modern-header">
+    <div class="header-container">
+        <div class="logo">🏢 MySindic Admin</div>
+        
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Rechercher résidences, utilisateurs...">
+        </div>
+        
+        <div class="header-actions">
+            <button class="icon-btn" onclick="refreshDashboard()" title="Actualiser">
+                🔄
+            </button>
+            <button class="icon-btn" title="Notifications">
+                🔔
+                <span class="badge" id="notification-count">0</span>
+            </button>
+            <button class="user-profile-btn">
+                <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
+                <span class="user-name">{{ current_user.username }}</span>
+            </button>
         </div>
     </div>
+</div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Résidences -->
-        <div class="stat-card-modern blue">
-            <div class="stat-icon blue">
-                🏢
-            </div>
-            <div class="stat-value" id="stat-residences">-</div>
-            <div class="stat-label">Résidences Actives</div>
-            <div class="stat-trend up">
-                <i data-feather="trending-up" class="w-4 h-4"></i>
-                <span>Voir toutes</span>
+<div class="dashboard-layout">
+    <aside class="left-sidebar">
+        <div class="nav-tabs-card">
+            <a href="#dashboard" class="nav-tab active" data-tab="dashboard" onclick="switchTab(event, 'dashboard')">
+                <span class="nav-tab-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin_residences') }}" class="nav-tab">
+                <span class="nav-tab-icon">🏢</span>
+                <span>Résidences</span>
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="nav-tab">
+                <span class="nav-tab-icon">👥</span>
+                <span>Utilisateurs</span>
+            </a>
+            <a href="{{ url_for('admin_finances') }}" class="nav-tab">
+                <span class="nav-tab-icon">💰</span>
+                <span>Finances</span>
+            </a>
+            <a href="{{ url_for('admin_maintenance') }}" class="nav-tab">
+                <span class="nav-tab-icon">🔧</span>
+                <span>Maintenance</span>
+            </a>
+            <a href="{{ url_for('admin_maintenance_log') }}" class="nav-tab">
+                <span class="nav-tab-icon">📝</span>
+                <span>Carnet d'Entretien</span>
+            </a>
+            <a href="{{ url_for('admin_assemblies') }}" class="nav-tab">
+                <span class="nav-tab-icon">🗳️</span>
+                <span>Assemblées</span>
+            </a>
+            <a href="{{ url_for('admin_documents') }}" class="nav-tab">
+                <span class="nav-tab-icon">📄</span>
+                <span>Documents</span>
+            </a>
+            <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
+                <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
+                    <span class="nav-tab-icon">🚪</span>
+                    <span>Déconnexion</span>
+                </a>
             </div>
         </div>
-
-        <!-- Utilisateurs -->
-        <div class="stat-card-modern green">
-            <div class="stat-icon green">
-                👥
-            </div>
-            <div class="stat-value" id="stat-users">-</div>
-            <div class="stat-label">Utilisateurs Enregistrés</div>
-            <div class="stat-trend up">
-                <i data-feather="trending-up" class="w-4 h-4"></i>
-                <span>Gérer</span>
-            </div>
+        
+        <div class="content-card">
+            <h3 style="font-size: 0.8rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem;">⚡ Actions Rapides</h3>
+            <a href="{{ url_for('admin_residences') }}#create" class="quick-action-btn">
+                <span style="font-size: 1.5rem;">🏗️</span>
+                <span>Nouvelle Résidence</span>
+            </a>
+            <a href="{{ url_for('admin_users') }}#create" class="quick-action-btn green">
+                <span style="font-size: 1.5rem;">👤</span>
+                <span>Nouvel Utilisateur</span>
+            </a>
+            <a href="{{ url_for('admin_finances') }}#create" class="quick-action-btn orange">
+                <span style="font-size: 1.5rem;">💳</span>
+                <span>Appel de Fonds</span>
+            </a>
         </div>
-
-        <!-- Unités -->
-        <div class="stat-card-modern purple">
-            <div class="stat-icon purple">
-                🏠
+    </aside>
+    
+    <main class="main-content">
+        <div id="tab-dashboard" class="tab-content active">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-value" id="stat-residences">-</div>
+                    <div class="stat-label">Résidences Actives</div>
+                </div>
+                
+                <div class="stat-card green">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="stat-users">-</div>
+                    <div class="stat-label">Utilisateurs</div>
+                </div>
+                
+                <div class="stat-card purple">
+                    <div class="stat-icon">🏠</div>
+                    <div class="stat-value" id="stat-units">-</div>
+                    <div class="stat-label">Unités Totales</div>
+                </div>
+                
+                <div class="stat-card orange">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="stat-charges">-</div>
+                    <div class="stat-label">Appels de Fonds</div>
+                </div>
+                
+                <div class="stat-card red">
+                    <div class="stat-icon">🔧</div>
+                    <div class="stat-value" id="stat-maintenance">-</div>
+                    <div class="stat-label">Demandes en Attente</div>
+                </div>
+                
+                <div class="stat-card indigo">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value" id="stat-unpaid">-</div>
+                    <div class="stat-label">Impayés</div>
+                </div>
             </div>
-            <div class="stat-value" id="stat-units">-</div>
-            <div class="stat-label">Unités Totales</div>
-            <div class="stat-trend up">
-                <i data-feather="trending-up" class="w-4 h-4"></i>
-                <span>+12% ce mois</span>
+            
+            <!-- Charts Row -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div class="chart-container">
+                    <h3 class="chart-title">📈 Activité Mensuelle</h3>
+                    <canvas id="monthlyChart" style="max-height: 300px;"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="chart-title">📊 Répartition des Demandes</h3>
+                    <canvas id="distributionChart" style="max-height: 300px;"></canvas>
+                </div>
             </div>
-        </div>
-
-        <!-- Charges -->
-        <div class="stat-card-modern orange">
-            <div class="stat-icon orange">
-                💰
-            </div>
-            <div class="stat-value" id="stat-charges">-</div>
-            <div class="stat-label">Appels de Fonds Publiés</div>
-            <div class="stat-trend up">
-                <i data-feather="trending-up" class="w-4 h-4"></i>
-                <span>Ce trimestre</span>
-            </div>
-        </div>
-
-        <!-- Maintenance -->
-        <div class="stat-card-modern red">
-            <div class="stat-icon red">
-                🔧
-            </div>
-            <div class="stat-value" id="stat-maintenance-pending">-</div>
-            <div class="stat-label">Demandes en Attente</div>
-            <div class="stat-trend down">
-                <i data-feather="alert-circle" class="w-4 h-4"></i>
-                <span id="stat-maintenance-total">- total</span>
-            </div>
-        </div>
-
-        <!-- Impayés -->
-        <div class="stat-card-modern indigo">
-            <div class="stat-icon indigo">
-                📊
-            </div>
-            <div class="stat-value" id="stat-unpaid">-</div>
-            <div class="stat-label">Montant Impayés</div>
-            <div class="stat-trend down">
-                <i data-feather="trending-down" class="w-4 h-4"></i>
-                <span>-8% vs mois dernier</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Chart 1: Statistiques mensuelles -->
-        <div class="chart-card">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Activité des 6 derniers mois</h3>
-            <canvas id="monthlyChart"></canvas>
-        </div>
-
-        <!-- Chart 2: Répartition par type -->
-        <div class="chart-card">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Répartition des Demandes</h3>
-            <canvas id="distributionChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Activity and Quick Actions -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Recent Activity -->
-        <div class="lg:col-span-2 bg-white rounded-16px shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <i data-feather="activity" class="w-5 h-5"></i>
-                Activité Récente
-            </h3>
-            <div id="recent-activity">
-                <div class="flex justify-center py-8">
-                    <div class="loading-spinner border-indigo-600"></div>
+            
+            <!-- Recent Activity -->
+            <div class="content-card">
+                <h3 class="chart-title">📌 Activité Récente</h3>
+                <div id="recent-activity">
+                    <div style="text-align: center; padding: 2rem; color: #9ca3af;">
+                        Chargement...
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="space-y-4">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <i data-feather="zap" class="w-5 h-5"></i>
-                Actions Rapides
-            </h3>
-            
-            <div class="quick-action-card" onclick="window.location.href='{{ url_for('admin_residences') }}'">
-                <div class="quick-action-icon">🏗️</div>
-                <div class="quick-action-title">Nouvelle Résidence</div>
-                <div class="quick-action-desc">Créer une copropriété</div>
-            </div>
-            
-            <div class="quick-action-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onclick="window.location.href='{{ url_for('admin_users') }}'">
-                <div class="quick-action-icon">👤</div>
-                <div class="quick-action-title">Gérer Utilisateurs</div>
-                <div class="quick-action-desc">Rôles et permissions</div>
-            </div>
-            
-            <div class="quick-action-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" onclick="window.location.href='{{ url_for('admin_finances') }}'">
-                <div class="quick-action-icon">💳</div>
-                <div class="quick-action-title">Appels de Fonds</div>
-                <div class="quick-action-desc">Créer une charge</div>
-            </div>
-        </div>
-    </div>
+    </main>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 let monthlyChart, distributionChart;
+
+function switchTab(event, tabName) {
+    event.preventDefault();
+    
+    // Update nav tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    const targetTab = document.getElementById(`tab-${tabName}`);
+    if (targetTab) {
+        targetTab.style.display = 'block';
+    }
+}
 
 async function loadDashboardStats() {
     try {
@@ -369,10 +540,13 @@ async function loadDashboardStats() {
             animateValue('stat-users', 0, stats.total_users || 0, 1000);
             animateValue('stat-units', 0, stats.total_units || 0, 1000);
             animateValue('stat-charges', 0, stats.total_charges || 0, 1000);
-            animateValue('stat-maintenance-pending', 0, stats.pending_maintenance || 0, 1000);
+            animateValue('stat-maintenance', 0, stats.pending_maintenance || 0, 1000);
             
-            document.getElementById('stat-maintenance-total').textContent = `${stats.total_maintenance || 0} total`;
             document.getElementById('stat-unpaid').textContent = MySindic.formatCurrency(stats.total_unpaid || 0);
+            
+            // Update notification badge
+            const notificationCount = stats.pending_maintenance || 0;
+            document.getElementById('notification-count').textContent = notificationCount;
             
             // Load charts
             loadCharts(stats);
@@ -496,7 +670,7 @@ async function loadRecentActivity() {
                 activities.push({
                     type: 'maintenance',
                     icon: '🔧',
-                    iconBg: '#EF4444',
+                    iconBg: '#FEF3C7',
                     title: req.title,
                     desc: req.category || 'Autre',
                     time: MySindic.formatDate(req.created_at),
@@ -511,35 +685,36 @@ async function loadRecentActivity() {
                 activities.push({
                     type: 'payment',
                     icon: '💳',
-                    iconBg: '#10B981',
+                    iconBg: '#D1FAE5',
                     title: `Paiement reçu`,
                     desc: MySindic.formatCurrency(payment.amount),
                     time: MySindic.formatDate(payment.created_at),
-                    status: 'validated'
+                    status: payment.status
                 });
             });
         }
         
-        // Sort by most recent (simplified)
-        activities.sort((a, b) => b.time.localeCompare(a.time));
-        
         if (activities.length === 0) {
-            container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune activité récente</p>';
+            container.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 2rem;">Aucune activité récente</p>';
             return;
         }
         
         container.innerHTML = activities.slice(0, 6).map(activity => `
             <div class="activity-item">
-                <div class="activity-icon" style="background: ${activity.iconBg}20;">
+                <div class="activity-icon" style="background: ${activity.iconBg};">
                     ${activity.icon}
                 </div>
-                <div class="flex-1">
-                    <p class="font-medium text-gray-900">${activity.title}</p>
-                    <p class="text-sm text-gray-600">${activity.desc}</p>
-                    <p class="text-xs text-gray-400 mt-1">${activity.time}</p>
+                <div style="flex: 1;">
+                    <p style="font-weight: 600; color: #111827; font-size: 0.875rem; margin-bottom: 0.125rem;">${activity.title}</p>
+                    <p style="font-size: 0.75rem; color: #6b7280;">${activity.desc}</p>
+                    <p style="font-size: 0.7rem; color: #9ca3af; margin-top: 0.25rem;">${activity.time}</p>
                 </div>
                 ${activity.status ? `
-                    <span class="badge ${activity.status === 'pending' ? 'badge-warning' : activity.status === 'validated' ? 'badge-success' : 'badge-info'}">
+                    <span style="padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; ${
+                        activity.status === 'pending' ? 'background: #FEF3C7; color: #92400E;' :
+                        activity.status === 'validated' ? 'background: #D1FAE5; color: #065F46;' :
+                        'background: #DBEAFE; color: #1E40AF;'
+                    }">
                         ${activity.status}
                     </span>
                 ` : ''}
@@ -548,7 +723,7 @@ async function loadRecentActivity() {
         
     } catch (error) {
         console.error('Error loading activity:', error);
-        container.innerHTML = '<p class="text-red-500 text-center py-4">Erreur de chargement</p>';
+        container.innerHTML = '<p style="text-align: center; color: #ef4444; padding: 1rem;">Erreur de chargement</p>';
     }
 }
 
@@ -559,7 +734,6 @@ function refreshDashboard() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboardStats();
-    feather.replace();
 });
 </script>
 {% endblock %}

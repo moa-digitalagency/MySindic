@@ -15,6 +15,7 @@ from decimal import Decimal
 
 from backend.models import db
 from backend.models.residence import Residence, Unit
+from backend.models.residence_admin import ResidenceAdmin
 from backend.models.user import User
 from backend.models.charge import Charge, ChargeDistribution
 from backend.models.payment import Payment
@@ -873,6 +874,188 @@ def update_user_role(user_id):
             'message': f'Rôle mis à jour de {old_role} vers {new_role}',
             'user': user.to_dict()
         }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== ASSIGNATION ADMINS AUX RÉSIDENCES ====================
+
+@admin_bp.route('/residences/<int:residence_id>/admins', methods=['POST'])
+@login_required
+@superadmin_required
+def assign_admin_to_residence(residence_id):
+    """Assigne un ou plusieurs admins à une résidence"""
+    try:
+        residence = Residence.query.get(residence_id)
+        if not residence:
+            return jsonify({'success': False, 'error': 'Résidence non trouvée'}), 404
+        
+        data = request.get_json()
+        admin_ids = data.get('admin_ids', [])
+        
+        if not admin_ids:
+            return jsonify({'success': False, 'error': 'Aucun administrateur spécifié'}), 400
+        
+        assigned_count = 0
+        for admin_id in admin_ids:
+            admin = User.query.get(admin_id)
+            if not admin or admin.role not in ['admin', 'superadmin']:
+                continue
+            
+            # Vérifier si déjà assigné
+            existing = ResidenceAdmin.query.filter_by(
+                residence_id=residence_id,
+                user_id=admin_id
+            ).first()
+            
+            if not existing:
+                assignment = ResidenceAdmin(
+                    residence_id=residence_id,
+                    user_id=admin_id,
+                    assigned_by=current_user.id
+                )
+                db.session.add(assignment)
+                assigned_count += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'{assigned_count} administrateur(s) assigné(s)'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/residences/<int:residence_id>/admins', methods=['GET'])
+@login_required
+@superadmin_required
+def get_residence_admins(residence_id):
+    """Récupère les admins assignés à une résidence"""
+    try:
+        assignments = ResidenceAdmin.query.filter_by(residence_id=residence_id).all()
+        admin_ids = [a.user_id for a in assignments]
+        admins = User.query.filter(User.id.in_(admin_ids)).all() if admin_ids else []
+        
+        return jsonify({
+            'success': True,
+            'admins': [admin.to_dict() for admin in admins]
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/residences/<int:residence_id>/admins/<int:admin_id>', methods=['DELETE'])
+@login_required
+@superadmin_required
+def remove_admin_from_residence(residence_id, admin_id):
+    """Retire un admin d'une résidence"""
+    try:
+        assignment = ResidenceAdmin.query.filter_by(
+            residence_id=residence_id,
+            user_id=admin_id
+        ).first()
+        
+        if not assignment:
+            return jsonify({'success': False, 'error': 'Assignation non trouvée'}), 404
+        
+        db.session.delete(assignment)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Admin retiré de la résidence'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== CRÉATION DE RÉSIDENCE AVEC WIZARD ====================
+
+@admin_bp.route('/residences/wizard', methods=['POST'])
+@login_required
+@superadmin_required
+def create_residence_wizard():
+    """Crée une résidence complète avec structure et admins (wizard)"""
+    try:
+        data = request.get_json()
+        
+        # Validation
+        required_fields = ['name', 'address', 'city']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Créer la résidence
+        residence = Residence(
+            name=data['name'],
+            address=data['address'],
+            city=data['city'],
+            postal_code=data.get('postal_code'),
+            description=data.get('description'),
+            total_units=data.get('total_units', 0),
+            syndic_name=data.get('syndic_name'),
+            syndic_email=data.get('syndic_email'),
+            syndic_phone=data.get('syndic_phone'),
+            total_tantiemes=data.get('total_tantiemes', 1000)
+        )
+        
+        db.session.add(residence)
+        db.session.flush()  # Pour obtenir l'ID
+        
+        # Créer les unités si fournies
+        units_data = data.get('units', [])
+        created_units = 0
+        
+        for unit_data in units_data:
+            unit = Unit(
+                residence_id=residence.id,
+                unit_number=unit_data.get('unit_number'),
+                floor=unit_data.get('floor'),
+                building=unit_data.get('building') or unit_data.get('division'),
+                unit_type=unit_data.get('unit_type'),
+                surface_area=unit_data.get('surface_area'),
+                tantiemes=unit_data.get('tantiemes', 10),
+                owner_name=unit_data.get('owner_name'),
+                owner_email=unit_data.get('owner_email'),
+                owner_phone=unit_data.get('owner_phone'),
+                is_occupied=unit_data.get('is_occupied', True)
+            )
+            db.session.add(unit)
+            created_units += 1
+        
+        # Mettre à jour le nombre total d'unités
+        if created_units > 0:
+            residence.total_units = created_units
+        
+        # Assigner les admins
+        admin_ids = data.get('admin_ids', [])
+        assigned_admins = 0
+        
+        for admin_id in admin_ids:
+            admin = User.query.get(admin_id)
+            if admin and admin.role in ['admin', 'superadmin']:
+                assignment = ResidenceAdmin(
+                    residence_id=residence.id,
+                    user_id=admin_id,
+                    assigned_by=current_user.id
+                )
+                db.session.add(assignment)
+                assigned_admins += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Résidence créée avec succès',
+            'residence': residence.to_dict(),
+            'stats': {
+                'units_created': created_units,
+                'admins_assigned': assigned_admins
+            }
+        }), 201
         
     except Exception as e:
         db.session.rollback()

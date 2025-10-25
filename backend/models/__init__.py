@@ -28,6 +28,7 @@ def init_db(app):
     # Importer tous les modèles ici pour que Flask-Migrate les détecte
     from backend.models.user import User
     from backend.models.residence import Residence, Unit
+    from backend.models.residence_admin import ResidenceAdmin
     from backend.models.maintenance import MaintenanceRequest
     from backend.models.document import Document
     from backend.models.charge import Charge, ChargeDistribution

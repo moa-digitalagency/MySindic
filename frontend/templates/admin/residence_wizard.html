@@ -763,44 +763,29 @@ async function submitResidence() {
         // Update total units
         wizardData.residence.total_units = totalUnits;
         
-        // Create residence
-        const residenceResponse = await fetch('/api/admin/residences', {
+        // Create residence with wizard endpoint (includes units and admin assignments)
+        const payload = {
+            ...wizardData.residence,
+            units: wizardData.units.map(unit => ({
+                unit_number: unit.unit_number,
+                floor: unit.floor,
+                building: unit.division,
+                unit_type: unit.unit_type,
+                tantiemes: Math.floor(wizardData.residence.total_tantiemes / totalUnits)
+            })),
+            admin_ids: wizardData.admins
+        };
+        
+        const residenceResponse = await fetch('/api/admin/residences/wizard', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(wizardData.residence)
+            body: JSON.stringify(payload)
         });
         
         const residenceData = await residenceResponse.json();
         
         if (!residenceData.success) {
             throw new Error(residenceData.error || 'Erreur lors de la création de la résidence');
-        }
-        
-        const residenceId = residenceData.residence.id;
-        
-        // Create units
-        for (const unit of wizardData.units) {
-            await fetch('/api/admin/units', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    residence_id: residenceId,
-                    unit_number: unit.unit_number,
-                    floor: unit.floor,
-                    building: unit.division,
-                    unit_type: unit.unit_type,
-                    tantiemes: Math.floor(wizardData.residence.total_tantiemes / totalUnits)
-                })
-            });
-        }
-        
-        // Assign admins to residence
-        for (const adminId of wizardData.admins) {
-            await fetch(`/api/admin/users/${adminId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ residence_id: residenceId })
-            });
         }
         
         MySindic.showToast('Résidence créée avec succès!', 'success');

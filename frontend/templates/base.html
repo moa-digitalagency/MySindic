@@ -17,110 +17,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     
-    {% if current_user.is_authenticated %}
-    <!-- Authenticated Navigation -->
-    {% if current_user.is_superadmin() %}
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ url_for('index') }}" class="text-2xl font-bold text-indigo-600">
-                            🏢 MySindic
-                        </a>
-                    </div>
-                    <div class="hidden md:ml-6 md:flex md:space-x-4 lg:space-x-6">
-                        <a href="{{ url_for('admin_dashboard') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Dashboard
-                        </a>
-                        <a href="{{ url_for('admin_users') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Utilisateurs
-                        </a>
-                        <a href="{{ url_for('admin_residences') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Résidences
-                        </a>
-                        <a href="{{ url_for('admin_finances') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Finances
-                        </a>
-                        <a href="{{ url_for('admin_maintenance') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Maintenance
-                        </a>
-                        <a href="{{ url_for('admin_maintenance_log') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Carnet
-                        </a>
-                        <a href="{{ url_for('admin_assemblies') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            AG
-                        </a>
-                        <a href="{{ url_for('admin_documents') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Documents
-                        </a>
-                    </div>
-                </div>
-                <div class="hidden md:ml-6 md:flex md:items-center">
-                    <div class="ml-3 relative">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-sm text-gray-700 hidden lg:inline">{{ current_user.username }}</span>
-                            <button onclick="MySindic.logout()" class="text-gray-500 hover:text-gray-700 transition" title="Déconnexion">
-                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center md:hidden">
-                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition">
-                        <span class="sr-only">Ouvrir le menu</span>
-                        <svg id="menu-icon-open" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                        <svg id="menu-icon-close" class="h-6 w-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="md:hidden hidden" id="mobile-menu">
-            <div class="pt-2 pb-3 px-2 space-y-1 bg-white border-t shadow-lg">
-                <a href="{{ url_for('admin_dashboard') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    📊 Dashboard
-                </a>
-                <a href="{{ url_for('admin_users') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    👥 Utilisateurs
-                </a>
-                <a href="{{ url_for('admin_residences') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    🏢 Résidences
-                </a>
-                <a href="{{ url_for('admin_finances') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    💰 Finances
-                </a>
-                <a href="{{ url_for('admin_maintenance') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    🔧 Maintenance
-                </a>
-                <a href="{{ url_for('admin_maintenance_log') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    📝 Carnet d'Entretien
-                </a>
-                <a href="{{ url_for('admin_assemblies') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    📋 Assemblées Générales
-                </a>
-                <a href="{{ url_for('admin_documents') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    📄 Documents
-                </a>
-                <div class="border-t border-gray-200 pt-3 mt-3">
-                    <div class="flex items-center px-4 py-2">
-                        <span class="text-sm text-gray-700 font-medium">{{ current_user.username }}</span>
-                    </div>
-                    <button onclick="MySindic.logout()" class="border-transparent text-red-600 hover:bg-red-50 hover:border-red-500 hover:text-red-700 block w-full text-left pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                        🚪 Déconnexion
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-    {% endif %}
-    {% else %}
+    {% if not current_user.is_authenticated %}
     <!-- Public Navigation -->
     <header class="bg-white shadow-md">
         <nav class="container mx-auto px-6 py-4">
@@ -162,7 +59,7 @@
         {% endif %}
     {% endwith %}
 
-    <main class="{% if current_user.is_authenticated %}max-w-7xl mx-auto py-6 sm:px-6 lg:px-8{% endif %}">
+    <main>
         {% block content %}{% endblock %}
     </main>
 

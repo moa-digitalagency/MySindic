@@ -2,138 +2,230 @@
 
 {% block title %}Gestion des Résidences - MySindic{% endblock %}
 
+{% block extra_css %}
+<style>
+    body {
+        background: #f5f7fa;
+    }
+    
+    .modern-header {
+        background: white;
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .header-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+    
+    .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+    
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    
+    .btn-create-residence {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    
+    .btn-create-residence:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .residence-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.25rem;
+        margin-top: 1rem;
+    }
+    
+    .residence-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .residence-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .residence-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .residence-name {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .residence-address {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+    
+    .residence-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-item {
+        background: #f9fafb;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        color: #9ca3af;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-value {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    
+    .residence-actions {
+        display: flex;
+        gap: 0.5rem;
+        border-top: 1px solid #f3f4f6;
+        padding-top: 1rem;
+    }
+    
+    .btn-action {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: white;
+        color: #6b7280;
+    }
+    
+    .btn-action:hover {
+        border-color: #667eea;
+        color: #667eea;
+        background: #f9fafb;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-text {
+        color: #9ca3af;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="px-4 sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-            <h1 class="text-2xl font-semibold text-gray-900">Gestion des Résidences</h1>
-            <p class="mt-2 text-sm text-gray-700">Liste de toutes les copropriétés gérées</p>
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">🏢 Gestion des Résidences</h1>
+            <p class="page-subtitle">Gérez toutes vos copropriétés en un seul endroit</p>
         </div>
-        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button onclick="openCreateResidenceModal()" class="btn-primary">
-                Nouvelle Résidence
-            </button>
-        </div>
+        <a href="{{ url_for('admin_residence_wizard') }}" class="btn-create-residence">
+            <span style="font-size: 1.25rem;">✨</span>
+            <span>Nouvelle Résidence</span>
+        </a>
     </div>
 
-    <div class="mt-8">
-        <div class="card">
-            <div id="residences-list" class="overflow-x-auto">
-                <div class="flex justify-center py-8">
-                    <div class="loading-spinner border-indigo-600"></div>
-                </div>
+    <div class="content-card">
+        <div id="residences-container">
+            <div class="flex justify-center py-8">
+                <div style="width: 40px; height: 40px; border: 4px solid #f3f4f6; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Créer/Éditer Résidence -->
-<div id="residenceModal" class="modal-backdrop hidden">
-    <div class="modal-content">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold" id="modal-title">Nouvelle Résidence</h2>
-                <button onclick="MySindic.closeModal('residenceModal')" class="text-gray-400 hover:text-gray-600">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
-            <form id="residenceForm" class="space-y-4">
-                <input type="hidden" id="residence-id">
-                
-                <div>
-                    <label class="label-field">Nom de la résidence *</label>
-                    <input type="text" id="residence-name" class="input-field" required>
-                </div>
-                
-                <div>
-                    <label class="label-field">Adresse *</label>
-                    <input type="text" id="residence-address" class="input-field" required>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="label-field">Ville *</label>
-                        <input type="text" id="residence-city" class="input-field" required>
-                    </div>
-                    <div>
-                        <label class="label-field">Code postal</label>
-                        <input type="text" id="residence-postal" class="input-field">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="label-field">Nombre de lots *</label>
-                        <input type="number" id="residence-units" class="input-field" required min="1">
-                    </div>
-                    <div>
-                        <label class="label-field">Total tantièmes</label>
-                        <input type="number" id="residence-tantiemes" class="input-field" value="1000">
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="label-field">Description</label>
-                    <textarea id="residence-description" class="input-field" rows="3"></textarea>
-                </div>
-                
-                <div class="border-t pt-4">
-                    <h3 class="font-medium text-gray-900 mb-3">Informations Syndic</h3>
-                    
-                    <div>
-                        <label class="label-field">Nom du syndic</label>
-                        <input type="text" id="syndic-name" class="input-field">
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div>
-                            <label class="label-field">Email</label>
-                            <input type="email" id="syndic-email" class="input-field">
-                        </div>
-                        <div>
-                            <label class="label-field">Téléphone</label>
-                            <input type="tel" id="syndic-phone" class="input-field">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="MySindic.closeModal('residenceModal')" class="btn-secondary">
-                        Annuler
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        Enregistrer
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Détails Résidence -->
-<div id="residenceDetailsModal" class="modal-backdrop hidden">
-    <div class="modal-content">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold" id="details-residence-name">Détails de la résidence</h2>
-                <button onclick="MySindic.closeModal('residenceDetailsModal')" class="text-gray-400 hover:text-gray-600">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            
-            <div id="residence-details-content" class="space-y-4">
-                <div class="flex justify-center py-8">
-                    <div class="loading-spinner border-indigo-600"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<style>
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -158,158 +250,88 @@ async function loadResidences() {
 }
 
 function displayResidences(residencesList) {
-    const container = document.getElementById('residences-list');
+    const container = document.getElementById('residences-container');
     
     if (residencesList.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500 py-8">Aucune résidence trouvée</p>';
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🏘️</div>
+                <p class="empty-text">Aucune résidence créée pour le moment</p>
+                <a href="${'{{ url_for("admin_residence_wizard") }}'}" class="btn-create-residence">
+                    <span style="font-size: 1.25rem;">✨</span>
+                    <span>Créer ma première résidence</span>
+                </a>
+            </div>
+        `;
         return;
     }
     
     container.innerHTML = `
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Ville</th>
-                    <th>Lots</th>
-                    <th>Syndic</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${residencesList.map(r => `
-                    <tr>
-                        <td>
-                            <div class="font-medium text-gray-900">${r.name}</div>
-                            <div class="text-sm text-gray-500">${r.address}</div>
-                        </td>
-                        <td>${r.city}</td>
-                        <td>${r.total_units}</td>
-                        <td>${r.syndic_name || '-'}</td>
-                        <td>
-                            <div class="flex space-x-2">
-                                <button onclick="viewResidence(${r.id})" class="text-indigo-600 hover:text-indigo-800">
-                                    Voir
-                                </button>
-                                <button onclick="editResidence(${r.id})" class="text-blue-600 hover:text-blue-800">
-                                    Éditer
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
+        <div class="residence-grid">
+            ${residencesList.map(r => `
+                <div class="residence-card" onclick="viewResidence(${r.id})">
+                    <h3 class="residence-name">${r.name}</h3>
+                    <div class="residence-address">
+                        <span>📍</span>
+                        <span>${r.address}, ${r.city}</span>
+                    </div>
+                    
+                    <div class="residence-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Unités</div>
+                            <div class="stat-value">${r.total_units}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Tantièmes</div>
+                            <div class="stat-value">${r.total_tantiemes}</div>
+                        </div>
+                    </div>
+                    
+                    ${r.syndic_name ? `
+                        <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 1rem;">
+                            <span style="font-weight: 600;">Syndic:</span> ${r.syndic_name}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="residence-actions">
+                        <button onclick="event.stopPropagation(); editResidence(${r.id})" class="btn-action">
+                            ✏️ Modifier
+                        </button>
+                        <button onclick="event.stopPropagation(); manageUnits(${r.id})" class="btn-action">
+                            🏠 Unités
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
     `;
 }
 
-function openCreateResidenceModal() {
-    document.getElementById('modal-title').textContent = 'Nouvelle Résidence';
-    document.getElementById('residenceForm').reset();
-    document.getElementById('residence-id').value = '';
-    MySindic.openModal('residenceModal');
+function viewResidence(residenceId) {
+    const residence = residences.find(r => r.id === residenceId);
+    if (!residence) return;
+    
+    // For now, just show a toast - can be expanded later
+    MySindic.showToast(`Consultation de ${residence.name}`, 'info');
+    // Could navigate to a detailed view page
+    // window.location.href = `/admin/residences/${residenceId}`;
 }
 
 function editResidence(residenceId) {
     const residence = residences.find(r => r.id === residenceId);
     if (!residence) return;
     
-    document.getElementById('modal-title').textContent = 'Éditer Résidence';
-    document.getElementById('residence-id').value = residence.id;
-    document.getElementById('residence-name').value = residence.name;
-    document.getElementById('residence-address').value = residence.address;
-    document.getElementById('residence-city').value = residence.city;
-    document.getElementById('residence-postal').value = residence.postal_code || '';
-    document.getElementById('residence-units').value = residence.total_units;
-    document.getElementById('residence-tantiemes').value = residence.total_tantiemes;
-    document.getElementById('residence-description').value = residence.description || '';
-    document.getElementById('syndic-name').value = residence.syndic_name || '';
-    document.getElementById('syndic-email').value = residence.syndic_email || '';
-    document.getElementById('syndic-phone').value = residence.syndic_phone || '';
-    
-    MySindic.openModal('residenceModal');
+    MySindic.showToast(`Modification de ${residence.name}`, 'info');
+    // Could open an edit modal or navigate to edit page
 }
 
-async function viewResidence(residenceId) {
+function manageUnits(residenceId) {
     const residence = residences.find(r => r.id === residenceId);
     if (!residence) return;
     
-    document.getElementById('details-residence-name').textContent = residence.name;
-    
-    const content = `
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="text-sm font-medium text-gray-500">Adresse</label>
-                <p class="mt-1 text-gray-900">${residence.address}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Ville</label>
-                <p class="mt-1 text-gray-900">${residence.city}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Nombre de lots</label>
-                <p class="mt-1 text-gray-900">${residence.total_units}</p>
-            </div>
-            <div>
-                <label class="text-sm font-medium text-gray-500">Total tantièmes</label>
-                <p class="mt-1 text-gray-900">${residence.total_tantiemes}</p>
-            </div>
-            ${residence.syndic_name ? `
-                <div class="col-span-2 border-t pt-4">
-                    <label class="text-sm font-medium text-gray-500">Syndic</label>
-                    <p class="mt-1 text-gray-900">${residence.syndic_name}</p>
-                    ${residence.syndic_email ? `<p class="text-sm text-gray-600">${residence.syndic_email}</p>` : ''}
-                    ${residence.syndic_phone ? `<p class="text-sm text-gray-600">${residence.syndic_phone}</p>` : ''}
-                </div>
-            ` : ''}
-        </div>
-    `;
-    
-    document.getElementById('residence-details-content').innerHTML = content;
-    MySindic.openModal('residenceDetailsModal');
+    MySindic.showToast(`Gestion des unités de ${residence.name}`, 'info');
+    // Navigate to units management page
 }
-
-document.getElementById('residenceForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const residenceId = document.getElementById('residence-id').value;
-    const formData = {
-        name: document.getElementById('residence-name').value,
-        address: document.getElementById('residence-address').value,
-        city: document.getElementById('residence-city').value,
-        postal_code: document.getElementById('residence-postal').value,
-        total_units: parseInt(document.getElementById('residence-units').value),
-        total_tantiemes: parseInt(document.getElementById('residence-tantiemes').value),
-        description: document.getElementById('residence-description').value,
-        syndic_name: document.getElementById('syndic-name').value,
-        syndic_email: document.getElementById('syndic-email').value,
-        syndic_phone: document.getElementById('syndic-phone').value
-    };
-    
-    try {
-        const url = residenceId ? `/api/admin/residences/${residenceId}` : '/api/admin/residences';
-        const method = residenceId ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            MySindic.showToast(data.message, 'success');
-            MySindic.closeModal('residenceModal');
-            loadResidences();
-        } else {
-            MySindic.showToast(data.error || 'Erreur lors de l\'enregistrement', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        MySindic.showToast('Erreur de connexion', 'error');
-    }
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     loadResidences();
