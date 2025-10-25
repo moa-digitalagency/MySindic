@@ -677,12 +677,23 @@
                     </div>
                 </div>
                 
+                <div id="formatting-toolbar" style="display: none; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem; gap: 0.25rem; flex-wrap: wrap;">
+                    <button onclick="applyFormat('bold')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">B</button>
+                    <button onclick="applyFormat('italic')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-style: italic; cursor: pointer; font-size: 0.75rem;">I</button>
+                    <button onclick="applyFormat('underline')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; text-decoration: underline; cursor: pointer; font-size: 0.75rem;">U</button>
+                </div>
+                
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
                     <div style="display: flex; gap: 0.5rem;">
                         <label for="image-upload" style="cursor: pointer; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
                             🖼️ <span>Photo</span>
                         </label>
                         <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                        
+                        <label for="video-upload" style="cursor: pointer; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                            🎥 <span>Vidéo</span>
+                        </label>
+                        <input type="file" id="video-upload" accept="video/*" style="display: none;" onchange="handleVideoUpload(event)">
                         
                         <button onclick="insertEmoji()" style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
                             😊 Emoji
@@ -778,9 +789,70 @@
                         <p class="card-subtitle">Gérez vos informations personnelles</p>
                     </div>
                 </div>
-                <div class="empty-state">
-                    <div class="empty-icon">⚙️</div>
-                    <p class="empty-text">Chargement du profil...</p>
+                
+                <div style="padding: 1rem 0;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 0.9rem; font-weight: 700; color: #111827; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>👤</span> Informations Personnelles
+                        </h3>
+                        <div style="display: grid; gap: 1rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Prénom</label>
+                                <input type="text" id="profile-first-name" placeholder="Ahmed" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Nom</label>
+                                <input type="text" id="profile-last-name" placeholder="Alami" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Email</label>
+                                <input type="email" id="profile-user-email" placeholder="ahmed.alami@example.com" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Téléphone</label>
+                                <input type="tel" id="profile-phone" placeholder="+212 6 00 00 00 00" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
+                        <h3 style="font-size: 0.9rem; font-weight: 700; color: #111827; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>🏢</span> Informations de Résidence
+                        </h3>
+                        <div style="display: grid; gap: 1rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Résidence</label>
+                                <input type="text" id="profile-residence" value="Résidence Les Jardins" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Numéro d'appartement</label>
+                                <input type="text" id="profile-unit" value="A101" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Bâtiment</label>
+                                    <input type="text" id="profile-building" value="A" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Étage</label>
+                                    <input type="text" id="profile-floor" value="1er" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                                </div>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Type de bien</label>
+                                <input type="text" id="profile-type" value="Appartement" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
+                        <button onclick="cancelProfileEdit()" style="padding: 0.625rem 1.25rem; background: white; color: #6b7280; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            Annuler
+                        </button>
+                        <button onclick="saveProfile()" style="padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);">
+                            Enregistrer
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -880,8 +952,98 @@ function insertEmoji() {
     textarea.selectionStart = textarea.selectionEnd = cursorPos + emoji.length;
 }
 
+function handleVideoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('video/')) {
+        MySindic.showToast('Veuillez sélectionner une vidéo', 'error');
+        return;
+    }
+    
+    if (file.size > 50 * 1024 * 1024) {
+        MySindic.showToast('La vidéo ne doit pas dépasser 50 MB', 'error');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        uploadedImage = e.target.result;
+        const videoPreview = document.createElement('video');
+        videoPreview.src = e.target.result;
+        videoPreview.controls = true;
+        videoPreview.style.maxWidth = '300px';
+        videoPreview.style.maxHeight = '200px';
+        videoPreview.style.borderRadius = '8px';
+        
+        const previewContainer = document.getElementById('media-preview').querySelector('div');
+        previewContainer.innerHTML = '';
+        previewContainer.appendChild(videoPreview);
+        
+        document.getElementById('remove-media-btn').style.display = 'block';
+        document.getElementById('media-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
 function toggleFormatting() {
-    MySindic.showToast('Fonctionnalité de formatage bientôt disponible', 'info');
+    const toolbar = document.getElementById('formatting-toolbar');
+    if (toolbar.style.display === 'none' || toolbar.style.display === '') {
+        toolbar.style.display = 'flex';
+    } else {
+        toolbar.style.display = 'none';
+    }
+}
+
+function applyFormat(format) {
+    const textarea = document.getElementById('new-post-content');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (!selectedText) {
+        MySindic.showToast('Sélectionnez du texte pour le formater', 'info');
+        return;
+    }
+    
+    let formattedText = selectedText;
+    switch(format) {
+        case 'bold':
+            formattedText = `**${selectedText}**`;
+            break;
+        case 'italic':
+            formattedText = `*${selectedText}*`;
+            break;
+        case 'underline':
+            formattedText = `__${selectedText}__`;
+            break;
+    }
+    
+    const textBefore = textarea.value.substring(0, start);
+    const textAfter = textarea.value.substring(end);
+    textarea.value = textBefore + formattedText + textAfter;
+    
+    textarea.focus();
+    textarea.selectionStart = start;
+    textarea.selectionEnd = start + formattedText.length;
+}
+
+function saveProfile() {
+    const firstName = document.getElementById('profile-first-name').value;
+    const lastName = document.getElementById('profile-last-name').value;
+    const email = document.getElementById('profile-user-email').value;
+    const phone = document.getElementById('profile-phone').value;
+    
+    if (!firstName || !lastName || !email || !phone) {
+        MySindic.showToast('Veuillez remplir tous les champs', 'error');
+        return;
+    }
+    
+    MySindic.showToast('Profil enregistré avec succès', 'success');
+}
+
+function cancelProfileEdit() {
+    loadResidentDashboard();
 }
 
 async function loadResidentDashboard() {
