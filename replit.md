@@ -16,11 +16,20 @@
 
 MySindic is built as a PWA with a Python Flask backend and an HTML/CSS frontend utilizing Tailwind CSS. PostgreSQL is used for the database, integrated via Replit Database.
 
+### Project Structure
+
+Le projet est organisé en deux dossiers principaux:
+- **`backend/`**: Code Python Flask (models, routes, utils, config)
+- **`front/`**: Interface utilisateur (static assets et templates HTML)
+
 ### UI/UX Decisions
 
-- **Design Approach:** Mobile-first and responsive design using Tailwind CSS for a modern aesthetic.
-- **Icons:** Feather Icons are used for modern iconography.
+- **Design Approach:** Mobile-first and responsive design using Tailwind CSS for a modern aesthetic. Interface réseau social pour les résidents.
+- **Icons:** Feather Icons et emojis pour une iconographie moderne.
 - **Frontend Framework:** Vanilla JavaScript for client-side interactions.
+- **Responsive Design:** 
+  - Desktop: Layout à 2 colonnes (feed + sidebar)
+  - Mobile: Navigation en bas de page avec onglets
 - **PWA Features (Future):** Service Worker, manifest, and offline mode are planned for a native-like mobile experience.
 
 ### Technical Implementations
@@ -66,6 +75,36 @@ MySindic is built as a PWA with a Python Flask backend and an HTML/CSS frontend 
 - **Feather Icons:** Open-source icon library.
 
 ## Recent Changes
+
+### October 25, 2025 - Réorganisation du Projet et Design Moderne ✅
+
+**Corrections:**
+1. **Base de données initialisée**
+   - Correction: Erreur "table users does not exist" corrigée
+   - Solution: Exécution du script init_db.py pour créer toutes les tables
+   - Comptes créés: admin@mysindic.ma / Admin123! et resident@mysindic.ma / Resident123!
+
+2. **Réorganisation de la structure du projet**
+   - Création du dossier `front/` pour séparer frontend et backend
+   - Déplacement de `backend/static/` vers `front/static/`
+   - Déplacement de `backend/templates/` vers `front/templates/`
+   - Mise à jour des chemins dans `backend/app.py`
+
+**Améliorations Design:**
+1. **Page d'accueil modernisée**
+   - Retrait du bouton "S'inscrire" (inscription réservée aux superadmins)
+   - Design épuré avec bouton "Connexion" unique et mis en valeur
+
+2. **Nouveau Dashboard Résident - Interface Réseau Social**
+   - **Desktop:** Layout à 2 colonnes avec feed central et panel à droite
+     - Feed: Fil d'actualité et demandes de maintenance
+     - Panel: Statistiques, sondages, paiements, actions rapides
+   - **Mobile:** Navigation en bas de page avec 4 onglets
+     - 📰 Actualité
+     - 🔧 Maintenance  
+     - 🗳️ Sondages
+     - 💰 Paiements
+   - Design moderne avec animations fluides et gradients
 
 ### October 24, 2025 - 21:20 - All Bugs Fixed ✅
 

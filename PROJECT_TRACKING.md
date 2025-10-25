@@ -1,9 +1,9 @@
 # MySindic - Document de Suivi du Projet
 
 **Date de création :** 24 octobre 2025  
-**Dernière mise à jour :** 24 octobre 2025 - 21:20 - Tous les bugs corrigés ✅
+**Dernière mise à jour :** 25 octobre 2025 - Réorganisation projet et design moderne ✅
 
-**🎉 STATUT ACTUEL : Application 100% fonctionnelle, migration Replit complète, tous les bugs corrigés**
+**🎉 STATUT ACTUEL : Application 100% fonctionnelle avec nouveau design réseau social**
 
 ## 📋 Vue d'ensemble
 
@@ -88,36 +88,71 @@ MySindic est une application web PWA de gestion de copropriété au Maroc, avec 
 
 ```
 MySindic/
-├── backend/
-│   ├── app.py                  # Application Flask principale
-│   ├── config.py              # Configuration
-│   ├── requirements.txt       # Dépendances Python
-│   ├── models/                # Modèles de données
+├── backend/                   # Backend Python Flask
+│   ├── app.py                # Application Flask principale
+│   ├── config.py             # Configuration
+│   ├── requirements.txt      # Dépendances Python
+│   ├── models/               # Modèles de données SQLAlchemy
 │   │   ├── __init__.py
 │   │   ├── user.py
 │   │   ├── residence.py
-│   │   └── maintenance.py
-│   ├── routes/                # Routes de l'API
+│   │   ├── charge.py
+│   │   ├── payment.py
+│   │   ├── maintenance.py
+│   │   ├── maintenance_log.py
+│   │   ├── news.py
+│   │   ├── poll.py
+│   │   ├── document.py
+│   │   ├── general_assembly.py
+│   │   └── litigation.py
+│   ├── routes/               # Routes de l'API (Blueprints)
 │   │   ├── __init__.py
-│   │   ├── auth.py
-│   │   ├── admin.py
-│   │   └── resident.py
-│   ├── utils/                 # Utilitaires
-│   │   ├── __init__.py
-│   │   └── helpers.py
-│   ├── static/                # Fichiers statiques
-│   └── templates/             # Templates HTML
-├── frontend/
-│   ├── css/
-│   ├── js/
-│   └── images/
-├── docs/
-├── deploy_vps.sh             # Script de déploiement VPS
-├── PROJECT_TRACKING.md       # Ce document
-├── CHANGELOG.md              # Journal des modifications
-├── DOCUMENTATION_FR.md       # Documentation française
-├── DOCUMENTATION_EN.md       # Documentation anglaise
-└── replit.md                 # Mémoire du projet Replit
+│   │   ├── auth.py          # Authentification
+│   │   ├── admin.py         # Routes superadmin
+│   │   └── resident.py      # Routes résidents
+│   └── utils/                # Services et utilitaires
+│       ├── __init__.py
+│       ├── charge_calculator.py
+│       └── notification_service.py
+├── front/                    # Frontend (HTML/CSS/JS)
+│   ├── static/               # Fichiers statiques
+│   │   ├── css/
+│   │   │   └── main.css     # Styles CSS personnalisés
+│   │   ├── js/
+│   │   │   └── main.js      # JavaScript principal
+│   │   ├── images/
+│   │   ├── manifest.json    # PWA manifest
+│   │   └── sw.js            # Service Worker PWA
+│   └── templates/            # Templates Jinja2
+│       ├── base.html        # Template de base
+│       ├── index.html       # Page d'accueil
+│       ├── auth/            # Pages authentification
+│       │   ├── login.html
+│       │   └── register.html
+│       ├── admin/           # Pages superadmin
+│       │   ├── dashboard.html
+│       │   ├── residences.html
+│       │   ├── finances.html
+│       │   ├── maintenance.html
+│       │   ├── maintenance_log.html
+│       │   ├── assemblies.html
+│       │   ├── documents.html
+│       │   └── users.html
+│       └── resident/        # Pages résidents
+│           ├── dashboard.html   # Dashboard réseau social
+│           ├── news.html
+│           ├── maintenance.html
+│           ├── finances.html
+│           ├── assemblies.html
+│           └── documents.html
+├── init_db.py                # Script d'initialisation DB
+├── main.py                   # Point d'entrée Gunicorn
+├── deploy_vps.sh            # Script de déploiement VPS
+├── PROJECT_TRACKING.md      # Ce document
+├── CHANGELOG.md             # Journal des modifications
+├── DOCUMENTATION_FR.md      # Documentation française
+├── DOCUMENTATION_EN.md      # Documentation anglaise
+└── replit.md                # Mémoire du projet Replit
 ```
 
 ### Base de données
