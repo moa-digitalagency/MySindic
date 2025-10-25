@@ -123,6 +123,12 @@ def create_app():
         """Gestion des résidences"""
         return render_template('admin/residences.html')
     
+    @app.route('/admin/residences/new')
+    @superadmin_required
+    def admin_residence_wizard():
+        """Assistant de création de résidence"""
+        return render_template('admin/residence_wizard.html')
+    
     @app.route('/admin/finances')
     @superadmin_required
     def admin_finances():

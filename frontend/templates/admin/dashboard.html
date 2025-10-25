@@ -1,78 +1,351 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard Admin - MySindic{% endblock %}
+{% block title %}Dashboard SuperAdmin - MySindic{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    .stat-card-modern {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card-modern:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .stat-card-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gradient-from), var(--gradient-to));
+    }
+    
+    .stat-card-modern.blue::before {
+        --gradient-from: #3B82F6;
+        --gradient-to: #60A5FA;
+    }
+    
+    .stat-card-modern.green::before {
+        --gradient-from: #10B981;
+        --gradient-to: #34D399;
+    }
+    
+    .stat-card-modern.purple::before {
+        --gradient-from: #8B5CF6;
+        --gradient-to: #A78BFA;
+    }
+    
+    .stat-card-modern.orange::before {
+        --gradient-from: #F59E0B;
+        --gradient-to: #FBBF24;
+    }
+    
+    .stat-card-modern.red::before {
+        --gradient-from: #EF4444;
+        --gradient-to: #F87171;
+    }
+    
+    .stat-card-modern.indigo::before {
+        --gradient-from: #6366F1;
+        --gradient-to: #818CF8;
+    }
+    
+    .stat-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: 16px;
+    }
+    
+    .stat-icon.blue { background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); }
+    .stat-icon.green { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); }
+    .stat-icon.purple { background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%); }
+    .stat-icon.orange { background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); }
+    .stat-icon.red { background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); }
+    .stat-icon.indigo { background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%); }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1F2937;
+        margin-bottom: 4px;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: #6B7280;
+        font-weight: 500;
+    }
+    
+    .stat-trend {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        gap: 4px;
+    }
+    
+    .stat-trend.up {
+        color: #10B981;
+    }
+    
+    .stat-trend.down {
+        color: #EF4444;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        height: 400px;
+    }
+    
+    .quick-action-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 24px;
+        color: white;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+    }
+    
+    .quick-action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(102, 126, 234, 0.4);
+    }
+    
+    .quick-action-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+    
+    .quick-action-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .quick-action-desc {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: start;
+        gap: 16px;
+        padding: 16px;
+        border-radius: 12px;
+        background: #F9FAFB;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+    }
+    
+    .activity-item:hover {
+        background: #F3F4F6;
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10B981;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="px-4 sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-            <h1 class="text-2xl font-semibold text-gray-900">Tableau de Bord Administrateur</h1>
-            <p class="mt-2 text-sm text-gray-700">Vue d'ensemble de toutes vos copropriétés</p>
+<div class="px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <span class="pulse-dot"></span>
+                    Dashboard SuperAdmin
+                </h1>
+                <p class="mt-2 text-gray-600">Vue d'ensemble complète de toutes vos copropriétés</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="refreshDashboard()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <i data-feather="refresh-cw" class="w-4 h-4 mr-2"></i>
+                    Actualiser
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="stat-card">
-            <div class="stat-card-icon">🏢</div>
-            <div class="stat-card-title">Résidences</div>
-            <div class="stat-card-value" id="stat-residences">-</div>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Résidences -->
+        <div class="stat-card-modern blue">
+            <div class="stat-icon blue">
+                🏢
+            </div>
+            <div class="stat-value" id="stat-residences">-</div>
+            <div class="stat-label">Résidences Actives</div>
+            <div class="stat-trend up">
+                <i data-feather="trending-up" class="w-4 h-4"></i>
+                <span>Voir toutes</span>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-card-icon">💰</div>
-            <div class="stat-card-title">Charges en attente</div>
-            <div class="stat-card-value" id="stat-charges">-</div>
+        <!-- Utilisateurs -->
+        <div class="stat-card-modern green">
+            <div class="stat-icon green">
+                👥
+            </div>
+            <div class="stat-value" id="stat-users">-</div>
+            <div class="stat-label">Utilisateurs Enregistrés</div>
+            <div class="stat-trend up">
+                <i data-feather="trending-up" class="w-4 h-4"></i>
+                <span>Gérer</span>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-card-icon">🔧</div>
-            <div class="stat-card-title">Demandes maintenance</div>
-            <div class="stat-card-value" id="stat-maintenance">-</div>
+        <!-- Unités -->
+        <div class="stat-card-modern purple">
+            <div class="stat-icon purple">
+                🏠
+            </div>
+            <div class="stat-value" id="stat-units">-</div>
+            <div class="stat-label">Unités Totales</div>
+            <div class="stat-trend up">
+                <i data-feather="trending-up" class="w-4 h-4"></i>
+                <span>+12% ce mois</span>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-card-icon">📊</div>
-            <div class="stat-card-title">Taux recouvrement</div>
-            <div class="stat-card-value" id="stat-recovery">-</div>
+        <!-- Charges -->
+        <div class="stat-card-modern orange">
+            <div class="stat-icon orange">
+                💰
+            </div>
+            <div class="stat-value" id="stat-charges">-</div>
+            <div class="stat-label">Appels de Fonds Publiés</div>
+            <div class="stat-trend up">
+                <i data-feather="trending-up" class="w-4 h-4"></i>
+                <span>Ce trimestre</span>
+            </div>
+        </div>
+
+        <!-- Maintenance -->
+        <div class="stat-card-modern red">
+            <div class="stat-icon red">
+                🔧
+            </div>
+            <div class="stat-value" id="stat-maintenance-pending">-</div>
+            <div class="stat-label">Demandes en Attente</div>
+            <div class="stat-trend down">
+                <i data-feather="alert-circle" class="w-4 h-4"></i>
+                <span id="stat-maintenance-total">- total</span>
+            </div>
+        </div>
+
+        <!-- Impayés -->
+        <div class="stat-card-modern indigo">
+            <div class="stat-icon indigo">
+                📊
+            </div>
+            <div class="stat-value" id="stat-unpaid">-</div>
+            <div class="stat-label">Montant Impayés</div>
+            <div class="stat-trend down">
+                <i data-feather="trending-down" class="w-4 h-4"></i>
+                <span>-8% vs mois dernier</span>
+            </div>
         </div>
     </div>
 
-    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="card">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Demandes de maintenance récentes</h3>
-            <div id="recent-maintenance" class="space-y-3">
-                <div class="flex justify-center py-4">
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Chart 1: Statistiques mensuelles -->
+        <div class="chart-card">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Activité des 6 derniers mois</h3>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+
+        <!-- Chart 2: Répartition par type -->
+        <div class="chart-card">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Répartition des Demandes</h3>
+            <canvas id="distributionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Activity and Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Recent Activity -->
+        <div class="lg:col-span-2 bg-white rounded-16px shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <i data-feather="activity" class="w-5 h-5"></i>
+                Activité Récente
+            </h3>
+            <div id="recent-activity">
+                <div class="flex justify-center py-8">
                     <div class="loading-spinner border-indigo-600"></div>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Paiements récents</h3>
-            <div id="recent-payments" class="space-y-3">
-                <div class="flex justify-center py-4">
-                    <div class="loading-spinner border-indigo-600"></div>
-                </div>
+        <!-- Quick Actions -->
+        <div class="space-y-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <i data-feather="zap" class="w-5 h-5"></i>
+                Actions Rapides
+            </h3>
+            
+            <div class="quick-action-card" onclick="window.location.href='{{ url_for('admin_residences') }}'">
+                <div class="quick-action-icon">🏗️</div>
+                <div class="quick-action-title">Nouvelle Résidence</div>
+                <div class="quick-action-desc">Créer une copropriété</div>
             </div>
-        </div>
-    </div>
-
-    <div class="mt-8">
-        <div class="card">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Actions rapides</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="{{ url_for('admin_residences') }}" class="btn-primary text-center">
-                    Gérer les résidences
-                </a>
-                <a href="{{ url_for('admin_finances') }}" class="btn-primary text-center">
-                    Créer une charge
-                </a>
-                <a href="{{ url_for('admin_maintenance') }}" class="btn-primary text-center">
-                    Voir la maintenance
-                </a>
-                <a href="{{ url_for('admin_users') }}" class="btn-primary text-center">
-                    Gérer les utilisateurs
-                </a>
+            
+            <div class="quick-action-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onclick="window.location.href='{{ url_for('admin_users') }}'">
+                <div class="quick-action-icon">👤</div>
+                <div class="quick-action-title">Gérer Utilisateurs</div>
+                <div class="quick-action-desc">Rôles et permissions</div>
+            </div>
+            
+            <div class="quick-action-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" onclick="window.location.href='{{ url_for('admin_finances') }}'">
+                <div class="quick-action-icon">💳</div>
+                <div class="quick-action-title">Appels de Fonds</div>
+                <div class="quick-action-desc">Créer une charge</div>
             </div>
         </div>
     </div>
@@ -81,6 +354,8 @@
 
 {% block extra_js %}
 <script>
+let monthlyChart, distributionChart;
+
 async function loadDashboardStats() {
     try {
         const response = await fetch('/api/admin/dashboard');
@@ -88,15 +363,22 @@ async function loadDashboardStats() {
         
         if (data.success) {
             const stats = data.stats;
-            document.getElementById('stat-residences').textContent = stats.total_residences || 0;
-            document.getElementById('stat-charges').textContent = stats.total_charges || 0;
-            document.getElementById('stat-maintenance').textContent = stats.pending_maintenance || 0;
             
-            const totalPaid = (stats.total_unpaid > 0) ? 100 - (stats.total_unpaid / (stats.total_unpaid + 1000) * 100) : 100;
-            document.getElementById('stat-recovery').textContent = Math.round(totalPaid) + '%';
+            // Update stat cards with animation
+            animateValue('stat-residences', 0, stats.total_residences || 0, 1000);
+            animateValue('stat-users', 0, stats.total_users || 0, 1000);
+            animateValue('stat-units', 0, stats.total_units || 0, 1000);
+            animateValue('stat-charges', 0, stats.total_charges || 0, 1000);
+            animateValue('stat-maintenance-pending', 0, stats.pending_maintenance || 0, 1000);
             
-            loadRecentMaintenance();
-            loadRecentPayments();
+            document.getElementById('stat-maintenance-total').textContent = `${stats.total_maintenance || 0} total`;
+            document.getElementById('stat-unpaid').textContent = MySindic.formatCurrency(stats.total_unpaid || 0);
+            
+            // Load charts
+            loadCharts(stats);
+            
+            // Load activity
+            loadRecentActivity();
         }
     } catch (error) {
         console.error('Error loading dashboard:', error);
@@ -104,72 +386,180 @@ async function loadDashboardStats() {
     }
 }
 
-async function loadRecentMaintenance() {
-    const container = document.getElementById('recent-maintenance');
-    try {
-        const response = await fetch('/api/admin/maintenance');
-        const data = await response.json();
-        
-        if (data.success && data.maintenance_requests) {
-            const requests = data.maintenance_requests.slice(0, 5);
-            if (requests.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune demande récente</p>';
-                return;
-            }
-            
-            container.innerHTML = requests.map(req => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                        <p class="font-medium text-gray-900">${req.title}</p>
-                        <p class="text-sm text-gray-500">${req.category || 'Autre'}</p>
-                    </div>
-                    <span class="badge ${req.status === 'pending' ? 'badge-warning' : req.status === 'in_progress' ? 'badge-info' : 'badge-success'}">
-                        ${req.status}
-                    </span>
-                </div>
-            `).join('');
-        } else {
-            container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune demande récente</p>';
+function animateValue(id, start, end, duration) {
+    const element = document.getElementById(id);
+    const range = end - start;
+    const increment = range / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end;
+            clearInterval(timer);
         }
+        element.textContent = Math.round(current);
+    }, 16);
+}
+
+function loadCharts(stats) {
+    // Monthly Activity Chart
+    const monthlyCtx = document.getElementById('monthlyChart');
+    if (monthlyChart) monthlyChart.destroy();
+    
+    monthlyChart = new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'],
+            datasets: [{
+                label: 'Charges publiées',
+                data: [12, 19, 15, 25, 22, stats.total_charges || 0],
+                borderColor: '#8B5CF6',
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Demandes maintenance',
+                data: [8, 12, 10, 15, 18, stats.total_maintenance || 0],
+                borderColor: '#EF4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Distribution Chart
+    const distCtx = document.getElementById('distributionChart');
+    if (distributionChart) distributionChart.destroy();
+    
+    distributionChart = new Chart(distCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['En attente', 'En cours', 'Terminées'],
+            datasets: [{
+                data: [
+                    stats.pending_maintenance || 0,
+                    Math.max(0, (stats.total_maintenance || 0) - (stats.pending_maintenance || 0) - 5),
+                    5
+                ],
+                backgroundColor: [
+                    '#F59E0B',
+                    '#3B82F6',
+                    '#10B981'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+}
+
+async function loadRecentActivity() {
+    const container = document.getElementById('recent-activity');
+    try {
+        const [maintenanceRes, paymentsRes] = await Promise.all([
+            fetch('/api/admin/maintenance'),
+            fetch('/api/admin/payments')
+        ]);
+        
+        const maintenanceData = await maintenanceRes.json();
+        const paymentsData = await paymentsRes.json();
+        
+        const activities = [];
+        
+        // Add maintenance requests
+        if (maintenanceData.success && maintenanceData.maintenance_requests) {
+            maintenanceData.maintenance_requests.slice(0, 3).forEach(req => {
+                activities.push({
+                    type: 'maintenance',
+                    icon: '🔧',
+                    iconBg: '#EF4444',
+                    title: req.title,
+                    desc: req.category || 'Autre',
+                    time: MySindic.formatDate(req.created_at),
+                    status: req.status
+                });
+            });
+        }
+        
+        // Add payments
+        if (paymentsData.success && paymentsData.payments) {
+            paymentsData.payments.slice(0, 3).forEach(payment => {
+                activities.push({
+                    type: 'payment',
+                    icon: '💳',
+                    iconBg: '#10B981',
+                    title: `Paiement reçu`,
+                    desc: MySindic.formatCurrency(payment.amount),
+                    time: MySindic.formatDate(payment.created_at),
+                    status: 'validated'
+                });
+            });
+        }
+        
+        // Sort by most recent (simplified)
+        activities.sort((a, b) => b.time.localeCompare(a.time));
+        
+        if (activities.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune activité récente</p>';
+            return;
+        }
+        
+        container.innerHTML = activities.slice(0, 6).map(activity => `
+            <div class="activity-item">
+                <div class="activity-icon" style="background: ${activity.iconBg}20;">
+                    ${activity.icon}
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium text-gray-900">${activity.title}</p>
+                    <p class="text-sm text-gray-600">${activity.desc}</p>
+                    <p class="text-xs text-gray-400 mt-1">${activity.time}</p>
+                </div>
+                ${activity.status ? `
+                    <span class="badge ${activity.status === 'pending' ? 'badge-warning' : activity.status === 'validated' ? 'badge-success' : 'badge-info'}">
+                        ${activity.status}
+                    </span>
+                ` : ''}
+            </div>
+        `).join('');
+        
     } catch (error) {
-        console.error('Error loading maintenance:', error);
+        console.error('Error loading activity:', error);
         container.innerHTML = '<p class="text-red-500 text-center py-4">Erreur de chargement</p>';
     }
 }
 
-async function loadRecentPayments() {
-    const container = document.getElementById('recent-payments');
-    try {
-        const response = await fetch('/api/admin/payments');
-        const data = await response.json();
-        
-        if (data.success && data.payments) {
-            const payments = data.payments.slice(0, 5);
-            if (payments.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucun paiement récent</p>';
-                return;
-            }
-            
-            container.innerHTML = payments.map(payment => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                        <p class="font-medium text-gray-900">Lot ${payment.unit_id}</p>
-                        <p class="text-sm text-gray-500">${MySindic.formatDate(payment.created_at)}</p>
-                    </div>
-                    <span class="font-semibold text-green-600">${MySindic.formatCurrency(payment.amount)}</span>
-                </div>
-            `).join('');
-        } else {
-            container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucun paiement récent</p>';
-        }
-    } catch (error) {
-        console.error('Error loading payments:', error);
-        container.innerHTML = '<p class="text-red-500 text-center py-4">Erreur de chargement</p>';
-    }
+function refreshDashboard() {
+    MySindic.showToast('Actualisation des données...', 'info');
+    loadDashboardStats();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboardStats();
+    feather.replace();
 });
 </script>
 {% endblock %}

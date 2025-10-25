@@ -198,6 +198,41 @@ def create_unit(residence_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/units', methods=['POST'])
+@login_required
+@superadmin_required
+def create_unit_simple():
+    """Crée un nouveau lot (endpoint simplifié)"""
+    try:
+        data = request.get_json()
+        required_fields = ['residence_id', 'unit_number', 'tantiemes']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        unit = Unit(
+            residence_id=data['residence_id'],
+            unit_number=data['unit_number'],
+            floor=data.get('floor'),
+            building=data.get('building'),
+            unit_type=data.get('unit_type'),
+            surface_area=data.get('surface_area'),
+            tantiemes=data['tantiemes'],
+            owner_name=data.get('owner_name'),
+            owner_email=data.get('owner_email'),
+            owner_phone=data.get('owner_phone'),
+            is_occupied=data.get('is_occupied', True)
+        )
+        
+        db.session.add(unit)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Lot créé avec succès', 'unit': unit.to_dict()}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== CHARGES ====================
 
 @admin_bp.route('/charges', methods=['GET'])

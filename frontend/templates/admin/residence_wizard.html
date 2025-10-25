@@ -1,0 +1,821 @@
+{% extends "base.html" %}
+
+{% block title %}Créer une Résidence - MySindic{% endblock %}
+
+{% block extra_head %}
+<style>
+    .wizard-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .wizard-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 48px;
+        position: relative;
+    }
+    
+    .wizard-steps::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #E5E7EB;
+        z-index: 0;
+    }
+    
+    .wizard-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+    
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #E5E7EB;
+        color: #9CA3AF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .wizard-step.active .step-circle {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .wizard-step.completed .step-circle {
+        background: #10B981;
+        color: white;
+    }
+    
+    .step-label {
+        font-size: 13px;
+        color: #6B7280;
+        text-align: center;
+        max-width: 120px;
+    }
+    
+    .wizard-step.active .step-label {
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .wizard-content {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        min-height: 500px;
+    }
+    
+    .wizard-panel {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .wizard-panel.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #E5E7EB;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .division-type-card {
+        border: 2px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: white;
+    }
+    
+    .division-type-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .division-type-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+    
+    .division-type-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+    
+    .division-type-name {
+        font-weight: 600;
+        color: #1F2937;
+        margin-bottom: 4px;
+    }
+    
+    .division-type-desc {
+        font-size: 13px;
+        color: #6B7280;
+    }
+    
+    .unit-config-item {
+        background: #F9FAFB;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+    
+    .unit-config-item:hover {
+        border-color: #667eea;
+        background: white;
+    }
+    
+    .wizard-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 2px solid #F3F4F6;
+    }
+    
+    .btn-wizard {
+        padding: 12px 32px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .btn-wizard-prev {
+        background: white;
+        border: 2px solid #E5E7EB;
+        color: #6B7280;
+    }
+    
+    .btn-wizard-prev:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+    
+    .btn-wizard-next {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-wizard-next:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-wizard-next:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .admin-select-card {
+        border: 2px solid #E5E7EB;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .admin-select-card:hover {
+        border-color: #667eea;
+        background: #F9FAFB;
+    }
+    
+    .admin-select-card.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+    
+    .admin-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+    }
+    
+    .checkbox-custom {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8 py-6">
+    <div class="wizard-container">
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{{ url_for('admin_residences') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-flex items-center gap-2">
+                <i data-feather="arrow-left" class="w-4 h-4"></i>
+                Retour aux résidences
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900 mt-4">Créer une Nouvelle Résidence</h1>
+            <p class="text-gray-600 mt-2">Suivez les étapes pour configurer votre copropriété</p>
+        </div>
+
+        <!-- Wizard Steps Indicator -->
+        <div class="wizard-steps">
+            <div class="wizard-step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Informations de base</div>
+            </div>
+            <div class="wizard-step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Type de découpe</div>
+            </div>
+            <div class="wizard-step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Configuration unités</div>
+            </div>
+            <div class="wizard-step" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Assignation admins</div>
+            </div>
+        </div>
+
+        <!-- Wizard Content -->
+        <div class="wizard-content">
+            <!-- Step 1: Basic Information -->
+            <div class="wizard-panel active" data-panel="1">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Informations de la Résidence</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group md:col-span-2">
+                        <label class="form-label">Nom de la résidence *</label>
+                        <input type="text" id="residence_name" class="form-input" placeholder="Ex: Résidence Les Jardins" required>
+                    </div>
+                    
+                    <div class="form-group md:col-span-2">
+                        <label class="form-label">Adresse *</label>
+                        <input type="text" id="residence_address" class="form-input" placeholder="Ex: 123 Avenue Mohammed V" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ville *</label>
+                        <input type="text" id="residence_city" class="form-input" placeholder="Ex: Casablanca" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Code postal</label>
+                        <input type="text" id="residence_postal" class="form-input" placeholder="Ex: 20000">
+                    </div>
+                    
+                    <div class="form-group md:col-span-2">
+                        <label class="form-label">Description</label>
+                        <textarea id="residence_description" class="form-input form-textarea" placeholder="Description de la résidence..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom du syndic</label>
+                        <input type="text" id="syndic_name" class="form-input" placeholder="Ex: MySindic">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email du syndic</label>
+                        <input type="email" id="syndic_email" class="form-input" placeholder="contact@mysindic.ma">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Téléphone du syndic</label>
+                        <input type="tel" id="syndic_phone" class="form-input" placeholder="+212522000000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Total tantièmes</label>
+                        <input type="number" id="residence_tantiemes" class="form-input" value="1000">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Division Type -->
+            <div class="wizard-panel" data-panel="2">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Type de Découpe</h2>
+                <p class="text-gray-600 mb-8">Choisissez comment votre résidence est organisée</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="division-types">
+                    <div class="division-type-card" data-type="lot" onclick="selectDivisionType('lot')">
+                        <div class="division-type-icon">📦</div>
+                        <div class="division-type-name">Lots Simples</div>
+                        <div class="division-type-desc">Numérotation directe des lots (A101, A102...)</div>
+                    </div>
+                    
+                    <div class="division-type-card" data-type="immeuble" onclick="selectDivisionType('immeuble')">
+                        <div class="division-type-icon">🏢</div>
+                        <div class="division-type-name">Immeubles</div>
+                        <div class="division-type-desc">Organisation par immeubles (Imm. A, B, C...)</div>
+                    </div>
+                    
+                    <div class="division-type-card" data-type="batiment" onclick="selectDivisionType('batiment')">
+                        <div class="division-type-icon">🏗️</div>
+                        <div class="division-type-name">Bâtiments</div>
+                        <div class="division-type-desc">Organisation par bâtiments (Bât. 1, 2, 3...)</div>
+                    </div>
+                    
+                    <div class="division-type-card" data-type="zone" onclick="selectDivisionType('zone')">
+                        <div class="division-type-icon">🗺️</div>
+                        <div class="division-type-name">Zones</div>
+                        <div class="division-type-desc">Organisation par zones (Zone Nord, Sud...)</div>
+                    </div>
+                </div>
+                
+                <div id="division-config" class="mt-8" style="display: none;">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Configuration de la découpe</h3>
+                    <div class="form-group">
+                        <label class="form-label">Nombre de <span id="division-label">divisions</span> *</label>
+                        <input type="number" id="division_count" class="form-input" min="1" max="50" value="1" onchange="updateDivisionPreview()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Préfixe de nomenclature</label>
+                        <input type="text" id="division_prefix" class="form-input" placeholder="Ex: A, B, C..." value="A" onchange="updateDivisionPreview()">
+                        <p class="text-sm text-gray-500 mt-2">Les divisions seront nommées: <span id="nomenclature-preview" class="font-semibold text-indigo-600"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Units Configuration -->
+            <div class="wizard-panel" data-panel="3">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Configuration des Unités</h2>
+                <p class="text-gray-600 mb-8">Définissez les types d'unités pour chaque division</p>
+                
+                <div id="units-configuration">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Step 4: Admin Assignment -->
+            <div class="wizard-panel" data-panel="4">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Assignation des Administrateurs</h2>
+                <p class="text-gray-600 mb-8">Sélectionnez les administrateurs pour gérer cette résidence</p>
+                
+                <div id="admin-list">
+                    <div class="flex justify-center py-8">
+                        <div class="loading-spinner border-indigo-600"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wizard Actions -->
+            <div class="wizard-actions">
+                <button type="button" class="btn-wizard btn-wizard-prev" onclick="previousStep()" style="display: none;">
+                    <i data-feather="arrow-left" class="w-4 h-4 inline"></i>
+                    Précédent
+                </button>
+                <button type="button" class="btn-wizard btn-wizard-next" onclick="nextStep()">
+                    Suivant
+                    <i data-feather="arrow-right" class="w-4 h-4 inline"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStep = 1;
+let wizardData = {
+    residence: {},
+    divisionType: null,
+    divisions: [],
+    units: [],
+    admins: []
+};
+
+function nextStep() {
+    if (!validateStep(currentStep)) {
+        return;
+    }
+    
+    saveStepData(currentStep);
+    
+    if (currentStep < 4) {
+        currentStep++;
+        updateWizard();
+    } else {
+        submitResidence();
+    }
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateWizard();
+    }
+}
+
+function updateWizard() {
+    // Update step indicators
+    document.querySelectorAll('.wizard-step').forEach((step, index) => {
+        const stepNum = index + 1;
+        if (stepNum < currentStep) {
+            step.classList.add('completed');
+            step.classList.remove('active');
+        } else if (stepNum === currentStep) {
+            step.classList.add('active');
+            step.classList.remove('completed');
+        } else {
+            step.classList.remove('active', 'completed');
+        }
+    });
+    
+    // Update panels
+    document.querySelectorAll('.wizard-panel').forEach((panel, index) => {
+        panel.classList.toggle('active', index + 1 === currentStep);
+    });
+    
+    // Update buttons
+    document.querySelector('.btn-wizard-prev').style.display = currentStep > 1 ? 'block' : 'none';
+    const nextBtn = document.querySelector('.btn-wizard-next');
+    if (currentStep === 4) {
+        nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4 inline mr-2"></i>Créer la résidence';
+    } else {
+        nextBtn.innerHTML = 'Suivant <i data-feather="arrow-right" class="w-4 h-4 inline ml-2"></i>';
+    }
+    
+    feather.replace();
+    
+    // Load step-specific data
+    if (currentStep === 3) {
+        loadUnitsConfiguration();
+    } else if (currentStep === 4) {
+        loadAdmins();
+    }
+}
+
+function validateStep(step) {
+    switch (step) {
+        case 1:
+            const name = document.getElementById('residence_name').value;
+            const address = document.getElementById('residence_address').value;
+            const city = document.getElementById('residence_city').value;
+            
+            if (!name || !address || !city) {
+                MySindic.showToast('Veuillez remplir tous les champs obligatoires', 'error');
+                return false;
+            }
+            return true;
+            
+        case 2:
+            if (!wizardData.divisionType) {
+                MySindic.showToast('Veuillez sélectionner un type de découpe', 'error');
+                return false;
+            }
+            
+            const divCount = parseInt(document.getElementById('division_count').value);
+            if (!divCount || divCount < 1) {
+                MySindic.showToast('Veuillez spécifier le nombre de divisions', 'error');
+                return false;
+            }
+            return true;
+            
+        case 3:
+            if (wizardData.units.length === 0) {
+                MySindic.showToast('Veuillez configurer au moins une unité', 'error');
+                return false;
+            }
+            return true;
+            
+        case 4:
+            return true;
+    }
+    return true;
+}
+
+function saveStepData(step) {
+    switch (step) {
+        case 1:
+            wizardData.residence = {
+                name: document.getElementById('residence_name').value,
+                address: document.getElementById('residence_address').value,
+                city: document.getElementById('residence_city').value,
+                postal_code: document.getElementById('residence_postal').value,
+                description: document.getElementById('residence_description').value,
+                syndic_name: document.getElementById('syndic_name').value,
+                syndic_email: document.getElementById('syndic_email').value,
+                syndic_phone: document.getElementById('syndic_phone').value,
+                total_tantiemes: parseInt(document.getElementById('residence_tantiemes').value) || 1000
+            };
+            break;
+            
+        case 2:
+            const divCount = parseInt(document.getElementById('division_count').value);
+            const prefix = document.getElementById('division_prefix').value;
+            wizardData.divisions = [];
+            
+            for (let i = 0; i < divCount; i++) {
+                wizardData.divisions.push({
+                    name: `${prefix}${i + 1}`,
+                    type: wizardData.divisionType
+                });
+            }
+            break;
+    }
+}
+
+function selectDivisionType(type) {
+    wizardData.divisionType = type;
+    
+    // Update UI
+    document.querySelectorAll('.division-type-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.type === type);
+    });
+    
+    // Show configuration
+    const config = document.getElementById('division-config');
+    config.style.display = 'block';
+    
+    // Update label
+    const labels = {
+        'lot': 'lots',
+        'immeuble': 'immeubles',
+        'batiment': 'bâtiments',
+        'zone': 'zones'
+    };
+    document.getElementById('division-label').textContent = labels[type] || 'divisions';
+    
+    updateDivisionPreview();
+}
+
+function updateDivisionPreview() {
+    const count = parseInt(document.getElementById('division_count').value) || 1;
+    const prefix = document.getElementById('division_prefix').value || 'A';
+    
+    const preview = [];
+    for (let i = 0; i < Math.min(count, 5); i++) {
+        preview.push(`${prefix}${i + 1}`);
+    }
+    
+    let text = preview.join(', ');
+    if (count > 5) {
+        text += `, ... (${count} au total)`;
+    }
+    
+    document.getElementById('nomenclature-preview').textContent = text;
+}
+
+function loadUnitsConfiguration() {
+    const container = document.getElementById('units-configuration');
+    
+    if (wizardData.divisions.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center">Aucune division configurée</p>';
+        return;
+    }
+    
+    const unitTypes = [
+        { value: 'appartement', label: 'Appartement', icon: '🏠' },
+        { value: 'villa', label: 'Villa', icon: '🏡' },
+        { value: 'commerce', label: 'Commerce', icon: '🏪' },
+        { value: 'bureau', label: 'Bureau', icon: '🏢' },
+        { value: 'parking', label: 'Parking', icon: '🚗' },
+        { value: 'cave', label: 'Cave', icon: '📦' }
+    ];
+    
+    let html = '';
+    wizardData.divisions.forEach((division, divIndex) => {
+        html += `
+            <div class="unit-config-item">
+                <h4 class="font-semibold text-gray-900 mb-4">${division.name}</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Type d'unités</label>
+                        <select id="unit_type_${divIndex}" class="form-input">
+                            ${unitTypes.map(type => `<option value="${type.value}">${type.icon} ${type.label}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nombre d'unités</label>
+                        <input type="number" id="unit_count_${divIndex}" class="form-input" min="1" value="10">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nombre d'étages</label>
+                        <input type="number" id="floor_count_${divIndex}" class="form-input" min="1" value="5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Unités par étage</label>
+                        <input type="number" id="units_per_floor_${divIndex}" class="form-input" min="1" value="2">
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+async function loadAdmins() {
+    const container = document.getElementById('admin-list');
+    
+    try {
+        const response = await fetch('/api/admin/users');
+        const data = await response.json();
+        
+        if (data.success && data.users) {
+            const admins = data.users.filter(u => u.role === 'admin' || u.role === 'superadmin');
+            
+            if (admins.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucun administrateur disponible</p>';
+                return;
+            }
+            
+            container.innerHTML = admins.map(admin => {
+                const initials = (admin.first_name?.charAt(0) || '') + (admin.last_name?.charAt(0) || '');
+                return `
+                    <div class="admin-select-card" onclick="toggleAdmin(${admin.id})">
+                        <input type="checkbox" id="admin_${admin.id}" class="checkbox-custom" onclick="event.stopPropagation();">
+                        <div class="admin-avatar">${initials}</div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900">${admin.first_name} ${admin.last_name}</div>
+                            <div class="text-sm text-gray-600">${admin.email}</div>
+                            <span class="badge badge-${admin.role === 'superadmin' ? 'purple' : 'blue'} mt-1">${admin.role_display || admin.role}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (error) {
+        console.error('Error loading admins:', error);
+        container.innerHTML = '<p class="text-red-500 text-center py-4">Erreur de chargement</p>';
+    }
+}
+
+function toggleAdmin(adminId) {
+    const checkbox = document.getElementById(`admin_${adminId}`);
+    checkbox.checked = !checkbox.checked;
+    
+    const card = checkbox.closest('.admin-select-card');
+    card.classList.toggle('selected', checkbox.checked);
+    
+    if (checkbox.checked) {
+        if (!wizardData.admins.includes(adminId)) {
+            wizardData.admins.push(adminId);
+        }
+    } else {
+        wizardData.admins = wizardData.admins.filter(id => id !== adminId);
+    }
+}
+
+async function submitResidence() {
+    try {
+        // Collect units data from step 3
+        wizardData.units = [];
+        let totalUnits = 0;
+        
+        wizardData.divisions.forEach((division, divIndex) => {
+            const unitType = document.getElementById(`unit_type_${divIndex}`).value;
+            const unitCount = parseInt(document.getElementById(`unit_count_${divIndex}`).value) || 0;
+            const floorCount = parseInt(document.getElementById(`floor_count_${divIndex}`).value) || 1;
+            const unitsPerFloor = parseInt(document.getElementById(`units_per_floor_${divIndex}`).value) || 1;
+            
+            totalUnits += unitCount;
+            
+            // Generate units for this division
+            let unitNum = 1;
+            for (let floor = 1; floor <= floorCount && unitNum <= unitCount; floor++) {
+                for (let u = 1; u <= unitsPerFloor && unitNum <= unitCount; u++) {
+                    wizardData.units.push({
+                        division: division.name,
+                        unit_number: `${division.name}${floor}${String(u).padStart(2, '0')}`,
+                        floor: floor,
+                        unit_type: unitType
+                    });
+                    unitNum++;
+                }
+            }
+        });
+        
+        // Update total units
+        wizardData.residence.total_units = totalUnits;
+        
+        // Create residence
+        const residenceResponse = await fetch('/api/admin/residences', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(wizardData.residence)
+        });
+        
+        const residenceData = await residenceResponse.json();
+        
+        if (!residenceData.success) {
+            throw new Error(residenceData.error || 'Erreur lors de la création de la résidence');
+        }
+        
+        const residenceId = residenceData.residence.id;
+        
+        // Create units
+        for (const unit of wizardData.units) {
+            await fetch('/api/admin/units', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    residence_id: residenceId,
+                    unit_number: unit.unit_number,
+                    floor: unit.floor,
+                    building: unit.division,
+                    unit_type: unit.unit_type,
+                    tantiemes: Math.floor(wizardData.residence.total_tantiemes / totalUnits)
+                })
+            });
+        }
+        
+        // Assign admins to residence
+        for (const adminId of wizardData.admins) {
+            await fetch(`/api/admin/users/${adminId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ residence_id: residenceId })
+            });
+        }
+        
+        MySindic.showToast('Résidence créée avec succès!', 'success');
+        setTimeout(() => {
+            window.location.href = '{{ url_for("admin_residences") }}';
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Error creating residence:', error);
+        MySindic.showToast(error.message || 'Erreur lors de la création', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    feather.replace();
+});
+</script>
+{% endblock %}
