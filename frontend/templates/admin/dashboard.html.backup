@@ -1,10 +1,12 @@
-{% extends "admin/admin_base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Dashboard SuperAdmin - MySindic{% endblock %}
 
-{% block admin_extra_css %}
+{% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
 
+{% block extra_css %}
 <style>
     body {
         background: #f5f7fa;
@@ -348,7 +350,94 @@
 </style>
 {% endblock %}
 
-{% block admin_content %}
+{% block content %}
+<div class="modern-header">
+    <div class="header-container">
+        <div class="logo">🏢 MySindic Admin</div>
+        
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Rechercher résidences, utilisateurs...">
+        </div>
+        
+        <div class="header-actions">
+            <button class="icon-btn" onclick="refreshDashboard()" title="Actualiser">
+                🔄
+            </button>
+            <button class="icon-btn" title="Notifications">
+                🔔
+                <span class="badge" id="notification-count">0</span>
+            </button>
+            <button class="user-profile-btn">
+                <div class="user-avatar">{{ current_user.first_name[0].upper() }}</div>
+                <span class="user-name">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-layout">
+    <aside class="left-sidebar">
+        <div class="nav-tabs-card">
+            <a href="#dashboard" class="nav-tab active" data-tab="dashboard" onclick="switchTab(event, 'dashboard')">
+                <span class="nav-tab-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin_residences') }}" class="nav-tab">
+                <span class="nav-tab-icon">🏢</span>
+                <span>Résidences</span>
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="nav-tab">
+                <span class="nav-tab-icon">👥</span>
+                <span>Utilisateurs</span>
+            </a>
+            <a href="{{ url_for('admin_finances') }}" class="nav-tab">
+                <span class="nav-tab-icon">💰</span>
+                <span>Finances</span>
+            </a>
+            <a href="{{ url_for('admin_maintenance') }}" class="nav-tab">
+                <span class="nav-tab-icon">🔧</span>
+                <span>Maintenance</span>
+            </a>
+            <a href="{{ url_for('admin_maintenance_log') }}" class="nav-tab">
+                <span class="nav-tab-icon">📝</span>
+                <span>Carnet d'Entretien</span>
+            </a>
+            <a href="{{ url_for('admin_assemblies') }}" class="nav-tab">
+                <span class="nav-tab-icon">🗳️</span>
+                <span>Assemblées</span>
+            </a>
+            <a href="{{ url_for('admin_documents') }}" class="nav-tab">
+                <span class="nav-tab-icon">📄</span>
+                <span>Documents</span>
+            </a>
+            <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
+                <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
+                    <span class="nav-tab-icon">🚪</span>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="content-card">
+            <h3 style="font-size: 0.8rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem;">⚡ Actions Rapides</h3>
+            <a href="{{ url_for('admin_residences') }}#create" class="quick-action-btn">
+                <span style="font-size: 1.5rem;">🏗️</span>
+                <span>Nouvelle Résidence</span>
+            </a>
+            <a href="{{ url_for('admin_users') }}#create" class="quick-action-btn green">
+                <span style="font-size: 1.5rem;">👤</span>
+                <span>Nouvel Utilisateur</span>
+            </a>
+            <a href="{{ url_for('admin_finances') }}#create" class="quick-action-btn orange">
+                <span style="font-size: 1.5rem;">💳</span>
+                <span>Appel de Fonds</span>
+            </a>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <div id="tab-dashboard" class="tab-content active">
             <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card blue">
@@ -411,9 +500,11 @@
                 </div>
             </div>
         </div>
+    </main>
+</div>
 {% endblock %}
 
-{% block admin_extra_js %}
+{% block extra_js %}
 <script>
 let monthlyChart, distributionChart;
 
