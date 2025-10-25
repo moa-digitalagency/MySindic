@@ -33,6 +33,9 @@
                         <a href="{{ url_for('admin_dashboard') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Dashboard
                         </a>
+                        <a href="{{ url_for('admin_users') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Utilisateurs
+                        </a>
                         <a href="{{ url_for('admin_residences') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                             Résidences
                         </a>
@@ -84,6 +87,9 @@
                 <a href="{{ url_for('admin_dashboard') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
                     📊 Dashboard
                 </a>
+                <a href="{{ url_for('admin_users') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
+                    👥 Utilisateurs
+                </a>
                 <a href="{{ url_for('admin_residences') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
                     🏢 Résidences
                 </a>
@@ -101,9 +107,6 @@
                 </a>
                 <a href="{{ url_for('admin_documents') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
                     📄 Documents
-                </a>
-                <a href="{{ url_for('admin_users') }}" class="border-transparent text-gray-600 hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-700 block pl-3 pr-4 py-3 border-l-4 text-base font-medium rounded-r transition">
-                    👥 Utilisateurs
                 </a>
                 <div class="border-t border-gray-200 pt-3 mt-3">
                     <div class="flex items-center px-4 py-2">
