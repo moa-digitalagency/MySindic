@@ -1,8 +1,10 @@
 # 🔐 MySindic - Identifiants de Démonstration
 
-**Date de création :** 24 octobre 2025
+**Dernière mise à jour :** 25 octobre 2025
 
 Ce document contient tous les identifiants de démonstration pour tester l'application MySindic.
+
+⚠️ **Auto-initialisation activée** - La base de données s'initialise automatiquement au premier démarrage!
 
 ---
 
@@ -38,18 +40,30 @@ Utilisez ce compte pour accéder à toutes les fonctionnalités d'administration
 
 ---
 
-## 🏠 Compte Résident
+## 🏠 Comptes Résidents
 
-Utilisez ce compte pour tester les fonctionnalités résidents.
+Utilisez ces comptes pour tester les fonctionnalités résidents.
 
+### Résident 1
 **Email :** `resident@mysindic.ma`  
 **Mot de passe :** `Resident123!`
-
-### Informations du Résident:
 - **Résidence :** Résidence Les Jardins
 - **Unité :** A101 (Appartement F3, 85.5 m²)
 - **Tantièmes :** 50/1000
-- **Propriétaire :** Propriétaire A101
+
+### Résident 2
+**Email :** `fatima@mysindic.ma`  
+**Mot de passe :** `Resident123!`
+- **Résidence :** Résidence Les Jardins
+- **Unité :** A102 (Appartement F2, 65.0 m²)
+- **Tantièmes :** 40/1000
+
+### Résident 3
+**Email :** `karim@mysindic.ma`  
+**Mot de passe :** `Resident123!`
+- **Résidence :** Résidence Les Jardins
+- **Unité :** A201 (Appartement F4, 110.0 m²)
+- **Tantièmes :** 65/1000
 
 ### Accès Résident:
 - ✅ Dashboard personnalisé
@@ -85,9 +99,11 @@ Utilisez ce compte pour tester les fonctionnalités résidents.
 **Total tantièmes :** 1000
 
 ### Unités créées:
-1. **A101** - F3, 85.5 m², 50 tantièmes
-2. **A102** - F2, 65.0 m², 40 tantièmes
-3. **A201** - F4, 110.0 m², 65 tantièmes
+1. **A101** - F3, 85.5 m², 50 tantièmes (Résident: resident@mysindic.ma)
+2. **A102** - F2, 65.0 m², 40 tantièmes (Résident: fatima@mysindic.ma)
+3. **A201** - F4, 110.0 m², 65 tantièmes (Résident: karim@mysindic.ma)
+4. **B101** - Studio, 45.0 m², 25 tantièmes (Vacant)
+5. **B102** - F5, 135.0 m², 80 tantièmes (Vacant)
 
 ---
 
@@ -177,22 +193,27 @@ curl http://localhost:5000/api/admin/residences \
 
 ## 📊 Données de Test Disponibles
 
-Après l'exécution de `python init_db.py`, vous aurez:
+L'auto-initialisation crée automatiquement:
 
-- ✅ 1 compte superadmin
-- ✅ 1 compte résident (attaché à l'unité A101)
+- ✅ 4 comptes utilisateurs (1 superadmin + 3 résidents)
 - ✅ 1 résidence (Résidence Les Jardins)
-- ✅ 3 unités (A101, A102, A201)
-- ✅ Base de données PostgreSQL avec 16 tables
+- ✅ 5 unités (A101, A102, A201, B101, B102)
+- ✅ 1 appel de fonds avec répartition automatique
+- ✅ 2 paiements validés
+- ✅ 2 demandes de maintenance avec logs
+- ✅ 2 actualités publiées
+- ✅ Base de données PostgreSQL avec 18 tables
 
 ---
 
 ## ⚠️ Notes Importantes
 
-1. **Sécurité :** Ces identifiants sont pour la démonstration uniquement. Changez-les en production!
-2. **Réinitialisation :** Pour réinitialiser la base de données, exécutez `python init_db.py`
-3. **Nouveaux comptes :** Vous pouvez créer de nouveaux comptes via `/register` ou l'API
-4. **Rôles :** Les rôles sont `superadmin` ou `resident`
+1. **Auto-initialisation :** La base de données s'initialise automatiquement au premier démarrage - aucune action manuelle requise!
+2. **Idempotence :** Si un admin existe déjà, le système ne réinitialise pas les données
+3. **Sécurité :** Ces identifiants sont pour la démonstration uniquement. Changez-les en production!
+4. **Réinitialisation manuelle :** Pour forcer une réinitialisation, exécutez `python reset_db.py`
+5. **Nouveaux comptes :** Seuls les superadmins peuvent créer de nouveaux comptes résidents
+6. **Rôles :** Les rôles sont `superadmin` ou `resident`
 
 ---
 
@@ -206,5 +227,6 @@ Si vous avez des problèmes:
 
 ---
 
-**Dernière mise à jour :** 24 octobre 2025  
-**Version de l'application :** 0.1.0
+**Dernière mise à jour :** 25 octobre 2025  
+**Version de l'application :** 0.1.0  
+**Auto-initialisation :** ✅ Activée

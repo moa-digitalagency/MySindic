@@ -76,6 +76,42 @@ Le projet est organisé en deux dossiers principaux:
 
 ## Recent Changes
 
+### October 25, 2025 - Automatic Database Initialization ✅
+
+**Auto-Initialization System:**
+1. **Smart Database Detection**
+   - Application automatically detects if database is empty on startup
+   - Checks for existence of superadmin account as initialization flag
+   - Idempotent initialization: never re-seeds if data already exists
+
+2. **Comprehensive Demo Data**
+   - Automatically creates complete demo dataset on first deployment
+   - 4 user accounts: 1 superadmin + 3 residents
+   - 1 residence "Les Jardins" with 5 units
+   - 1 charge (fund call) with automatic distribution
+   - 2 validated payments
+   - 2 maintenance requests with logs
+   - 2 news articles
+   - All data properly linked with foreign keys
+
+3. **Implementation Files**
+   - `backend/app.py`: Contains `auto_init_database()` function that runs on app startup
+   - `backend/init_demo_data.py`: Complete seeding script with all demo data
+   - `init_db.py`: Manual initialization wrapper (optional use)
+   - `reset_db.py`: Safe database reset tool with confirmation
+
+4. **Demo Credentials**
+   - Superadmin: admin@mysindic.ma / Admin123!
+   - Resident 1: resident@mysindic.ma / Resident123!
+   - Resident 2: fatima@mysindic.ma / Resident123!
+   - Resident 3: karim@mysindic.ma / Resident123!
+
+**Benefits:**
+- Zero manual setup required on deployment
+- Consistent demo environment across all deployments
+- Safe re-deployments: existing data is preserved
+- Clear error handling and logging
+
 ### October 25, 2025 - Migration Replit & Modern Design Update ✅
 
 **Migration:**
@@ -189,10 +225,26 @@ uv run gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
 
 ### Database Initialization
 
-To reset and initialize the database with sample data:
+**Automatic Initialization:**
+The database initializes automatically on first deployment with complete demo data. No manual setup required!
 
+**Manual Operations:**
+
+To manually initialize/reset the database:
+```bash
+uv run python reset_db.py
+```
+
+Or to initialize without prompts:
 ```bash
 uv run python init_db.py
 ```
 
-This creates sample residences, units, and demo user accounts.
+**What Gets Created:**
+- Complete residence with 5 units
+- 4 user accounts (1 admin + 3 residents)
+- Financial data (charges, payments)
+- Maintenance requests and logs
+- News articles
+
+All demo accounts use the password: `Resident123!` (or `Admin123!` for admin)
