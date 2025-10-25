@@ -28,9 +28,9 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.75rem 1.25rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
+        background: rgba(102, 126, 234, 0.08);
+        border: 2px dashed #667eea;
+        color: #667eea;
         border-radius: 10px;
         font-size: 0.875rem;
         font-weight: 600;
@@ -41,14 +41,14 @@
     
     .btn-create-residence:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        background: rgba(102, 126, 234, 0.15);
     }
     
     .content-card {
-        background: white;
+        background: rgba(255, 255, 255, 0.6);
+        border: 2px dashed #e5e7eb;
         border-radius: 12px;
         padding: 1.25rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
     .residence-grid {
@@ -59,30 +59,18 @@
     }
     
     .residence-card {
-        background: white;
-        border: 2px solid #e5e7eb;
+        background: rgba(102, 126, 234, 0.05);
+        border: 2px dashed #667eea;
         border-radius: 12px;
         padding: 1.25rem;
         transition: all 0.3s;
         cursor: pointer;
         position: relative;
-        overflow: hidden;
-    }
-    
-    .residence-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     }
     
     .residence-card:hover {
-        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
     .residence-name {
@@ -109,7 +97,8 @@
     }
     
     .stat-item {
-        background: #f9fafb;
+        background: rgba(139, 92, 246, 0.05);
+        border: 2px dashed #8b5cf6;
         padding: 0.75rem;
         border-radius: 8px;
     }
@@ -136,20 +125,20 @@
     .btn-action {
         flex: 1;
         padding: 0.5rem;
-        border: 1px solid #e5e7eb;
+        border: 2px dashed #6b7280;
         border-radius: 8px;
         font-size: 0.8rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
-        background: white;
+        background: transparent;
         color: #6b7280;
     }
     
     .btn-action:hover {
         border-color: #667eea;
         color: #667eea;
-        background: #f9fafb;
+        background: rgba(102, 126, 234, 0.05);
     }
     
     .empty-state {
