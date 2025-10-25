@@ -2,104 +2,384 @@
 
 {% block title %}Mon Tableau de Bord - MySindic{% endblock %}
 
+{% block extra_css %}
+<style>
+    @media (min-width: 768px) {
+        .social-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+    }
+    
+    .mobile-nav-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #e5e7eb;
+        padding: 0.5rem;
+        z-index: 40;
+        display: flex;
+        justify-content: space-around;
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5rem;
+        color: #6b7280;
+        transition: all 0.2s;
+        cursor: pointer;
+        flex: 1;
+        max-width: 80px;
+    }
+    
+    .mobile-nav-item.active {
+        color: #4f46e5;
+    }
+    
+    .mobile-nav-item:active {
+        transform: scale(0.95);
+    }
+    
+    .mobile-nav-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .mobile-nav-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .feed-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .post-card {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s;
+    }
+    
+    .post-card:hover {
+        background-color: #fafafa;
+    }
+    
+    .sidebar-panel {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 80px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    
+    .tab-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .tab-section:last-child {
+        border-bottom: none;
+    }
+    
+    .mobile-section {
+        display: none;
+        padding: 1rem;
+        margin-bottom: 80px;
+    }
+    
+    .mobile-section.active {
+        display: block;
+    }
+    
+    @media (max-width: 767px) {
+        .desktop-sidebar {
+            display: none !important;
+        }
+        .feed-main {
+            margin-bottom: 80px;
+        }
+        body {
+            padding-bottom: 80px;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .mobile-nav-bottom {
+            display: none;
+        }
+    }
+    
+    .action-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        border: none;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .stat-mini {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .poll-option {
+        padding: 0.75rem;
+        background: #f3f4f6;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .poll-option:hover {
+        background: #e5e7eb;
+    }
+    
+    .payment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        border-radius: 6px;
+        margin-bottom: 0.75rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="px-4 sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center">
-        <div class="sm:flex-auto">
-            <h1 class="text-2xl font-semibold text-gray-900">Mon Tableau de Bord</h1>
-            <p class="mt-2 text-sm text-gray-700" id="residence-name">Chargement...</p>
-        </div>
-    </div>
-
-    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="stat-card">
-            <div class="stat-card-icon">💰</div>
-            <div class="stat-card-title">Mon solde</div>
-            <div class="stat-card-value" id="stat-balance">-</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-icon">📋</div>
-            <div class="stat-card-title">Mes demandes</div>
-            <div class="stat-card-value" id="stat-requests">-</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-icon">📰</div>
-            <div class="stat-card-title">Nouvelles actualités</div>
-            <div class="stat-card-value" id="stat-news">-</div>
-        </div>
-    </div>
-
-    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="card">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Mes demandes de maintenance</h3>
-                <a href="{{ url_for('resident_maintenance') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    Voir tout
-                </a>
-            </div>
-            <div id="my-maintenance" class="space-y-3">
-                <div class="flex justify-center py-4">
-                    <div class="loading-spinner border-indigo-600"></div>
+<div class="bg-gray-50 min-h-screen">
+    <!-- Desktop Layout -->
+    <div class="social-layout px-4 py-6">
+        <!-- Main Feed -->
+        <div class="feed-main">
+            <!-- Fil d'actualité -->
+            <div class="feed-container mb-6" id="feed-actualite">
+                <div class="p-4 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
+                    <h2 class="text-xl font-bold text-gray-900">📰 Fil d'Actualité</h2>
+                    <p class="text-sm text-gray-600 mt-1">Dernières nouvelles de votre résidence</p>
+                </div>
+                
+                <div id="news-feed" class="divide-y">
+                    <!-- Les actualités seront chargées ici -->
+                    <div class="flex justify-center py-8">
+                        <div class="loading-spinner border-indigo-600"></div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-4">
-                <button onclick="window.location.href='{{ url_for('resident_maintenance') }}#new'" class="btn-primary w-full">
-                    Nouvelle demande
-                </button>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Actualités récentes</h3>
-                <a href="{{ url_for('resident_news') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    Voir tout
-                </a>
-            </div>
-            <div id="recent-news" class="space-y-3">
-                <div class="flex justify-center py-4">
-                    <div class="loading-spinner border-indigo-600"></div>
+            
+            <!-- Section Demandes Maintenance (toutes) -->
+            <div class="feed-container mb-6" id="feed-maintenance">
+                <div class="p-4 border-b bg-gradient-to-r from-blue-50 to-cyan-50">
+                    <h2 class="text-xl font-bold text-gray-900">🔧 Demandes de Maintenance</h2>
+                    <p class="text-sm text-gray-600 mt-1">Vos demandes et celles de la résidence</p>
+                </div>
+                
+                <div id="all-maintenance" class="divide-y">
+                    <div class="flex justify-center py-8">
+                        <div class="loading-spinner border-blue-600"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="mt-8">
-        <div class="card">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Mes charges impayées</h3>
-            <div id="unpaid-charges" class="overflow-x-auto">
-                <div class="flex justify-center py-4">
-                    <div class="loading-spinner border-indigo-600"></div>
+        
+        <!-- Desktop Sidebar (Panel à droite) -->
+        <div class="desktop-sidebar">
+            <div class="sidebar-panel">
+                <!-- Statistiques rapides -->
+                <div class="tab-section">
+                    <h3 class="font-bold text-gray-900 mb-3">📊 Mon Profil</h3>
+                    <div class="stat-mini">
+                        <span class="text-sm text-gray-600">Mon solde</span>
+                        <span class="font-bold text-gray-900" id="sidebar-balance">-</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="text-sm text-gray-600">Mes demandes</span>
+                        <span class="font-bold text-gray-900" id="sidebar-requests">-</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="text-sm text-gray-600">Résidence</span>
+                        <span class="font-bold text-gray-900 text-xs" id="sidebar-residence">-</span>
+                    </div>
+                </div>
+                
+                <!-- Sondages -->
+                <div class="tab-section">
+                    <h3 class="font-bold text-gray-900 mb-3">🗳️ Sondages Actifs</h3>
+                    <div id="polls-sidebar">
+                        <p class="text-sm text-gray-500">Aucun sondage en cours</p>
+                    </div>
+                </div>
+                
+                <!-- Paiements à venir -->
+                <div class="tab-section">
+                    <h3 class="font-bold text-gray-900 mb-3">💰 Paiements</h3>
+                    <div id="payments-sidebar">
+                        <div class="flex justify-center py-4">
+                            <div class="loading-spinner border-indigo-600 w-6 h-6"></div>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='{{ url_for('resident_finances') }}'" class="action-button mt-3">
+                        <span>💳</span>
+                        <span>Voir mes finances</span>
+                    </button>
+                </div>
+                
+                <!-- Action rapide -->
+                <div>
+                    <button onclick="openNewMaintenanceRequest()" class="action-button">
+                        <span>➕</span>
+                        <span>Nouvelle demande</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Mobile Sections -->
+    <div class="md:hidden">
+        <!-- Section Actualité (mobile) -->
+        <div id="mobile-actualite" class="mobile-section active">
+            <div class="feed-container">
+                <div class="p-4 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
+                    <h2 class="text-lg font-bold text-gray-900">📰 Actualités</h2>
+                </div>
+                <div id="news-feed-mobile"></div>
+            </div>
+        </div>
+        
+        <!-- Section Maintenance (mobile) -->
+        <div id="mobile-maintenance" class="mobile-section">
+            <div class="feed-container">
+                <div class="p-4 border-b bg-gradient-to-r from-blue-50 to-cyan-50">
+                    <h2 class="text-lg font-bold text-gray-900">🔧 Maintenance</h2>
+                </div>
+                <div id="all-maintenance-mobile"></div>
+                <div class="p-4">
+                    <button onclick="openNewMaintenanceRequest()" class="action-button">
+                        ➕ Nouvelle demande
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Sondages (mobile) -->
+        <div id="mobile-sondages" class="mobile-section">
+            <div class="feed-container">
+                <div class="p-4 border-b bg-gradient-to-r from-green-50 to-emerald-50">
+                    <h2 class="text-lg font-bold text-gray-900">🗳️ Sondages</h2>
+                </div>
+                <div id="polls-mobile" class="p-4">
+                    <p class="text-gray-500 text-center py-8">Aucun sondage actif pour le moment</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Paiements (mobile) -->
+        <div id="mobile-paiements" class="mobile-section">
+            <div class="feed-container">
+                <div class="p-4 border-b bg-gradient-to-r from-yellow-50 to-orange-50">
+                    <h2 class="text-lg font-bold text-gray-900">💰 Mes Paiements</h2>
+                </div>
+                <div id="payments-mobile" class="p-4"></div>
+                <div class="p-4">
+                    <button onclick="window.location.href='{{ url_for('resident_finances') }}'" class="action-button">
+                        💳 Voir toutes mes finances
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav-bottom">
+        <div class="mobile-nav-item active" onclick="switchMobileTab('actualite')">
+            <div class="mobile-nav-icon">📰</div>
+            <div class="mobile-nav-label">Actualité</div>
+        </div>
+        <div class="mobile-nav-item" onclick="switchMobileTab('maintenance')">
+            <div class="mobile-nav-icon">🔧</div>
+            <div class="mobile-nav-label">Maintenance</div>
+        </div>
+        <div class="mobile-nav-item" onclick="switchMobileTab('sondages')">
+            <div class="mobile-nav-icon">🗳️</div>
+            <div class="mobile-nav-label">Sondages</div>
+        </div>
+        <div class="mobile-nav-item" onclick="switchMobileTab('paiements')">
+            <div class="mobile-nav-icon">💰</div>
+            <div class="mobile-nav-label">Paiements</div>
+        </div>
+    </nav>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+function switchMobileTab(tab) {
+    document.querySelectorAll('.mobile-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.mobile-nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    document.getElementById(`mobile-${tab}`).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
 async function loadResidentDashboard() {
     try {
         const response = await fetch('/api/resident/dashboard');
         const data = await response.json();
         
         if (data.success) {
-            document.getElementById('residence-name').textContent = 'Ma résidence';
-            
             const balance = data.balance || 0;
-            const balanceEl = document.getElementById('stat-balance');
-            balanceEl.textContent = MySindic.formatCurrency(Math.abs(balance));
-            balanceEl.classList.add(balance < 0 ? 'text-red-600' : 'text-green-600');
+            const balanceText = MySindic.formatCurrency(Math.abs(balance));
+            const balanceClass = balance < 0 ? 'text-red-600' : 'text-green-600';
             
-            document.getElementById('stat-requests').textContent = data.maintenance_requests?.length || 0;
-            document.getElementById('stat-news').textContent = data.news?.length || 0;
+            document.getElementById('sidebar-balance').innerHTML = `<span class="${balanceClass}">${balanceText}</span>`;
+            document.getElementById('sidebar-requests').textContent = data.maintenance_requests?.length || 0;
+            document.getElementById('sidebar-residence').textContent = 'Ma résidence';
             
-            loadMyMaintenance(data.maintenance_requests || []);
-            loadRecentNews(data.news || []);
+            loadNewsFeed(data.news || []);
+            loadMaintenanceFeed(data.maintenance_requests || [], data.all_maintenance_requests || []);
             loadUnpaidCharges();
+            loadPolls();
         }
     } catch (error) {
         console.error('Error loading dashboard:', error);
@@ -107,44 +387,102 @@ async function loadResidentDashboard() {
     }
 }
 
-function loadMyMaintenance(requests) {
-    const container = document.getElementById('my-maintenance');
-    if (requests.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune demande en cours</p>';
+function loadNewsFeed(news) {
+    const desktopContainer = document.getElementById('news-feed');
+    const mobileContainer = document.getElementById('news-feed-mobile');
+    
+    if (news.length === 0) {
+        const emptyMessage = `
+            <div class="post-card text-center py-8">
+                <div class="text-6xl mb-3">📭</div>
+                <p class="text-gray-500">Aucune actualité pour le moment</p>
+            </div>
+        `;
+        desktopContainer.innerHTML = emptyMessage;
+        mobileContainer.innerHTML = emptyMessage;
         return;
     }
     
-    container.innerHTML = requests.map(req => `
-        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div>
-                <p class="font-medium text-gray-900">${req.title}</p>
-                <p class="text-sm text-gray-500">${MySindic.formatDate(req.created_at)}</p>
+    const newsHTML = news.map(item => `
+        <div class="post-card">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 text-3xl mr-3">📢</div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-gray-900 mb-2">${item.title}</h3>
+                    <p class="text-gray-700 mb-3">${item.content}</p>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <span>🕒 ${MySindic.formatDate(item.created_at)}</span>
+                    </div>
+                </div>
             </div>
-            <span class="badge ${req.status === 'pending' ? 'badge-warning' : req.status === 'in_progress' ? 'badge-info' : 'badge-success'}">
-                ${req.status}
-            </span>
         </div>
     `).join('');
+    
+    desktopContainer.innerHTML = newsHTML;
+    mobileContainer.innerHTML = newsHTML;
 }
 
-function loadRecentNews(news) {
-    const container = document.getElementById('recent-news');
-    if (news.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune actualité récente</p>';
+function loadMaintenanceFeed(myRequests, allRequests) {
+    const desktopContainer = document.getElementById('all-maintenance');
+    const mobileContainer = document.getElementById('all-maintenance-mobile');
+    
+    const combined = [...myRequests.map(r => ({...r, isMine: true})), 
+                      ...(allRequests || []).map(r => ({...r, isMine: false}))];
+    
+    if (combined.length === 0) {
+        const emptyMessage = `
+            <div class="post-card text-center py-8">
+                <div class="text-6xl mb-3">✨</div>
+                <p class="text-gray-500">Aucune demande de maintenance</p>
+            </div>
+        `;
+        desktopContainer.innerHTML = emptyMessage;
+        mobileContainer.innerHTML = emptyMessage;
         return;
     }
     
-    container.innerHTML = news.map(item => `
-        <div class="p-3 bg-gray-50 rounded-lg">
-            <p class="font-medium text-gray-900">${item.title}</p>
-            <p class="text-sm text-gray-500 mt-1">${item.content.substring(0, 100)}...</p>
-            <p class="text-xs text-gray-400 mt-2">${MySindic.formatDate(item.created_at)}</p>
-        </div>
-    `).join('');
+    const maintenanceHTML = combined.map(req => {
+        const statusColors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'in_progress': 'bg-blue-100 text-blue-800',
+            'completed': 'bg-green-100 text-green-800'
+        };
+        const statusLabels = {
+            'pending': 'En attente',
+            'in_progress': 'En cours',
+            'completed': 'Terminée'
+        };
+        
+        return `
+            <div class="post-card ${req.isMine ? 'bg-indigo-50' : ''}">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-3xl mr-3">🔧</div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-gray-900">${req.title}</h3>
+                            ${req.isMine ? '<span class="text-xs bg-indigo-600 text-white px-2 py-1 rounded">Ma demande</span>' : ''}
+                        </div>
+                        <p class="text-gray-700 mb-3">${req.description || 'Aucune description'}</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">🕒 ${MySindic.formatDate(req.created_at)}</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${statusColors[req.status] || 'bg-gray-100 text-gray-800'}">
+                                ${statusLabels[req.status] || req.status}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    desktopContainer.innerHTML = maintenanceHTML;
+    mobileContainer.innerHTML = maintenanceHTML;
 }
 
 async function loadUnpaidCharges() {
-    const container = document.getElementById('unpaid-charges');
+    const sidebarContainer = document.getElementById('payments-sidebar');
+    const mobileContainer = document.getElementById('payments-mobile');
+    
     try {
         const response = await fetch('/api/resident/charges/unpaid');
         const data = await response.json();
@@ -153,43 +491,65 @@ async function loadUnpaidCharges() {
             const charges = data.unpaid_charges || [];
             
             if (charges.length === 0) {
-                container.innerHTML = '<p class="text-green-600 text-center py-4 font-medium">✓ Vous êtes à jour dans vos paiements</p>';
+                const successMessage = '<p class="text-green-600 text-sm font-medium">✓ Vous êtes à jour</p>';
+                sidebarContainer.innerHTML = successMessage;
+                mobileContainer.innerHTML = `<div class="text-center py-8 text-green-600 font-semibold">✓ Vous êtes à jour dans vos paiements</div>`;
                 return;
             }
             
-            container.innerHTML = `
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Date d'échéance</th>
-                            <th>Montant</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${charges.map(charge => `
-                            <tr>
-                                <td>${charge.title || 'Charge'}</td>
-                                <td>${MySindic.formatDate(charge.due_date)}</td>
-                                <td class="text-red-600 font-semibold">${MySindic.formatCurrency(charge.amount)}</td>
-                                <td>
-                                    <a href="{{ url_for('resident_finances') }}" class="text-indigo-600 hover:text-indigo-800">
-                                        Déclarer paiement
-                                    </a>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        } else {
-            container.innerHTML = '<p class="text-gray-500 text-center py-4">Impossible de charger les charges</p>';
+            const paymentsHTML = charges.map(charge => `
+                <div class="payment-item">
+                    <div>
+                        <p class="font-medium text-gray-900 text-sm">${charge.title || 'Charge'}</p>
+                        <p class="text-xs text-gray-600">Échéance: ${MySindic.formatDate(charge.due_date)}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-red-600">${MySindic.formatCurrency(charge.amount)}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            sidebarContainer.innerHTML = paymentsHTML;
+            mobileContainer.innerHTML = paymentsHTML;
         }
     } catch (error) {
         console.error('Error loading unpaid charges:', error);
-        container.innerHTML = '<p class="text-red-500 text-center py-4">Erreur de chargement</p>';
     }
+}
+
+function loadPolls() {
+    const sidebarContainer = document.getElementById('polls-sidebar');
+    const mobileContainer = document.getElementById('polls-mobile');
+    
+    const samplePolls = [
+        {
+            question: "Êtes-vous favorable à l'installation de panneaux solaires ?",
+            options: ["Oui", "Non", "Besoin de plus d'infos"]
+        }
+    ];
+    
+    if (samplePolls.length === 0) {
+        const emptyMessage = '<p class="text-sm text-gray-500">Aucun sondage actif</p>';
+        sidebarContainer.innerHTML = emptyMessage;
+        mobileContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Aucun sondage actif pour le moment</p>';
+        return;
+    }
+    
+    const pollsHTML = samplePolls.map(poll => `
+        <div class="mb-4">
+            <p class="text-sm font-medium text-gray-900 mb-2">${poll.question}</p>
+            ${poll.options.map(option => `
+                <div class="poll-option text-sm">${option}</div>
+            `).join('')}
+        </div>
+    `).join('');
+    
+    sidebarContainer.innerHTML = pollsHTML;
+    mobileContainer.innerHTML = `<div class="p-4">${pollsHTML}</div>`;
+}
+
+function openNewMaintenanceRequest() {
+    window.location.href = '{{ url_for("resident_maintenance") }}#new';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
