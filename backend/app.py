@@ -57,7 +57,7 @@ def create_app():
     
     # Initialiser Flask-Login
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'login_page'
     login_manager.login_message = 'Veuillez vous connecter pour accéder à cette page.'
     
     @login_manager.user_loader
@@ -273,19 +273,42 @@ def register_blueprints(app):
 # Créer l'application
 app = create_app()
 
+
+def auto_init_database():
+    """
+    Initialise automatiquement la base de données au démarrage si nécessaire
+    """
+    with app.app_context():
+        try:
+            # Vérifier si la base de données est déjà initialisée
+            from backend.models.user import User
+            existing_admin = User.query.filter_by(role='superadmin').first()
+            
+            if not existing_admin:
+                print("📦 Base de données vide détectée. Initialisation automatique...")
+                from backend.init_demo_data import init_demo_data
+                init_demo_data(app, db)
+            else:
+                print(f"✅ Base de données déjà initialisée (Admin: {existing_admin.email})")
+        except Exception as e:
+            # Si les tables n'existent pas, les créer et initialiser
+            print(f"⚠️  Erreur détectée: {str(e)}")
+            print("📋 Création des tables et initialisation des données...")
+            try:
+                from backend.init_demo_data import init_demo_data
+                init_demo_data(app, db)
+            except Exception as init_error:
+                print(f"❌ Erreur lors de l'initialisation: {str(init_error)}")
+
+
+# Initialiser automatiquement la base de données au démarrage
+auto_init_database()
+
+
 if __name__ == '__main__':
     # Port pour Replit (obligatoire: 5000)
     # Pour VPS, utiliser le script deploy_vps.sh qui démarre sur port 5006
     port = int(os.getenv('PORT', 5000))
-    
-    # Créer les tables si elles n'existent pas (en développement uniquement)
-    with app.app_context():
-        if os.getenv('FLASK_ENV') == 'development':
-            try:
-                db.create_all()
-                print("✅ Tables de base de données créées")
-            except Exception as e:
-                print(f"⚠️ Erreur lors de la création des tables: {e}")
     
     # Bind sur 0.0.0.0 pour être accessible depuis l'extérieur
     print(f"🚀 Démarrage de MySindic sur le port {port}...")
