@@ -603,6 +603,67 @@
 
 <div class="dashboard-layout">
     <aside class="left-sidebar">
+        <div class="nav-tabs-card">
+            <a href="/resident/dashboard" class="nav-tab active">
+                <span class="nav-tab-icon">📰</span>
+                <span>Actualité</span>
+            </a>
+            <a href="/resident/maintenance" class="nav-tab">
+                <span class="nav-tab-icon">🔧</span>
+                <span>Maintenance</span>
+            </a>
+            <a href="/resident/assemblies" class="nav-tab">
+                <span class="nav-tab-icon">🗳️</span>
+                <span>Assemblées Générales</span>
+            </a>
+            <a href="/resident/finances" class="nav-tab">
+                <span class="nav-tab-icon">💰</span>
+                <span>Finances</span>
+            </a>
+            <a href="/resident/documents" class="nav-tab">
+                <span class="nav-tab-icon">📄</span>
+                <span>Documents</span>
+            </a>
+            <a href="/resident/profile" class="nav-tab">
+                <span class="nav-tab-icon">👤</span>
+                <span>Mon Profil</span>
+            </a>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <div class="content-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">📰 Fil d'Actualité</h2>
+                    <p class="card-subtitle">Dernières nouvelles de votre résidence</p>
+                </div>
+            </div>
+            <div id="news-feed">
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p class="empty-text">Aucune actualité pour le moment</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">🔧 Demandes de Maintenance</h2>
+                    <p class="card-subtitle">Vos demandes et celles de la résidence</p>
+                </div>
+            </div>
+            <div id="maintenance-feed">
+                <div class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <p class="empty-text">Aucune demande de maintenance</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <aside class="right-sidebar">
         <div class="profile-card">
             <div class="profile-header-img">
                 <div class="profile-avatar-large" id="profile-avatar-large">👤</div>
@@ -652,67 +713,6 @@
                     <span class="info-value" id="unit-type">-</span>
                 </div>
             </div>
-        </div>
-    </aside>
-    
-    <main class="main-content">
-        <div class="content-card">
-            <div class="card-header">
-                <div>
-                    <h2 class="card-title">📰 Fil d'Actualité</h2>
-                    <p class="card-subtitle">Dernières nouvelles de votre résidence</p>
-                </div>
-            </div>
-            <div id="news-feed">
-                <div class="empty-state">
-                    <div class="empty-icon">📭</div>
-                    <p class="empty-text">Aucune actualité pour le moment</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="content-card">
-            <div class="card-header">
-                <div>
-                    <h2 class="card-title">🔧 Demandes de Maintenance</h2>
-                    <p class="card-subtitle">Vos demandes et celles de la résidence</p>
-                </div>
-            </div>
-            <div id="maintenance-feed">
-                <div class="empty-state">
-                    <div class="empty-icon">✨</div>
-                    <p class="empty-text">Aucune demande de maintenance</p>
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <aside class="right-sidebar">
-        <div class="nav-tabs-card">
-            <a href="/resident/dashboard" class="nav-tab active">
-                <span class="nav-tab-icon">📰</span>
-                <span>Actualité</span>
-            </a>
-            <a href="/resident/maintenance" class="nav-tab">
-                <span class="nav-tab-icon">🔧</span>
-                <span>Maintenance</span>
-            </a>
-            <a href="/resident/assemblies" class="nav-tab">
-                <span class="nav-tab-icon">🗳️</span>
-                <span>Assemblées Générales</span>
-            </a>
-            <a href="/resident/finances" class="nav-tab">
-                <span class="nav-tab-icon">💰</span>
-                <span>Finances</span>
-            </a>
-            <a href="/resident/documents" class="nav-tab">
-                <span class="nav-tab-icon">📄</span>
-                <span>Documents</span>
-            </a>
-            <a href="/resident/profile" class="nav-tab">
-                <span class="nav-tab-icon">👤</span>
-                <span>Mon Profil</span>
-            </a>
         </div>
         
         <div class="calendar-card">
