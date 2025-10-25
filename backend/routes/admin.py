@@ -375,6 +375,21 @@ def get_unit_balance(unit_id):
 
 # ==================== ACTUALITÉS ====================
 
+@admin_bp.route('/news', methods=['GET'])
+@login_required
+@superadmin_required
+def get_all_news():
+    """Récupère toutes les actualités"""
+    try:
+        news = News.query.order_by(News.is_pinned.desc(), News.published_at.desc()).all()
+        return jsonify({
+            'success': True,
+            'news': [n.to_dict() for n in news]
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @admin_bp.route('/news', methods=['POST'])
 @login_required
 @superadmin_required
