@@ -814,17 +814,24 @@ function saveStepData(step) {
             const divCountEl = document.getElementById('division_count');
             const prefixEl = document.getElementById('division_prefix');
             
-            if (!divCountEl || !prefixEl) {
-                console.error('Division count or prefix element not found');
-                return;
-            }
+            console.log('saveStepData(2) - Elements found:', {
+                divCountEl: !!divCountEl,
+                prefixEl: !!prefixEl,
+                divCountValue: divCountEl?.value,
+                prefixValue: prefixEl?.value,
+                divisionType: wizardData.divisionType
+            });
             
-            const divCount = parseInt(divCountEl.value) || 1;
-            const prefix = prefixEl.value || 'A';
+            // Utiliser des valeurs par défaut si les éléments ne sont pas trouvés
+            const divCount = divCountEl ? (parseInt(divCountEl.value) || 3) : 3;
+            const prefix = prefixEl ? (prefixEl.value || 'A') : 'A';
+            
+            // Toujours réinitialiser le tableau
             wizardData.divisions = [];
             
             console.log('Saving divisions:', { divCount, prefix, divisionType: wizardData.divisionType });
             
+            // Créer les divisions
             for (let i = 0; i < divCount; i++) {
                 wizardData.divisions.push({
                     name: `${prefix}${i + 1}`,
@@ -832,7 +839,12 @@ function saveStepData(step) {
                 });
             }
             
-            console.log('Divisions saved:', wizardData.divisions);
+            console.log('Divisions saved successfully:', wizardData.divisions);
+            
+            // Afficher une notification de succès visuelle
+            if (wizardData.divisions.length > 0 && typeof MySindic !== 'undefined') {
+                MySindic.showToast(`${wizardData.divisions.length} division(s) configurée(s) avec succès`, 'success');
+            }
             break;
     }
 }
@@ -913,9 +925,17 @@ function loadUnitsConfiguration() {
     const container = document.getElementById('units-configuration');
     
     console.log('Loading units configuration. Divisions:', wizardData.divisions);
+    console.log('wizardData:', wizardData);
     
-    if (wizardData.divisions.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune division configurée. Veuillez retourner à l\'étape 2.</p>';
+    if (!wizardData.divisions || wizardData.divisions.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">⚠️</div>
+                <p class="text-gray-700 font-semibold mb-2">Aucune division configurée</p>
+                <p class="text-gray-500 mb-4">Les données de l'étape 2 n'ont pas été sauvegardées correctement.</p>
+                <p class="text-sm text-gray-400">Debug: divisions=${JSON.stringify(wizardData.divisions)}, type=${wizardData.divisionType}</p>
+            </div>
+        `;
         return;
     }
     
