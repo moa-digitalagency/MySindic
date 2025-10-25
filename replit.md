@@ -25,7 +25,7 @@ Le projet est organisé en deux dossiers principaux:
 ### UI/UX Decisions
 
 - **Design Approach:** Mobile-first and responsive design using Tailwind CSS for a modern aesthetic. Interface réseau social pour les résidents.
-- **Unified Admin Interface:** Modern admin dashboard matching resident interface design with sidebar navigation, gradient stat cards, and consistent layouts across all admin pages.
+- **Unified Admin Interface:** Modern admin dashboard with reusable base template (`admin_base.html`) featuring persistent sidebar navigation, gradient stat cards, and consistent layouts. All admin pages extend this base template using block inheritance for maintainability and DRY principles.
 - **Residence Creation Wizard:** Multi-step fluid wizard for creating residences with:
   - Step 1: Basic residence information
   - Step 2: Division type selection (lot, immeuble, bâtiment, zone)
@@ -41,6 +41,10 @@ Le projet est organisé en deux dossiers principaux:
 ### Technical Implementations
 
 - **Backend:** Flask is the web framework, with SQLAlchemy as the ORM. Flask-Migrate handles database migrations, Flask-Login manages user sessions, and Flask-CORS provides CORS support. PyJWT is used for authentication tokens. Gunicorn is the WSGI server.
+- **Frontend Architecture:** Template inheritance system with reusable base templates:
+  - `admin_base.html`: Unified admin shell with persistent sidebar, header, and quick actions
+  - Block structure: `admin_content`, `admin_extra_css`, `admin_extra_js` for page-specific content
+  - Eliminates code duplication across all 8 admin pages
 - **Data Models:** 17 core data models cover users, residences, residence-admin assignments, financial management, maintenance, communication, documents, general assemblies, and litigation.
 - **Business Services:**
     - **ChargeCalculator:** Automates charge distribution.
