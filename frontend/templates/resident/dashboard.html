@@ -4,484 +4,552 @@
 
 {% block extra_css %}
 <style>
-    @media (min-width: 768px) {
-        .social-layout {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 1.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
     
-    .mobile-nav-bottom {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+    /* Navigation horizontale moderne */
+    .top-nav {
         background: white;
-        border-top: 1px solid #e5e7eb;
-        padding: 0.5rem;
-        z-index: 40;
+        border-radius: 2rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        padding: 1rem 2rem;
+        margin-bottom: 2rem;
         display: flex;
-        justify-content: space-around;
-        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    
-    .mobile-nav-item {
-        display: flex;
-        flex-direction: column;
+        gap: 2rem;
         align-items: center;
-        padding: 0.5rem;
-        color: #6b7280;
-        transition: all 0.2s;
-        cursor: pointer;
-        flex: 1;
-        max-width: 80px;
+        overflow-x: auto;
     }
     
-    .mobile-nav-item.active {
+    .top-nav-item {
+        padding: 0.75rem 1.5rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        color: #6b7280;
+        transition: all 0.3s;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    
+    .top-nav-item:hover {
+        background: #f3f4f6;
         color: #4f46e5;
     }
     
-    .mobile-nav-item:active {
-        transform: scale(0.95);
+    .top-nav-item.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
     
-    .mobile-nav-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.25rem;
+    /* Layout principal */
+    .main-layout {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
     }
     
-    .mobile-nav-label {
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-    
-    .feed-container {
+    /* Feed principal */
+    .feed-card {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-radius: 2rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         overflow: hidden;
+        margin-bottom: 2rem;
     }
     
-    .post-card {
-        padding: 1.5rem;
+    .feed-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 2px solid #f3f4f6;
+        background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+    }
+    
+    .feed-header h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+        margin: 0;
+    }
+    
+    .feed-header p {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0.25rem 0 0 0;
+    }
+    
+    .post-item {
+        padding: 1.5rem 2rem;
         border-bottom: 1px solid #f3f4f6;
-        transition: background-color 0.2s;
+        transition: all 0.3s;
     }
     
-    .post-card:hover {
-        background-color: #fafafa;
+    .post-item:hover {
+        background: #fafafa;
     }
     
-    .sidebar-panel {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        position: sticky;
-        top: 80px;
-        max-height: calc(100vh - 100px);
-        overflow-y: auto;
-    }
-    
-    .tab-section {
-        margin-bottom: 1.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    
-    .tab-section:last-child {
+    .post-item:last-child {
         border-bottom: none;
     }
     
-    .mobile-section {
-        display: none;
-        padding: 1rem;
-        margin-bottom: 80px;
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
     }
     
-    .mobile-section.active {
-        display: block;
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
     }
     
-    @media (max-width: 767px) {
-        .desktop-sidebar {
-            display: none !important;
-        }
-        .feed-main {
-            display: none !important;
-        }
-        body {
-            padding-bottom: 80px;
-        }
+    .empty-state-text {
+        color: #9ca3af;
+        font-size: 0.95rem;
     }
     
-    @media (min-width: 768px) {
-        .mobile-nav-bottom {
-            display: none;
-        }
+    /* Sidebar droite */
+    .sidebar {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
     }
     
-    .action-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: transform 0.2s, box-shadow 0.2s;
-        cursor: pointer;
-        border: none;
-        width: 100%;
-        justify-content: center;
+    .sidebar-card {
+        background: white;
+        border-radius: 2rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     
-    .action-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-    
-    .stat-mini {
+    .sidebar-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 0.75rem;
-        background: #f9fafb;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
+        gap: 0.5rem;
     }
     
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.875rem 1rem;
+        background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+        border-radius: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .stat-value {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    
+    .balance-positive {
+        color: #10b981;
+    }
+    
+    .balance-negative {
+        color: #ef4444;
+    }
+    
+    /* Poll options */
     .poll-option {
-        padding: 0.75rem;
+        padding: 0.875rem 1rem;
         background: #f3f4f6;
-        border-radius: 6px;
+        border-radius: 1rem;
         margin-bottom: 0.5rem;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.3s;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
     }
     
     .poll-option:hover {
-        background: #e5e7eb;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: translateX(4px);
     }
     
-    .payment-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: #fef3c7;
+    /* Payment items */
+    .payment-alert {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
         border-left: 4px solid #f59e0b;
-        border-radius: 6px;
+        border-radius: 1rem;
+        padding: 1rem;
         margin-bottom: 0.75rem;
+    }
+    
+    .payment-alert-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #92400e;
+        margin-bottom: 0.25rem;
+    }
+    
+    .payment-alert-amount {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #b45309;
+    }
+    
+    .payment-success {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        border-left: 4px solid #10b981;
+        border-radius: 1rem;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .payment-success-text {
+        color: #065f46;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    /* Action button */
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 1.25rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Status badges */
+    .status-badge {
+        padding: 0.375rem 0.875rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .my-request-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 1024px) {
+        .main-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            position: static;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .top-nav {
+            padding: 0.75rem 1rem;
+            gap: 0.75rem;
+        }
+        
+        .top-nav-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .main-layout {
+            padding: 0 1rem;
+        }
+        
+        .feed-card {
+            border-radius: 1.5rem;
+        }
+        
+        .sidebar-card {
+            border-radius: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen">
-    <!-- Desktop Layout -->
-    <div class="social-layout px-4 py-6">
-        <!-- Main Feed -->
-        <div class="feed-main">
-            <!-- Fil d'actualité -->
-            <div class="feed-container mb-6" id="feed-actualite">
-                <div class="p-4 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
-                    <h2 class="text-xl font-bold text-gray-900">📰 Fil d'Actualité</h2>
-                    <p class="text-sm text-gray-600 mt-1">Dernières nouvelles de votre résidence</p>
+<div class="min-h-screen py-6">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Navigation horizontale -->
+        <nav class="top-nav">
+            <a href="/resident/dashboard" class="top-nav-item active">
+                📊 Dashboard
+            </a>
+            <a href="/resident/finances" class="top-nav-item">
+                💰 Finances
+            </a>
+            <a href="/resident/maintenance" class="top-nav-item">
+                🔧 Maintenance
+            </a>
+            <a href="/resident/assemblies" class="top-nav-item">
+                🗳️ AG
+            </a>
+            <a href="/resident/documents" class="top-nav-item">
+                📄 Documents
+            </a>
+        </nav>
+        
+        <!-- Layout principal -->
+        <div class="main-layout">
+            <!-- Colonne principale (Feed) -->
+            <div class="feed-column">
+                <!-- Fil d'actualité -->
+                <div class="feed-card">
+                    <div class="feed-header">
+                        <h2>📰 Fil d'Actualité</h2>
+                        <p>Dernières nouvelles de votre résidence</p>
+                    </div>
+                    <div id="news-feed">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p class="empty-state-text">Aucune actualité pour le moment</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div id="news-feed" class="divide-y">
-                    <!-- Les actualités seront chargées ici -->
-                    <div class="flex justify-center py-8">
-                        <div class="loading-spinner border-indigo-600"></div>
+                <!-- Demandes de maintenance -->
+                <div class="feed-card">
+                    <div class="feed-header">
+                        <h2>🔧 Demandes de Maintenance</h2>
+                        <p>Vos demandes et celles de la résidence</p>
+                    </div>
+                    <div id="maintenance-feed">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">✨</div>
+                            <p class="empty-state-text">Aucune demande de maintenance</p>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Section Demandes Maintenance (toutes) -->
-            <div class="feed-container mb-6" id="feed-maintenance">
-                <div class="p-4 border-b bg-gradient-to-r from-blue-50 to-cyan-50">
-                    <h2 class="text-xl font-bold text-gray-900">🔧 Demandes de Maintenance</h2>
-                    <p class="text-sm text-gray-600 mt-1">Vos demandes et celles de la résidence</p>
-                </div>
-                
-                <div id="all-maintenance" class="divide-y">
-                    <div class="flex justify-center py-8">
-                        <div class="loading-spinner border-blue-600"></div>
+            <!-- Sidebar droite -->
+            <div class="sidebar">
+                <!-- Mon Profil -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">📊 Mon Profil</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Mon solde</span>
+                        <span class="stat-value" id="balance-value">- MAD</span>
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Desktop Sidebar (Panel à droite) -->
-        <div class="desktop-sidebar">
-            <div class="sidebar-panel">
-                <!-- Statistiques rapides -->
-                <div class="tab-section">
-                    <h3 class="font-bold text-gray-900 mb-3">📊 Mon Profil</h3>
-                    <div class="stat-mini">
-                        <span class="text-sm text-gray-600">Mon solde</span>
-                        <span class="font-bold text-gray-900" id="sidebar-balance">-</span>
+                    <div class="stat-row">
+                        <span class="stat-label">Mes demandes</span>
+                        <span class="stat-value" id="requests-count">0</span>
                     </div>
-                    <div class="stat-mini">
-                        <span class="text-sm text-gray-600">Mes demandes</span>
-                        <span class="font-bold text-gray-900" id="sidebar-requests">-</span>
-                    </div>
-                    <div class="stat-mini">
-                        <span class="text-sm text-gray-600">Résidence</span>
-                        <span class="font-bold text-gray-900 text-xs" id="sidebar-residence">-</span>
+                    <div class="stat-row">
+                        <span class="stat-label">Résidence</span>
+                        <span class="stat-value" id="residence-name" style="font-size: 0.75rem;">Ma résidence</span>
                     </div>
                 </div>
                 
-                <!-- Sondages -->
-                <div class="tab-section">
-                    <h3 class="font-bold text-gray-900 mb-3">🗳️ Sondages Actifs</h3>
-                    <div id="polls-sidebar">
-                        <p class="text-sm text-gray-500">Aucun sondage en cours</p>
-                    </div>
-                </div>
-                
-                <!-- Paiements à venir -->
-                <div class="tab-section">
-                    <h3 class="font-bold text-gray-900 mb-3">💰 Paiements</h3>
-                    <div id="payments-sidebar">
-                        <div class="flex justify-center py-4">
-                            <div class="loading-spinner border-indigo-600 w-6 h-6"></div>
+                <!-- Sondages Actifs -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">🗳️ Sondages Actifs</h3>
+                    <div id="polls-container">
+                        <div>
+                            <p class="stat-label mb-2">Êtes-vous favorable à l'installation de panneaux solaires ?</p>
+                            <div class="poll-option">Oui</div>
+                            <div class="poll-option">Non</div>
+                            <div class="poll-option">Besoin de plus d'infos</div>
                         </div>
                     </div>
-                    <button onclick="window.location.href='{{ url_for('resident_finances') }}'" class="action-button mt-3">
-                        <span>💳</span>
-                        <span>Voir mes finances</span>
+                </div>
+                
+                <!-- Paiements -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">💰 Paiements</h3>
+                    <div id="payments-container">
+                        <div class="payment-success">
+                            <p class="payment-success-text">✓ Vous êtes à jour</p>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='/resident/finances'" class="action-btn mt-3">
+                        💳 Voir mes finances
                     </button>
                 </div>
                 
                 <!-- Action rapide -->
-                <div>
-                    <button onclick="openNewMaintenanceRequest()" class="action-button">
-                        <span>➕</span>
-                        <span>Nouvelle demande</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Mobile Sections -->
-    <div class="md:hidden">
-        <!-- Section Actualité (mobile) -->
-        <div id="mobile-actualite" class="mobile-section active">
-            <div class="feed-container">
-                <div class="p-4 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
-                    <h2 class="text-lg font-bold text-gray-900">📰 Actualités</h2>
-                </div>
-                <div id="news-feed-mobile"></div>
-            </div>
-        </div>
-        
-        <!-- Section Maintenance (mobile) -->
-        <div id="mobile-maintenance" class="mobile-section">
-            <div class="feed-container">
-                <div class="p-4 border-b bg-gradient-to-r from-blue-50 to-cyan-50">
-                    <h2 class="text-lg font-bold text-gray-900">🔧 Maintenance</h2>
-                </div>
-                <div id="all-maintenance-mobile"></div>
-                <div class="p-4">
-                    <button onclick="openNewMaintenanceRequest()" class="action-button">
+                <div class="sidebar-card">
+                    <button onclick="openNewMaintenanceRequest()" class="action-btn">
                         ➕ Nouvelle demande
                     </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Section Sondages (mobile) -->
-        <div id="mobile-sondages" class="mobile-section">
-            <div class="feed-container">
-                <div class="p-4 border-b bg-gradient-to-r from-green-50 to-emerald-50">
-                    <h2 class="text-lg font-bold text-gray-900">🗳️ Sondages</h2>
-                </div>
-                <div id="polls-mobile" class="p-4">
-                    <p class="text-gray-500 text-center py-8">Aucun sondage actif pour le moment</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Section Paiements (mobile) -->
-        <div id="mobile-paiements" class="mobile-section">
-            <div class="feed-container">
-                <div class="p-4 border-b bg-gradient-to-r from-yellow-50 to-orange-50">
-                    <h2 class="text-lg font-bold text-gray-900">💰 Mes Paiements</h2>
-                </div>
-                <div id="payments-mobile" class="p-4"></div>
-                <div class="p-4">
-                    <button onclick="window.location.href='{{ url_for('resident_finances') }}'" class="action-button">
-                        💳 Voir toutes mes finances
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
-    
-    <!-- Mobile Bottom Navigation -->
-    <nav class="mobile-nav-bottom">
-        <div class="mobile-nav-item active" onclick="switchMobileTab('actualite')">
-            <div class="mobile-nav-icon">📰</div>
-            <div class="mobile-nav-label">Actualité</div>
-        </div>
-        <div class="mobile-nav-item" onclick="switchMobileTab('maintenance')">
-            <div class="mobile-nav-icon">🔧</div>
-            <div class="mobile-nav-label">Maintenance</div>
-        </div>
-        <div class="mobile-nav-item" onclick="switchMobileTab('sondages')">
-            <div class="mobile-nav-icon">🗳️</div>
-            <div class="mobile-nav-label">Sondages</div>
-        </div>
-        <div class="mobile-nav-item" onclick="switchMobileTab('paiements')">
-            <div class="mobile-nav-icon">💰</div>
-            <div class="mobile-nav-label">Paiements</div>
-        </div>
-    </nav>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function switchMobileTab(tab) {
-    document.querySelectorAll('.mobile-section').forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    document.querySelectorAll('.mobile-nav-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    document.getElementById(`mobile-${tab}`).classList.add('active');
-    event.currentTarget.classList.add('active');
-}
-
 async function loadResidentDashboard() {
     try {
         const response = await fetch('/api/resident/dashboard');
         const data = await response.json();
         
         if (data.success) {
-            const balance = data.balance || 0;
-            const balanceText = MySindic.formatCurrency(Math.abs(balance));
-            const balanceClass = balance < 0 ? 'text-red-600' : 'text-green-600';
+            // Mettre à jour le profil
+            updateProfile(data);
             
-            document.getElementById('sidebar-balance').innerHTML = `<span class="${balanceClass}">${balanceText}</span>`;
-            document.getElementById('sidebar-requests').textContent = data.maintenance_requests?.length || 0;
-            document.getElementById('sidebar-residence').textContent = 'Ma résidence';
-            
+            // Charger les actualités
             loadNewsFeed(data.news || []);
+            
+            // Charger les demandes de maintenance
             loadMaintenanceFeed(data.maintenance_requests || [], data.all_maintenance_requests || []);
+            
+            // Charger les paiements impayés
             loadUnpaidCharges();
-            loadPolls();
         }
     } catch (error) {
         console.error('Error loading dashboard:', error);
-        MySindic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
+function updateProfile(data) {
+    const balance = data.balance || 0;
+    const balanceEl = document.getElementById('balance-value');
+    const balanceText = MySindic.formatCurrency(Math.abs(balance));
+    
+    if (balance < 0) {
+        balanceEl.innerHTML = `<span class="balance-negative">${balanceText}</span>`;
+    } else {
+        balanceEl.innerHTML = `<span class="balance-positive">${balanceText}</span>`;
+    }
+    
+    document.getElementById('requests-count').textContent = data.maintenance_requests?.length || 0;
+}
+
 function loadNewsFeed(news) {
-    const desktopContainer = document.getElementById('news-feed');
-    const mobileContainer = document.getElementById('news-feed-mobile');
+    const container = document.getElementById('news-feed');
     
     if (news.length === 0) {
-        const emptyMessage = `
-            <div class="post-card text-center py-8">
-                <div class="text-6xl mb-3">📭</div>
-                <p class="text-gray-500">Aucune actualité pour le moment</p>
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p class="empty-state-text">Aucune actualité pour le moment</p>
             </div>
         `;
-        desktopContainer.innerHTML = emptyMessage;
-        mobileContainer.innerHTML = emptyMessage;
         return;
     }
     
     const newsHTML = news.map(item => `
-        <div class="post-card">
-            <div class="flex items-start">
-                <div class="flex-shrink-0 text-3xl mr-3">📢</div>
+        <div class="post-item">
+            <div class="flex items-start gap-3">
+                <div class="text-3xl">📢</div>
                 <div class="flex-1">
                     <h3 class="font-bold text-gray-900 mb-2">${item.title}</h3>
-                    <p class="text-gray-700 mb-3">${item.content}</p>
-                    <div class="flex items-center text-sm text-gray-500">
-                        <span>🕒 ${MySindic.formatDate(item.created_at)}</span>
+                    <p class="text-gray-700 text-sm mb-3">${item.content}</p>
+                    <div class="text-xs text-gray-500">
+                        🕒 ${MySindic.formatDate(item.created_at)}
                     </div>
                 </div>
             </div>
         </div>
     `).join('');
     
-    desktopContainer.innerHTML = newsHTML;
-    mobileContainer.innerHTML = newsHTML;
+    container.innerHTML = newsHTML;
 }
 
 function loadMaintenanceFeed(myRequests, allRequests) {
-    const desktopContainer = document.getElementById('all-maintenance');
-    const mobileContainer = document.getElementById('all-maintenance-mobile');
+    const container = document.getElementById('maintenance-feed');
     
-    const combined = [...myRequests.map(r => ({...r, isMine: true})), 
-                      ...(allRequests || []).map(r => ({...r, isMine: false}))];
+    const combined = [
+        ...myRequests.map(r => ({...r, isMine: true})), 
+        ...(allRequests || []).filter(r => !myRequests.find(m => m.id === r.id))
+    ];
     
     if (combined.length === 0) {
-        const emptyMessage = `
-            <div class="post-card text-center py-8">
-                <div class="text-6xl mb-3">✨</div>
-                <p class="text-gray-500">Aucune demande de maintenance</p>
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">✨</div>
+                <p class="empty-state-text">Aucune demande de maintenance</p>
             </div>
         `;
-        desktopContainer.innerHTML = emptyMessage;
-        mobileContainer.innerHTML = emptyMessage;
         return;
     }
     
-    const maintenanceHTML = combined.map(req => {
-        const statusColors = {
-            'pending': 'bg-yellow-100 text-yellow-800',
-            'in_progress': 'bg-blue-100 text-blue-800',
-            'completed': 'bg-green-100 text-green-800'
-        };
-        const statusLabels = {
-            'pending': 'En attente',
-            'in_progress': 'En cours',
-            'completed': 'Terminée'
-        };
-        
-        return `
-            <div class="post-card ${req.isMine ? 'bg-indigo-50' : ''}">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0 text-3xl mr-3">🔧</div>
-                    <div class="flex-1">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-bold text-gray-900">${req.title}</h3>
-                            ${req.isMine ? '<span class="text-xs bg-indigo-600 text-white px-2 py-1 rounded">Ma demande</span>' : ''}
-                        </div>
-                        <p class="text-gray-700 mb-3">${req.description || 'Aucune description'}</p>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-500">🕒 ${MySindic.formatDate(req.created_at)}</span>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium ${statusColors[req.status] || 'bg-gray-100 text-gray-800'}">
-                                ${statusLabels[req.status] || req.status}
-                            </span>
-                        </div>
+    const statusLabels = {
+        'pending': 'En attente',
+        'in_progress': 'En cours',
+        'completed': 'Terminée'
+    };
+    
+    const statusClasses = {
+        'pending': 'status-pending',
+        'in_progress': 'status-progress',
+        'completed': 'status-completed'
+    };
+    
+    const maintenanceHTML = combined.map(req => `
+        <div class="post-item">
+            <div class="flex items-start gap-3">
+                <div class="text-3xl">🔧</div>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-gray-900">${req.title}</h3>
+                        ${req.isMine ? '<span class="my-request-badge">Ma demande</span>' : ''}
+                    </div>
+                    <p class="text-gray-700 text-sm mb-3">${req.description || 'Aucune description'}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">🕒 ${MySindic.formatDate(req.created_at)}</span>
+                        <span class="status-badge ${statusClasses[req.status] || 'status-pending'}">
+                            ${statusLabels[req.status] || req.status}
+                        </span>
                     </div>
                 </div>
             </div>
-        `;
-    }).join('');
+        </div>
+    `).join('');
     
-    desktopContainer.innerHTML = maintenanceHTML;
-    mobileContainer.innerHTML = maintenanceHTML;
+    container.innerHTML = maintenanceHTML;
 }
 
 async function loadUnpaidCharges() {
-    const sidebarContainer = document.getElementById('payments-sidebar');
-    const mobileContainer = document.getElementById('payments-mobile');
+    const container = document.getElementById('payments-container');
     
     try {
         const response = await fetch('/api/resident/charges/unpaid');
@@ -491,65 +559,31 @@ async function loadUnpaidCharges() {
             const charges = data.unpaid_charges || [];
             
             if (charges.length === 0) {
-                const successMessage = '<p class="text-green-600 text-sm font-medium">✓ Vous êtes à jour</p>';
-                sidebarContainer.innerHTML = successMessage;
-                mobileContainer.innerHTML = `<div class="text-center py-8 text-green-600 font-semibold">✓ Vous êtes à jour dans vos paiements</div>`;
+                container.innerHTML = `
+                    <div class="payment-success">
+                        <p class="payment-success-text">✓ Vous êtes à jour</p>
+                    </div>
+                `;
                 return;
             }
             
             const paymentsHTML = charges.map(charge => `
-                <div class="payment-item">
-                    <div>
-                        <p class="font-medium text-gray-900 text-sm">${charge.title || 'Charge'}</p>
-                        <p class="text-xs text-gray-600">Échéance: ${MySindic.formatDate(charge.due_date)}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-red-600">${MySindic.formatCurrency(charge.amount)}</p>
-                    </div>
+                <div class="payment-alert">
+                    <p class="payment-alert-title">${charge.title || 'Charge'}</p>
+                    <p class="text-xs text-amber-800 mb-1">Échéance: ${MySindic.formatDate(charge.due_date)}</p>
+                    <p class="payment-alert-amount">${MySindic.formatCurrency(charge.amount)}</p>
                 </div>
             `).join('');
             
-            sidebarContainer.innerHTML = paymentsHTML;
-            mobileContainer.innerHTML = paymentsHTML;
+            container.innerHTML = paymentsHTML;
         }
     } catch (error) {
         console.error('Error loading unpaid charges:', error);
     }
 }
 
-function loadPolls() {
-    const sidebarContainer = document.getElementById('polls-sidebar');
-    const mobileContainer = document.getElementById('polls-mobile');
-    
-    const samplePolls = [
-        {
-            question: "Êtes-vous favorable à l'installation de panneaux solaires ?",
-            options: ["Oui", "Non", "Besoin de plus d'infos"]
-        }
-    ];
-    
-    if (samplePolls.length === 0) {
-        const emptyMessage = '<p class="text-sm text-gray-500">Aucun sondage actif</p>';
-        sidebarContainer.innerHTML = emptyMessage;
-        mobileContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Aucun sondage actif pour le moment</p>';
-        return;
-    }
-    
-    const pollsHTML = samplePolls.map(poll => `
-        <div class="mb-4">
-            <p class="text-sm font-medium text-gray-900 mb-2">${poll.question}</p>
-            ${poll.options.map(option => `
-                <div class="poll-option text-sm">${option}</div>
-            `).join('')}
-        </div>
-    `).join('');
-    
-    sidebarContainer.innerHTML = pollsHTML;
-    mobileContainer.innerHTML = `<div class="p-4">${pollsHTML}</div>`;
-}
-
 function openNewMaintenanceRequest() {
-    window.location.href = '{{ url_for("resident_maintenance") }}#new';
+    window.location.href = '/resident/maintenance#new';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
