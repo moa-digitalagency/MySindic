@@ -20,7 +20,7 @@ MySindic is built as a PWA with a Python Flask backend and an HTML/CSS frontend 
 
 Le projet est organisé en deux dossiers principaux:
 - **`backend/`**: Code Python Flask (models, routes, utils, config)
-- **`front/`**: Interface utilisateur (static assets et templates HTML)
+- **`frontend/`**: Interface utilisateur (static assets et templates HTML)
 
 ### UI/UX Decisions
 
@@ -76,6 +76,24 @@ Le projet est organisé en deux dossiers principaux:
 
 ## Recent Changes
 
+### October 25, 2025 - Migration Replit & Modern Design Update ✅
+
+**Migration:**
+1. **Folder renamed from 'front' to 'frontend'**
+   - Updated all references in backend/app.py
+   - Updated all documentation (replit.md, PROJECT_TRACKING.md)
+   - Clearer separation of concerns
+
+2. **Modern Design System Applied**
+   - Inspired by modern social media interfaces
+   - Rounded corners: Increased to 1.5rem-2rem for cards, 1rem for buttons
+   - Soft shadows: Updated to softer, more elegant shadows
+   - Gradient buttons: Applied purple-indigo gradients to primary buttons
+   - Smooth transitions: Added transform and hover effects
+   - Pastel colors: Gradient backgrounds and soft color palette
+   - Card-based layout: Enhanced with hover animations
+   - Modern input fields: Rounded with focus animations
+
 ### October 25, 2025 - Réorganisation du Projet et Design Moderne ✅
 
 **Corrections:**
@@ -85,9 +103,9 @@ Le projet est organisé en deux dossiers principaux:
    - Comptes créés: admin@mysindic.ma / Admin123! et resident@mysindic.ma / Resident123!
 
 2. **Réorganisation de la structure du projet**
-   - Création du dossier `front/` pour séparer frontend et backend
-   - Déplacement de `backend/static/` vers `front/static/`
-   - Déplacement de `backend/templates/` vers `front/templates/`
+   - Création du dossier `frontend/` pour séparer frontend et backend
+   - Déplacement de `backend/static/` vers `frontend/static/`
+   - Déplacement de `backend/templates/` vers `frontend/templates/`
    - Mise à jour des chemins dans `backend/app.py`
 
 **Améliorations Design:**

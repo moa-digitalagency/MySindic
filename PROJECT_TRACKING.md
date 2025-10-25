@@ -114,7 +114,7 @@ MySindic/
 │       ├── __init__.py
 │       ├── charge_calculator.py
 │       └── notification_service.py
-├── front/                    # Frontend (HTML/CSS/JS)
+├── frontend/                 # Frontend (HTML/CSS/JS)
 │   ├── static/               # Fichiers statiques
 │   │   ├── css/
 │   │   │   └── main.css     # Styles CSS personnalisés

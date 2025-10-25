@@ -38,12 +38,12 @@ def create_app():
     Returns:
         Flask: Instance de l'application configurée
     """
-    # Chemins relatifs vers le dossier front
-    front_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'front')
+    # Chemins relatifs vers le dossier frontend
+    frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'frontend')
     
     app = Flask(__name__, 
-                static_folder=os.path.join(front_dir, 'static'),
-                template_folder=os.path.join(front_dir, 'templates'))
+                static_folder=os.path.join(frontend_dir, 'static'),
+                template_folder=os.path.join(frontend_dir, 'templates'))
     
     # Charger la configuration
     config_class = get_config()
