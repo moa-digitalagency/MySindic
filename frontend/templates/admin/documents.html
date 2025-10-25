@@ -279,10 +279,10 @@ function renderDocuments(documents) {
                 </td>
                 <td class="px-3 py-4 sm:px-6">
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <button onclick="viewDocument(${doc.id})" class="text-indigo-600 hover:text-indigo-800 text-xs sm:text-sm">
+                        <button onclick="viewDocument(${doc.id})" style="padding: 0.375rem 0.75rem; border: 2px dashed #667eea; background: rgba(102, 126, 234, 0.05); color: #667eea; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.background='rgba(102, 126, 234, 0.05)'">
                             Voir
                         </button>
-                        <button onclick="downloadDocument(${doc.id})" class="text-green-600 hover:text-green-800 text-xs sm:text-sm">
+                        <button onclick="downloadDocument(${doc.id})" style="padding: 0.375rem 0.75rem; border: 2px dashed #10b981; background: rgba(16, 185, 129, 0.05); color: #10b981; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.1)'" onmouseout="this.style.background='rgba(16, 185, 129, 0.05)'">
                             <span class="hidden sm:inline">Télécharger</span>
                             <span class="sm:hidden">⬇️</span>
                         </button>
