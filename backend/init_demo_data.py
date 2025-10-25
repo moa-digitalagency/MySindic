@@ -19,6 +19,7 @@ def init_demo_data(app, db):
     """
     from backend.models.user import User
     from backend.models.residence import Residence, Unit
+    from backend.models.residence_admin import ResidenceAdmin
     from backend.models.charge import Charge, ChargeDistribution
     from backend.models.payment import Payment
     from backend.models.maintenance import MaintenanceRequest

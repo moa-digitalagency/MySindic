@@ -25,6 +25,12 @@ Le projet est organisé en deux dossiers principaux:
 ### UI/UX Decisions
 
 - **Design Approach:** Mobile-first and responsive design using Tailwind CSS for a modern aesthetic. Interface réseau social pour les résidents.
+- **Unified Admin Interface:** Modern admin dashboard matching resident interface design with sidebar navigation, gradient stat cards, and consistent layouts across all admin pages.
+- **Residence Creation Wizard:** Multi-step fluid wizard for creating residences with:
+  - Step 1: Basic residence information
+  - Step 2: Division type selection (lot, immeuble, bâtiment, zone)
+  - Step 3: Unit configuration with dynamic forms
+  - Step 4: Admin assignment to residences
 - **Icons:** Feather Icons et emojis pour une iconographie moderne.
 - **Frontend Framework:** Vanilla JavaScript for client-side interactions.
 - **Responsive Design:**
@@ -35,12 +41,14 @@ Le projet est organisé en deux dossiers principaux:
 ### Technical Implementations
 
 - **Backend:** Flask is the web framework, with SQLAlchemy as the ORM. Flask-Migrate handles database migrations, Flask-Login manages user sessions, and Flask-CORS provides CORS support. PyJWT is used for authentication tokens. Gunicorn is the WSGI server.
-- **Data Models:** 16 core data models cover users, residences, financial management, maintenance, communication, documents, general assemblies, and litigation.
+- **Data Models:** 17 core data models cover users, residences, residence-admin assignments, financial management, maintenance, communication, documents, general assemblies, and litigation.
 - **Business Services:**
     - **ChargeCalculator:** Automates charge distribution.
     - **NotificationService:** Centralized service for sending email notifications.
 - **API Structure:**
     - **Admin Routes (`/api/admin/*`):** Comprehensive CRUD operations and dashboards for superadmins.
+      - **Residence Creation Wizard (`/api/admin/residences/wizard`):** Transactional endpoint that creates residence, units, and admin assignments in a single commit with rollback on failure.
+      - **Admin Assignment Routes:** CRUD operations for managing many-to-many admin-residence assignments.
     - **Resident Routes (`/api/resident/*`):** Secure, personalized dashboards for residents.
 - **Role Management System:** Supports `superadmin`, `admin`, `owner`, `resident` roles with dedicated management interfaces and permission checks.
 
