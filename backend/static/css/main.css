@@ -1,3 +1,11 @@
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -272,4 +280,25 @@
 .tab-button-inactive:hover {
     color: #374151;
     border-bottom-color: #D1D5DB;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.smooth-shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.smooth-shadow-lg {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
