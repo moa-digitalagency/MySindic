@@ -11,36 +11,9 @@
         margin-bottom: 1.5rem;
     }
     
-    .stat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.25rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-    
     .stat-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-    }
-    
-    .stat-card.blue::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
-    .stat-card.green::before { background: linear-gradient(90deg, #10B981, #34D399); }
-    .stat-card.purple::before { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
-    .stat-card.orange::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
-    .stat-card.red::before { background: linear-gradient(90deg, #EF4444, #F87171); }
-    .stat-card.indigo::before { background: linear-gradient(90deg, #6366F1, #818CF8); }
     
     .stat-icon {
         font-size: 2rem;
@@ -61,10 +34,10 @@
     }
     
     .chart-container {
-        background: white;
+        background: rgba(255, 255, 255, 0.5);
+        border: 2px dashed #E5E7EB;
         border-radius: 12px;
         padding: 1.25rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         margin-bottom: 1rem;
     }
     
