@@ -963,6 +963,80 @@ def update_user_role(user_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/users/stats', methods=['GET'])
+@login_required
+@superadmin_required
+def get_user_stats():
+    """Récupère les statistiques des utilisateurs par rôle"""
+    try:
+        stats = {
+            'superadmin': User.query.filter_by(role='superadmin').count(),
+            'admin': User.query.filter_by(role='admin').count(),
+            'owner': User.query.filter_by(role='owner').count(),
+            'resident': User.query.filter_by(role='resident').count()
+        }
+        return jsonify(stats), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== SETTINGS & PERMISSIONS ====================
+
+@admin_bp.route('/settings/permissions', methods=['POST'])
+@login_required
+@superadmin_required
+def save_permissions():
+    """Sauvegarde les permissions des rôles
+    
+    Note: Cette fonctionnalité est en cours de développement.
+    Pour une implémentation complète, les permissions devraient être:
+    - Stockées dans une table dédiée ou un fichier de configuration
+    - Chargées au démarrage de l'application
+    - Utilisées pour contrôler l'accès aux fonctionnalités
+    
+    Actuellement, les permissions sont définies de manière statique dans le code.
+    """
+    try:
+        data = request.get_json()
+        
+        # Validation des données
+        if not isinstance(data, dict):
+            return jsonify({
+                'success': False,
+                'error': 'Format de données invalide'
+            }), 400
+        
+        # Validation que seuls les rôles autorisés sont modifiés
+        valid_roles = ['admin', 'owner', 'resident']
+        for role in data.keys():
+            if role not in valid_roles:
+                return jsonify({
+                    'success': False,
+                    'error': f'Rôle invalide: {role}. Seuls {", ".join(valid_roles)} peuvent être modifiés.'
+                }), 400
+        
+        # TODO: Implémenter la persistance des permissions
+        # Options possibles:
+        # 1. Table Permission(role, resource, action, allowed)
+        # 2. Fichier JSON de configuration
+        # 3. Variables d'environnement
+        
+        # Pour l'instant, on log les changements
+        print(f"[PERMISSIONS] Superadmin {current_user.email} a modifié les permissions:")
+        for role, permissions in data.items():
+            print(f"  - {role}: {len(permissions)} permissions activées")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Configuration des permissions enregistrée (fonctionnalité en développement)',
+            'note': 'Les permissions seront pleinement fonctionnelles dans une prochaine version',
+            'permissions': data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== ASSIGNATION ADMINS AUX RÉSIDENCES ====================
 
 @admin_bp.route('/residences/<int:residence_id>/admins', methods=['POST'])

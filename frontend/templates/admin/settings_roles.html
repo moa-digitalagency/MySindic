@@ -1,0 +1,713 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Rôles & Permissions - MySindic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .settings-header {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .settings-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .settings-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .settings-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0;
+        background: white;
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1rem 0;
+    }
+    
+    .settings-tab {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-tab:hover {
+        color: #2563eb;
+    }
+    
+    .settings-tab.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .settings-content {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0 0 12px 12px;
+        padding: 1.5rem;
+        min-height: 400px;
+    }
+    
+    .role-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .role-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .role-card.admin {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .role-card.owner {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .role-card.resident {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .role-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.05);
+        transform: rotate(45deg);
+    }
+    
+    .role-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .role-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .role-description {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+    }
+    
+    .role-stats {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.75rem;
+        opacity: 0.8;
+    }
+    
+    .permissions-section {
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .permissions-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .permission-table {
+        width: 100%;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .permission-table thead {
+        background: #f3f4f6;
+    }
+    
+    .permission-table th {
+        padding: 0.875rem 1rem;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .permission-table td {
+        padding: 0.875rem 1rem;
+        border-top: 1px solid #e5e7eb;
+        font-size: 0.875rem;
+    }
+    
+    .permission-name {
+        font-weight: 500;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .permission-description {
+        color: #6b7280;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+    
+    .permission-check {
+        width: 20px;
+        height: 20px;
+        accent-color: #2563eb;
+        cursor: pointer;
+    }
+    
+    .permission-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .permission-badge.full {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .permission-badge.partial {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .permission-badge.none {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="settings-header">
+    <h1 class="settings-title">🔐 Gestion des Rôles & Permissions</h1>
+    <p class="settings-subtitle">Configurez les rôles utilisateurs et leurs permissions d'accès</p>
+</div>
+
+<div class="settings-tabs">
+    <a href="{{ url_for('admin_settings_roles') }}" class="settings-tab active">
+        <span>🔐</span>
+        <span>Rôles & Permissions</span>
+    </a>
+    <a href="{{ url_for('admin_settings') }}" class="settings-tab">
+        <span>⚙️</span>
+        <span>Général</span>
+    </a>
+    <a href="#" class="settings-tab">
+        <span>📧</span>
+        <span>Notifications</span>
+    </a>
+    <a href="#" class="settings-tab">
+        <span>🎨</span>
+        <span>Apparence</span>
+    </a>
+    <a href="#" class="settings-tab">
+        <span>🔒</span>
+        <span>Sécurité</span>
+    </a>
+</div>
+
+<div class="settings-content">
+    <div class="role-grid">
+        <div class="role-card">
+            <div class="role-icon">👑</div>
+            <div class="role-name">Super Admin</div>
+            <div class="role-description">Accès complet à toutes les fonctionnalités de la plateforme</div>
+            <div class="role-stats">
+                <span>📊 Tous les droits</span>
+                <span id="superadmin-count">• 0 utilisateurs</span>
+            </div>
+        </div>
+        
+        <div class="role-card admin">
+            <div class="role-icon">👔</div>
+            <div class="role-name">Admin Syndic</div>
+            <div class="role-description">Gestion administrative d'une ou plusieurs résidences</div>
+            <div class="role-stats">
+                <span>📋 Gestion résidence</span>
+                <span id="admin-count">• 0 utilisateurs</span>
+            </div>
+        </div>
+        
+        <div class="role-card owner">
+            <div class="role-icon">🏠</div>
+            <div class="role-name">Propriétaire</div>
+            <div class="role-description">Propriétaire d'un ou plusieurs lots dans une résidence</div>
+            <div class="role-stats">
+                <span>💰 Finances & Votes</span>
+                <span id="owner-count">• 0 utilisateurs</span>
+            </div>
+        </div>
+        
+        <div class="role-card resident">
+            <div class="role-icon">👤</div>
+            <div class="role-name">Résident</div>
+            <div class="role-description">Résident locataire avec accès limité</div>
+            <div class="role-stats">
+                <span>📰 Consultation</span>
+                <span id="resident-count">• 0 utilisateurs</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="permissions-section">
+        <h2 class="permissions-title">
+            <span>🔑</span>
+            <span>Matrice des Permissions</span>
+        </h2>
+        
+        <table class="permission-table">
+            <thead>
+                <tr>
+                    <th>Permission</th>
+                    <th style="text-align: center; width: 120px;">Super Admin</th>
+                    <th style="text-align: center; width: 120px;">Admin Syndic</th>
+                    <th style="text-align: center; width: 120px;">Propriétaire</th>
+                    <th style="text-align: center; width: 120px;">Résident</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>🏢</span>
+                            <span>Gestion des résidences</span>
+                        </div>
+                        <div class="permission-description">Créer, modifier et supprimer des résidences</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>👥</span>
+                            <span>Gestion des utilisateurs</span>
+                        </div>
+                        <div class="permission-description">Créer, modifier et gérer les comptes utilisateurs</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>💰</span>
+                            <span>Gestion financière complète</span>
+                        </div>
+                        <div class="permission-description">Créer des appels de fonds, valider les paiements</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>💳</span>
+                            <span>Effectuer des paiements</span>
+                        </div>
+                        <div class="permission-description">Déclarer et effectuer des paiements de charges</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>🔧</span>
+                            <span>Gestion de la maintenance</span>
+                        </div>
+                        <div class="permission-description">Traiter et gérer les demandes de maintenance</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>📝</span>
+                            <span>Créer des demandes de maintenance</span>
+                        </div>
+                        <div class="permission-description">Soumettre de nouvelles demandes de maintenance</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>📓</span>
+                            <span>Carnet d'entretien</span>
+                        </div>
+                        <div class="permission-description">Gérer le carnet d'entretien de la résidence</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>🗳️</span>
+                            <span>Gestion des assemblées générales</span>
+                        </div>
+                        <div class="permission-description">Créer et gérer les assemblées générales</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>✅</span>
+                            <span>Voter aux assemblées</span>
+                        </div>
+                        <div class="permission-description">Participer aux votes des assemblées générales</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>📄</span>
+                            <span>Gestion des documents</span>
+                        </div>
+                        <div class="permission-description">Télécharger et gérer les documents de la résidence</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>📖</span>
+                            <span>Consulter les documents</span>
+                        </div>
+                        <div class="permission-description">Voir et télécharger les documents partagés</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>📰</span>
+                            <span>Publier des actualités</span>
+                        </div>
+                        <div class="permission-description">Créer et publier des actualités pour les résidents</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>📺</span>
+                            <span>Consulter les actualités</span>
+                        </div>
+                        <div class="permission-description">Voir les actualités et annonces de la résidence</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="permission-name">
+                            <span>⚙️</span>
+                            <span>Accès aux paramètres</span>
+                        </div>
+                        <div class="permission-description">Modifier les paramètres de la plateforme</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check" checked disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="permission-check">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 1.5rem; padding: 1rem; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; display: flex; align-items: start; gap: 0.75rem;">
+            <span style="font-size: 1.25rem;">⚠️</span>
+            <div>
+                <div style="font-weight: 600; color: #92400e; margin-bottom: 0.25rem;">Note importante</div>
+                <div style="font-size: 0.875rem; color: #92400e;">
+                    Les permissions du rôle Super Admin ne peuvent pas être modifiées. 
+                    Les modifications apportées aux autres rôles prendront effet immédiatement pour tous les utilisateurs concernés.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition" onclick="location.reload()">
+            Réinitialiser
+        </button>
+        <button class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition" onclick="savePermissions()">
+            Enregistrer les permissions
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+// Charger les statistiques des rôles
+async function loadRoleStats() {
+    try {
+        const response = await fetch('/api/admin/users/stats');
+        if (response.ok) {
+            const stats = await response.json();
+            
+            document.getElementById('superadmin-count').textContent = `• ${stats.superadmin || 0} utilisateurs`;
+            document.getElementById('admin-count').textContent = `• ${stats.admin || 0} utilisateurs`;
+            document.getElementById('owner-count').textContent = `• ${stats.owner || 0} utilisateurs`;
+            document.getElementById('resident-count').textContent = `• ${stats.resident || 0} utilisateurs`;
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement des statistiques:', error);
+    }
+}
+
+// Sauvegarder les permissions
+async function savePermissions() {
+    const permissions = {
+        admin: [],
+        owner: [],
+        resident: []
+    };
+    
+    const rows = document.querySelectorAll('.permission-table tbody tr');
+    rows.forEach((row, index) => {
+        const checkboxes = row.querySelectorAll('.permission-check:not([disabled])');
+        checkboxes.forEach((checkbox, roleIndex) => {
+            const role = ['admin', 'owner', 'resident'][roleIndex];
+            if (checkbox.checked) {
+                permissions[role].push(index);
+            }
+        });
+    });
+    
+    try {
+        const response = await fetch('/api/admin/settings/permissions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(permissions)
+        });
+        
+        if (response.ok) {
+            MySindic.showToast('✅ Permissions enregistrées avec succès', 'success');
+        } else {
+            MySindic.showToast('❌ Erreur lors de l\'enregistrement', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        MySindic.showToast('❌ Erreur de connexion', 'error');
+    }
+}
+
+// Charger les statistiques au chargement de la page
+document.addEventListener('DOMContentLoaded', loadRoleStats);
+
+console.log('✅ Page Rôles & Permissions chargée');
+</script>
+{% endblock %}

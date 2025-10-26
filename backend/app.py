@@ -176,6 +176,18 @@ def create_app():
         """Gestion des actualités"""
         return render_template('admin/news.html')
     
+    @app.route('/admin/settings')
+    @superadmin_required
+    def admin_settings():
+        """Paramètres de l'application"""
+        return render_template('admin/settings.html')
+    
+    @app.route('/admin/settings/roles')
+    @superadmin_required
+    def admin_settings_roles():
+        """Gestion des rôles et permissions"""
+        return render_template('admin/settings_roles.html')
+    
     # Routes Résidents (pages HTML)
     @app.route('/resident/dashboard')
     @login_required

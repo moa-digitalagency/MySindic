@@ -320,6 +320,12 @@
                 <span>Actualités</span>
             </a>
             <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
+                <a href="{{ url_for('admin_settings') }}" class="nav-tab {% if request.endpoint == 'admin_settings' or request.endpoint == 'admin_settings_roles' %}active{% endif %}">
+                    <span class="nav-tab-icon">⚙️</span>
+                    <span>Paramètres</span>
+                </a>
+            </div>
+            <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
                 <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
                     <span class="nav-tab-icon">🚪</span>
                     <span>Déconnexion</span>

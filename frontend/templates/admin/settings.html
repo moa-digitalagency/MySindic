@@ -1,0 +1,278 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Paramètres - MySindic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .settings-header {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .settings-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .settings-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .settings-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0;
+        background: white;
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1rem 0;
+    }
+    
+    .settings-tab {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-tab:hover {
+        color: #2563eb;
+    }
+    
+    .settings-tab.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .settings-content {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0 0 12px 12px;
+        padding: 1.5rem;
+        min-height: 400px;
+    }
+    
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+    
+    .settings-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .settings-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .settings-item:last-child {
+        border-bottom: none;
+    }
+    
+    .settings-item-label {
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .settings-item-description {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="settings-header">
+    <h1 class="settings-title">⚙️ Paramètres de l'Application</h1>
+    <p class="settings-subtitle">Gérez les paramètres globaux de votre plateforme MySindic</p>
+</div>
+
+<div class="settings-tabs">
+    <a href="{{ url_for('admin_settings_roles') }}" class="settings-tab">
+        <span>🔐</span>
+        <span>Rôles & Permissions</span>
+    </a>
+    <a href="{{ url_for('admin_settings') }}" class="settings-tab active">
+        <span>⚙️</span>
+        <span>Général</span>
+    </a>
+    <a href="#" class="settings-tab">
+        <span>📧</span>
+        <span>Notifications</span>
+    </a>
+    <a href="#" class="settings-tab">
+        <span>🎨</span>
+        <span>Apparence</span>
+    </a>
+    <a href="#" class="settings-tab">
+        <span>🔒</span>
+        <span>Sécurité</span>
+    </a>
+</div>
+
+<div class="settings-content">
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>🏢</span>
+            <span>Paramètres Généraux</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Nom de la plateforme</div>
+                    <div class="settings-item-description">Le nom affiché dans l'application</div>
+                </div>
+                <input type="text" value="MySindic" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Langue par défaut</div>
+                    <div class="settings-item-description">Langue de l'interface utilisateur</div>
+                </div>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
+                    <option value="fr" selected>Français</option>
+                    <option value="ar">العربية (Arabe)</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Fuseau horaire</div>
+                    <div class="settings-item-description">Fuseau horaire utilisé dans l'application</div>
+                </div>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
+                    <option value="Africa/Casablanca" selected>Africa/Casablanca (GMT+1)</option>
+                    <option value="Europe/Paris">Europe/Paris (GMT+1)</option>
+                    <option value="UTC">UTC (GMT+0)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>📊</span>
+            <span>Paramètres de Gestion</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Monnaie</div>
+                    <div class="settings-item-description">Devise utilisée pour les transactions</div>
+                </div>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
+                    <option value="MAD" selected>Dirham Marocain (MAD)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                    <option value="USD">Dollar US (USD)</option>
+                </select>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Format de date</div>
+                    <div class="settings-item-description">Format d'affichage des dates</div>
+                </div>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
+                    <option value="dd/mm/yyyy" selected>JJ/MM/AAAA</option>
+                    <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
+                    <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
+                </select>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Délai de paiement par défaut</div>
+                    <div class="settings-item-description">Nombre de jours pour payer les charges</div>
+                </div>
+                <input type="number" value="30" min="1" max="90" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>🔔</span>
+            <span>Notifications</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Notifications par email</div>
+                    <div class="settings-item-description">Envoyer des notifications par email aux utilisateurs</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Notifications en temps réel</div>
+                    <div class="settings-item-description">Afficher les notifications en temps réel dans l'application</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            Annuler
+        </button>
+        <button class="px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+            Enregistrer les modifications
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+console.log('✅ Page Paramètres chargée');
+</script>
+{% endblock %}
