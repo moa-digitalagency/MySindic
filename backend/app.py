@@ -14,7 +14,7 @@ import sys
 # Ajouter le répertoire parent au PYTHONPATH
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask, render_template, jsonify, redirect, url_for
+from flask import Flask, render_template, jsonify, redirect, url_for, make_response
 from flask_cors import CORS
 from flask_login import LoginManager, login_required, current_user
 from functools import wraps
@@ -127,7 +127,12 @@ def create_app():
     @superadmin_required
     def admin_residence_wizard():
         """Assistant de création de résidence"""
-        return render_template('admin/residence_wizard.html')
+        response = make_response(render_template('admin/residence_wizard.html'))
+        # Désactiver le cache pour forcer le rechargement
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     
     @app.route('/admin/finances')
     @superadmin_required
