@@ -26,25 +26,32 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        color: #6b7280;
+        color: #374151;
         text-decoration: none;
         font-size: 0.875rem;
         font-weight: 500;
         margin-bottom: 1rem;
         transition: all 0.2s;
-        padding: 0.5rem 0;
+        padding: 0.5rem 1rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
     }
     
     .back-link:hover {
         color: #2563eb;
-        gap: 0.75rem;
+        background: white;
+        border-color: #2563eb;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
     }
     
-    .back-link i {
+    .back-link svg {
+        width: 16px;
+        height: 16px;
         transition: transform 0.2s;
     }
     
-    .back-link:hover i {
+    .back-link:hover svg {
         transform: translateX(-3px);
     }
     
@@ -477,60 +484,60 @@
     }
     
     .btn-wizard {
-        padding: 0.75rem 1.75rem;
+        padding: 0.75rem 1.5rem;
         border-radius: 8px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.875rem;
         transition: all 0.2s ease;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.625rem;
         border: none;
+        outline: none;
     }
     
-    .btn-wizard-prev {
-        background: #f3f4f6;
-        color: #374151;
-        border: 1px solid #e5e7eb;
-    }
-    
-    .btn-wizard-prev:hover {
-        background: #e5e7eb;
-        color: #111827;
-        border-color: #d1d5db;
-    }
-    
-    .btn-wizard-prev i {
+    .btn-wizard svg {
+        width: 18px;
+        height: 18px;
         transition: transform 0.2s;
     }
     
-    .btn-wizard-prev:hover i {
+    .btn-wizard-prev {
+        background: white;
+        color: #374151;
+        border: 1.5px solid #e5e7eb;
+    }
+    
+    .btn-wizard-prev:hover {
+        background: #f9fafb;
+        color: #111827;
+        border-color: #9ca3af;
+    }
+    
+    .btn-wizard-prev:hover svg {
         transform: translateX(-2px);
     }
     
     .btn-wizard-next {
-        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        background: #2563eb;
         color: white;
-        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+        border: none;
+        box-shadow: 0 1px 3px rgba(37, 99, 235, 0.15);
     }
     
     .btn-wizard-next:hover:not(:disabled) {
-        background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        background: #1d4ed8;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         transform: translateY(-1px);
     }
     
-    .btn-wizard-next i {
-        transition: transform 0.2s;
-    }
-    
-    .btn-wizard-next:hover:not(:disabled) i {
+    .btn-wizard-next:hover:not(:disabled) svg {
         transform: translateX(2px);
     }
     
     .btn-wizard-next:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
         background: #9ca3af;
         box-shadow: none;
@@ -600,7 +607,9 @@
 <div class="wizard-header">
     <div class="wizard-header-container">
         <a href="{{ url_for('admin_residences') }}" class="back-link">
-            <i data-feather="arrow-left" class="w-4 h-4"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
             Retour aux résidences
         </a>
         <h1 class="wizard-title">Créer une Nouvelle Résidence</h1>
@@ -761,12 +770,16 @@
         <!-- Wizard Actions -->
         <div class="wizard-actions">
             <button type="button" class="btn-wizard btn-wizard-prev" onclick="previousStep()" style="display: none;">
-                <i data-feather="arrow-left" class="w-4 h-4"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
                 Précédent
             </button>
             <button type="button" class="btn-wizard btn-wizard-next" onclick="nextStep()">
                 Suivant
-                <i data-feather="arrow-right" class="w-4 h-4"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
             </button>
         </div>
     </div>
