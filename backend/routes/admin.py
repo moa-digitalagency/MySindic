@@ -98,34 +98,89 @@ def get_residences():
 @login_required
 @superadmin_required
 def create_residence():
-    """Crée une nouvelle résidence"""
+    """Crée une nouvelle résidence avec ses unités (format wizard ou simple)"""
     try:
         data = request.get_json()
-        required_fields = ['name', 'address', 'city', 'total_units']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
         
-        residence = Residence(
-            name=data['name'],
-            address=data['address'],
-            city=data['city'],
-            postal_code=data.get('postal_code'),
-            total_units=data['total_units'],
-            description=data.get('description'),
-            syndic_name=data.get('syndic_name'),
-            syndic_email=data.get('syndic_email'),
-            syndic_phone=data.get('syndic_phone'),
-            total_tantiemes=data.get('total_tantiemes', 1000)
-        )
-        
-        db.session.add(residence)
-        db.session.commit()
-        
-        return jsonify({'success': True, 'message': 'Résidence créée avec succès', 'residence': residence.to_dict()}), 201
+        # Support pour 2 formats: wizard complet ou création simple
+        if 'residence' in data and 'units' in data:
+            # Format wizard: { residence: {...}, units: [...], divisions: [...], admins: [...] }
+            residence_data = data['residence']
+            units_data = data.get('units', [])
+            
+            # Validation
+            required_fields = ['name', 'address', 'city']
+            for field in required_fields:
+                if field not in residence_data:
+                    return jsonify({'success': False, 'message': f'Le champ {field} est requis'}), 400
+            
+            # Créer la résidence
+            residence = Residence(
+                name=residence_data['name'],
+                address=residence_data['address'],
+                city=residence_data['city'],
+                postal_code=residence_data.get('postal_code'),
+                total_units=len(units_data),
+                description=residence_data.get('description'),
+                syndic_name=residence_data.get('syndic_name'),
+                syndic_email=residence_data.get('syndic_email'),
+                syndic_phone=residence_data.get('syndic_phone'),
+                total_tantiemes=residence_data.get('total_tantiemes', 1000)
+            )
+            
+            db.session.add(residence)
+            db.session.flush()  # Pour obtenir l'ID de la résidence
+            
+            # Créer les unités
+            created_units = []
+            for unit_data in units_data:
+                unit = Unit(
+                    residence_id=residence.id,
+                    unit_number=unit_data['unit_number'],
+                    floor=unit_data.get('floor'),
+                    building=unit_data.get('division'),  # Stocker la division/bâtiment
+                    unit_type=unit_data.get('unit_type', 'appartement'),
+                    tantiemes=unit_data.get('tantiemes', 50)
+                )
+                db.session.add(unit)
+                created_units.append(unit)
+            
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': f'Résidence créée avec succès avec {len(created_units)} unité(s)',
+                'residence': residence.to_dict()
+            }), 201
+            
+        else:
+            # Format simple: création directe
+            required_fields = ['name', 'address', 'city', 'total_units']
+            for field in required_fields:
+                if field not in data:
+                    return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+            
+            residence = Residence(
+                name=data['name'],
+                address=data['address'],
+                city=data['city'],
+                postal_code=data.get('postal_code'),
+                total_units=data['total_units'],
+                description=data.get('description'),
+                syndic_name=data.get('syndic_name'),
+                syndic_email=data.get('syndic_email'),
+                syndic_phone=data.get('syndic_phone'),
+                total_tantiemes=data.get('total_tantiemes', 1000)
+            )
+            
+            db.session.add(residence)
+            db.session.commit()
+            
+            return jsonify({'success': True, 'message': 'Résidence créée avec succès', 'residence': residence.to_dict()}), 201
+            
     except Exception as e:
         db.session.rollback()
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @admin_bp.route('/residences/<int:residence_id>', methods=['PUT'])

@@ -1086,10 +1086,8 @@ function loadUnitsConfiguration() {
     
     console.log('✅ Configuration chargée avec', wizardData.divisions.length, 'division(s)');
     
-    // Initialize distributionMode if not set
-    if (!wizardData.distributionMode) {
-        wizardData.distributionMode = 'equal';
-    }
+    // Initialize distributionMode to 'equal' by default
+    wizardData.distributionMode = wizardData.distributionMode || 'equal';
     
     const unitTypes = [
         { value: 'appartement', label: 'Appartement', icon: '🏠' },
