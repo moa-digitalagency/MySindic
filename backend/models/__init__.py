@@ -40,3 +40,4 @@ def init_db(app):
     from backend.models.general_assembly import GeneralAssembly, Resolution, Vote, Attendance
     from backend.models.litigation import Litigation
     from backend.models.maintenance_log import MaintenanceLog
+    from backend.models.app_settings import AppSettings

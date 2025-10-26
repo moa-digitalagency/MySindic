@@ -1,0 +1,257 @@
+<!--
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
+-->
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Code Personnalisé - MySindic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .settings-header {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .settings-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .settings-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .settings-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0;
+        background: white;
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1rem 0;
+        overflow-x: auto;
+    }
+    
+    .settings-tab {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+    
+    .settings-tab:hover {
+        color: #2563eb;
+    }
+    
+    .settings-tab.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .settings-content {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0 0 12px 12px;
+        padding: 1.5rem;
+        min-height: 400px;
+    }
+    
+    .code-editor {
+        width: 100%;
+        min-height: 300px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f9fafb;
+    }
+    
+    .info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-box-title {
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-box-content {
+        color: #1e40af;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="settings-header">
+    <h1 class="settings-title">⚙️ Paramètres de l'Application</h1>
+    <p class="settings-subtitle">Gérez les paramètres globaux de votre plateforme MySindic</p>
+</div>
+
+<div class="settings-tabs">
+    <a href="{{ url_for('admin_settings_roles') }}" class="settings-tab">
+        <span>🔐</span>
+        <span>Rôles & Permissions</span>
+    </a>
+    <a href="{{ url_for('admin_settings') }}" class="settings-tab">
+        <span>⚙️</span>
+        <span>Général</span>
+    </a>
+    <a href="{{ url_for('admin_settings_notifications') }}" class="settings-tab">
+        <span>📧</span>
+        <span>Notifications</span>
+    </a>
+    <a href="{{ url_for('admin_settings_appearance') }}" class="settings-tab">
+        <span>🎨</span>
+        <span>Apparence</span>
+    </a>
+    <a href="{{ url_for('admin_settings_security') }}" class="settings-tab">
+        <span>🔒</span>
+        <span>Sécurité</span>
+    </a>
+    <a href="{{ url_for('admin_settings_custom_code') }}" class="settings-tab active">
+        <span>💻</span>
+        <span>Code Personnalisé</span>
+    </a>
+</div>
+
+<div class="settings-content">
+    <div class="info-box">
+        <div class="info-box-title">ℹ️ À propos du Code Personnalisé</div>
+        <div class="info-box-content">
+            Cette section vous permet d'ajouter du code personnalisé dans l'élément <code>&lt;head&gt;</code> de votre application web.
+            Vous pouvez utiliser cette fonctionnalité pour:
+            <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                <li>Ajouter des scripts d'analyse (Google Analytics, etc.)</li>
+                <li>Intégrer des outils de chat (Intercom, Crisp, etc.)</li>
+                <li>Ajouter des balises meta personnalisées</li>
+                <li>Charger des polices ou styles externes</li>
+                <li>Ajouter des pixels de suivi (Facebook, LinkedIn, etc.)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <form id="custom-code-form">
+        <div style="margin-bottom: 1rem;">
+            <label for="custom-code" style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                Code &lt;head&gt; Personnalisé
+            </label>
+            <textarea 
+                id="custom-code" 
+                name="code" 
+                class="code-editor"
+                placeholder="<!-- Ajoutez votre code ici -->"
+            ></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" onclick="loadCustomCode()" class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                Réinitialiser
+            </button>
+            <button type="submit" class="px-6 py-2.5 border-2 border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+                💾 Enregistrer
+            </button>
+        </div>
+    </form>
+    
+    <div id="message-container" style="margin-top: 1rem;"></div>
+</div>
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+let originalCode = '';
+
+function showMessage(message, type = 'success') {
+    const container = document.getElementById('message-container');
+    const bgColor = type === 'success' ? '#d1fae5' : '#fee2e2';
+    const borderColor = type === 'success' ? '#10b981' : '#ef4444';
+    const textColor = type === 'success' ? '#065f46' : '#991b1b';
+    
+    container.innerHTML = `
+        <div style="background: ${bgColor}; border: 1px solid ${borderColor}; color: ${textColor}; padding: 1rem; border-radius: 8px;">
+            ${message}
+        </div>
+    `;
+    
+    setTimeout(() => {
+        container.innerHTML = '';
+    }, 5000);
+}
+
+async function loadCustomCode() {
+    try {
+        const response = await fetch('/api/admin/settings/custom-head');
+        const data = await response.json();
+        
+        if (data.success) {
+            originalCode = data.code || '';
+            document.getElementById('custom-code').value = originalCode;
+        } else {
+            showMessage('Erreur lors du chargement du code: ' + data.error, 'error');
+        }
+    } catch (error) {
+        showMessage('Erreur lors du chargement du code: ' + error.message, 'error');
+    }
+}
+
+document.getElementById('custom-code-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const code = document.getElementById('custom-code').value;
+    
+    try {
+        const response = await fetch('/api/admin/settings/custom-head', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage('✅ Code personnalisé sauvegardé avec succès!', 'success');
+            originalCode = code;
+        } else {
+            showMessage('Erreur lors de la sauvegarde: ' + data.error, 'error');
+        }
+    } catch (error) {
+        showMessage('Erreur lors de la sauvegarde: ' + error.message, 'error');
+    }
+});
+
+loadCustomCode();
+</script>
+{% endblock %}

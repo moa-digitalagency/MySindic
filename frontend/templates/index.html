@@ -14,11 +14,13 @@ www.myoneart.com
     <meta name="description" content="MySindic - Gestion de copropriété au Maroc">
     <title>MySindic - Gestion de Copropriété</title>
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- PWA Manifest -->
     <link rel="manifest" href="/static/manifest.json">
+    
+    {% if custom_head_code %}
+    {{ custom_head_code|safe }}
+    {% endif %}
     
     <style>
         @keyframes fadeIn {
@@ -28,12 +30,97 @@ www.myoneart.com
         .animate-fade-in {
             animation: fadeIn 0.6s ease-out;
         }
+        
+        .hero-slider {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .hero-slide.active {
+            opacity: 1;
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.85) 0%, rgba(99, 102, 241, 0.7) 50%, rgba(139, 92, 246, 0.6) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-content {
+            text-align: center;
+            color: white;
+            z-index: 10;
+            padding: 2rem;
+            max-width: 900px;
+        }
+        
+        .slider-nav {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 20;
+        }
+        
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .slider-dot.active {
+            background: white;
+            width: 40px;
+            border-radius: 6px;
+        }
+        
+        .feature-card {
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
@@ -55,36 +142,81 @@ www.myoneart.com
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section class="container mx-auto px-6 py-20 animate-fade-in">
-        <div class="text-center">
-            <h2 class="text-5xl font-bold text-gray-800 mb-6">
-                Gestion Moderne de Copropriété
-            </h2>
-            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                Solution complète et digitale pour les syndics et résidents au Maroc. 
-                Simplifiez la gestion, améliorez la communication.
-            </p>
-            <div class="flex justify-center space-x-4">
-                <a href="/login" class="px-8 py-4 border-2 border-solid border-indigo-600 text-indigo-600 rounded-2xl text-lg font-bold hover:shadow-2xl transition-all transform hover:-translate-y-1" style="background: rgba(99, 102, 241, 0.08);">
-                    Se connecter
-                </a>
-                <a href="#features" class="px-8 py-4 border-2 border-solid border-gray-400 text-gray-700 rounded-2xl text-lg font-bold hover:shadow-xl transition-all transform hover:-translate-y-1" style="background: rgba(156, 163, 175, 0.05);">
-                    En savoir plus
-                </a>
+    <section class="container mx-auto px-6 py-12 animate-fade-in">
+        <div class="hero-slider">
+            <div class="hero-slide active" style="background-image: url('/static/images/modern_apartment_bui_21cda109.jpg');">
+                <div class="hero-overlay">
+                    <div class="hero-content">
+                        <h2 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
+                            Gestion Moderne de Copropriété
+                        </h2>
+                        <p class="text-xl md:text-2xl mb-8 opacity-95">
+                            Solution complète et digitale pour les syndics et résidents au Maroc
+                        </p>
+                        <div class="flex justify-center space-x-4">
+                            <a href="/login" class="px-8 py-4 bg-white text-indigo-600 rounded-2xl text-lg font-bold hover:shadow-2xl transition-all transform hover:-translate-y-1">
+                                Se connecter
+                            </a>
+                            <a href="#features" class="px-8 py-4 border-2 border-white text-white rounded-2xl text-lg font-bold hover:bg-white hover:text-indigo-600 transition-all transform hover:-translate-y-1">
+                                En savoir plus
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-slide" style="background-image: url('/static/images/happy_diverse_reside_16977e99.jpg');">
+                <div class="hero-overlay">
+                    <div class="hero-content">
+                        <h2 class="text-5xl md:text-6xl font-bold mb-6">
+                            Une Communauté Connectée
+                        </h2>
+                        <p class="text-xl md:text-2xl mb-8 opacity-95">
+                            Améliorez la communication entre syndics et résidents
+                        </p>
+                        <div class="flex justify-center space-x-4">
+                            <a href="/register" class="px-8 py-4 bg-white text-indigo-600 rounded-2xl text-lg font-bold hover:shadow-2xl transition-all transform hover:-translate-y-1">
+                                S'inscrire
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-slide" style="background-image: url('/static/images/professional_propert_c478bec7.jpg');">
+                <div class="hero-overlay">
+                    <div class="hero-content">
+                        <h2 class="text-5xl md:text-6xl font-bold mb-6">
+                            Technologie Avancée
+                        </h2>
+                        <p class="text-xl md:text-2xl mb-8 opacity-95">
+                            Des outils modernes pour une gestion efficace
+                        </p>
+                        <div class="flex justify-center space-x-4">
+                            <a href="#features" class="px-8 py-4 bg-white text-indigo-600 rounded-2xl text-lg font-bold hover:shadow-2xl transition-all transform hover:-translate-y-1">
+                                Découvrir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slider-nav">
+                <div class="slider-dot active" onclick="goToSlide(0)"></div>
+                <div class="slider-dot" onclick="goToSlide(1)"></div>
+                <div class="slider-dot" onclick="goToSlide(2)"></div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
     <section id="features" class="container mx-auto px-6 py-16">
         <h3 class="text-3xl font-bold text-center text-gray-800 mb-12">
             Fonctionnalités Principales
         </h3>
         
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Feature 1 -->
-            <div class="border-2 border-dashed border-indigo-300 p-8 rounded-3xl transition-all transform hover:-translate-y-2" style="background: rgba(99, 102, 241, 0.05);">
+            <div class="feature-card border-2 border-dashed border-indigo-300 p-8 rounded-3xl" style="background: rgba(99, 102, 241, 0.05);">
+                <img src="/static/images/professional_propert_1e86802a.jpg" alt="Gestion Financière" class="feature-image">
                 <div class="text-5xl mb-4">💰</div>
                 <h4 class="text-xl font-bold text-gray-800 mb-3">Gestion Financière</h4>
                 <p class="text-gray-600 leading-relaxed">
@@ -92,8 +224,8 @@ www.myoneart.com
                 </p>
             </div>
             
-            <!-- Feature 2 -->
-            <div class="border-2 border-dashed border-green-300 p-8 rounded-3xl transition-all transform hover:-translate-y-2" style="background: rgba(16, 185, 129, 0.05);">
+            <div class="feature-card border-2 border-dashed border-green-300 p-8 rounded-3xl" style="background: rgba(16, 185, 129, 0.05);">
+                <img src="/static/images/modern_apartment_bui_04cc653f.jpg" alt="Maintenance" class="feature-image">
                 <div class="text-5xl mb-4">🔧</div>
                 <h4 class="text-xl font-bold text-gray-800 mb-3">Maintenance</h4>
                 <p class="text-gray-600 leading-relaxed">
@@ -101,8 +233,8 @@ www.myoneart.com
                 </p>
             </div>
             
-            <!-- Feature 3 -->
-            <div class="border-2 border-dashed border-purple-300 p-8 rounded-3xl transition-all transform hover:-translate-y-2" style="background: rgba(139, 92, 246, 0.05);">
+            <div class="feature-card border-2 border-dashed border-purple-300 p-8 rounded-3xl" style="background: rgba(139, 92, 246, 0.05);">
+                <img src="/static/images/happy_diverse_reside_11e04449.jpg" alt="Assemblées Générales" class="feature-image">
                 <div class="text-5xl mb-4">🗳️</div>
                 <h4 class="text-xl font-bold text-gray-800 mb-3">Assemblées Générales</h4>
                 <p class="text-gray-600 leading-relaxed">
@@ -110,8 +242,7 @@ www.myoneart.com
                 </p>
             </div>
             
-            <!-- Feature 4 -->
-            <div class="border-2 border-dashed border-blue-300 p-8 rounded-3xl transition-all transform hover:-translate-y-2" style="background: rgba(59, 130, 246, 0.05);">
+            <div class="feature-card border-2 border-dashed border-blue-300 p-8 rounded-3xl" style="background: rgba(59, 130, 246, 0.05);">
                 <div class="text-5xl mb-4">📊</div>
                 <h4 class="text-xl font-bold text-gray-800 mb-3">Tableau de Bord</h4>
                 <p class="text-gray-600 leading-relaxed">
@@ -119,8 +250,7 @@ www.myoneart.com
                 </p>
             </div>
             
-            <!-- Feature 5 -->
-            <div class="border-2 border-dashed border-pink-300 p-8 rounded-3xl transition-all transform hover:-translate-y-2" style="background: rgba(236, 72, 153, 0.05);">
+            <div class="feature-card border-2 border-dashed border-pink-300 p-8 rounded-3xl" style="background: rgba(236, 72, 153, 0.05);">
                 <div class="text-5xl mb-4">📱</div>
                 <h4 class="text-xl font-bold text-gray-800 mb-3">Mobile First</h4>
                 <p class="text-gray-600 leading-relaxed">
@@ -128,8 +258,7 @@ www.myoneart.com
                 </p>
             </div>
             
-            <!-- Feature 6 -->
-            <div class="border-2 border-dashed border-orange-300 p-8 rounded-3xl transition-all transform hover:-translate-y-2" style="background: rgba(245, 158, 11, 0.05);">
+            <div class="feature-card border-2 border-dashed border-orange-300 p-8 rounded-3xl" style="background: rgba(245, 158, 11, 0.05);">
                 <div class="text-5xl mb-4">📄</div>
                 <h4 class="text-xl font-bold text-gray-800 mb-3">Documents</h4>
                 <p class="text-gray-600 leading-relaxed">
@@ -139,7 +268,6 @@ www.myoneart.com
         </div>
     </section>
 
-    <!-- Stats Section -->
     <section class="py-16" style="background: rgba(99, 102, 241, 0.08);">
         <div class="container mx-auto px-6">
             <div class="grid md:grid-cols-3 gap-8 text-center">
@@ -159,7 +287,6 @@ www.myoneart.com
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
@@ -181,7 +308,34 @@ www.myoneart.com
     </footer>
 
     <script>
-        // Test de l'API
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                dots[i].classList.remove('active');
+            });
+            
+            currentSlide = index;
+            if (currentSlide >= slides.length) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = slides.length - 1;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+        
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+        
+        function goToSlide(index) {
+            showSlide(index);
+        }
+        
+        setInterval(nextSlide, 5000);
+        
         fetch('/api/info')
             .then(response => response.json())
             .then(data => {

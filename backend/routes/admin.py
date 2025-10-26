@@ -28,6 +28,7 @@ from backend.models.document import Document
 from backend.models.general_assembly import GeneralAssembly, Resolution, Vote, Attendance
 from backend.models.litigation import Litigation
 from backend.models.maintenance_log import MaintenanceLog
+from backend.models.app_settings import AppSettings
 from backend.utils.charge_calculator import ChargeCalculator
 from backend.utils.notification_service import NotificationService
 
@@ -1213,6 +1214,123 @@ def create_residence_wizard():
                 'admins_assigned': assigned_admins
             }
         }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ==================== PARAMÈTRES DE L'APPLICATION ====================
+
+@admin_bp.route('/settings', methods=['GET'])
+@login_required
+@superadmin_required
+def get_settings():
+    """Récupère tous les paramètres de l'application"""
+    try:
+        settings = AppSettings.query.all()
+        return jsonify({
+            'success': True,
+            'settings': {s.key: s.to_dict() for s in settings}
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/settings/<key>', methods=['GET'])
+@login_required
+@superadmin_required
+def get_setting(key):
+    """Récupère un paramètre spécifique"""
+    try:
+        value = AppSettings.get_value(key)
+        return jsonify({
+            'success': True,
+            'key': key,
+            'value': value
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/settings', methods=['POST'])
+@login_required
+@superadmin_required
+def set_setting():
+    """Définit ou met à jour un paramètre"""
+    try:
+        data = request.get_json(silent=True)
+        
+        if not data or not isinstance(data, dict):
+            return jsonify({
+                'success': False,
+                'error': 'Données JSON invalides ou manquantes'
+            }), 400
+        
+        if 'key' not in data or 'value' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Les champs key et value sont requis'
+            }), 400
+        
+        setting = AppSettings.set_value(
+            key=data['key'],
+            value=data['value'],
+            description=data.get('description')
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Paramètre sauvegardé avec succès',
+            'setting': setting.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/settings/custom-head', methods=['GET'])
+@login_required
+@superadmin_required
+def get_custom_head():
+    """Récupère le code <head> personnalisé"""
+    try:
+        code = AppSettings.get_value('custom_head_code', '')
+        return jsonify({
+            'success': True,
+            'code': code
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/settings/custom-head', methods=['POST'])
+@login_required
+@superadmin_required
+def set_custom_head():
+    """Définit le code <head> personnalisé"""
+    try:
+        data = request.get_json(silent=True)
+        
+        if not data or not isinstance(data, dict):
+            return jsonify({
+                'success': False,
+                'error': 'Données JSON invalides ou manquantes'
+            }), 400
+        
+        code = data.get('code', '')
+        
+        setting = AppSettings.set_value(
+            key='custom_head_code',
+            value=code,
+            description='Code personnalisé à injecter dans l\'élément <head>'
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Code <head> personnalisé sauvegardé avec succès',
+            'setting': setting.to_dict()
+        }), 200
         
     except Exception as e:
         db.session.rollback()

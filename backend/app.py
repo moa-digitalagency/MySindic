@@ -69,6 +69,13 @@ def create_app():
         from backend.models.user import User
         return User.query.get(int(user_id))
     
+    @app.context_processor
+    def inject_custom_head():
+        """Injecte le code <head> personnalisé dans tous les templates"""
+        from backend.models.app_settings import AppSettings
+        custom_head_code = AppSettings.get_value('custom_head_code', '')
+        return dict(custom_head_code=custom_head_code)
+    
     # Enregistrer les blueprints (routes)
     register_blueprints(app)
     
@@ -208,6 +215,12 @@ def create_app():
     def admin_settings_security():
         """Paramètres de sécurité"""
         return render_template('admin/settings_security.html')
+    
+    @app.route('/admin/settings/custom-code')
+    @superadmin_required
+    def admin_settings_custom_code():
+        """Paramètres de code personnalisé"""
+        return render_template('admin/settings_custom_code.html')
     
     # Routes Résidents (pages HTML)
     @app.route('/resident/dashboard')
