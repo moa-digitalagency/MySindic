@@ -1,3 +1,11 @@
+<!--
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
+-->
 {% extends "admin/admin_base.html" %}
 
 {% block title %}Rôles & Permissions - MySindic{% endblock %}
@@ -239,15 +247,15 @@
         <span>⚙️</span>
         <span>Général</span>
     </a>
-    <a href="#" class="settings-tab">
+    <a href="{{ url_for('admin_settings_notifications') }}" class="settings-tab">
         <span>📧</span>
         <span>Notifications</span>
     </a>
-    <a href="#" class="settings-tab">
+    <a href="{{ url_for('admin_settings_appearance') }}" class="settings-tab">
         <span>🎨</span>
         <span>Apparence</span>
     </a>
-    <a href="#" class="settings-tab">
+    <a href="{{ url_for('admin_settings_security') }}" class="settings-tab">
         <span>🔒</span>
         <span>Sécurité</span>
     </a>

@@ -1,0 +1,303 @@
+<!--
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
+-->
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Notifications - MySindic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .settings-header {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .settings-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .settings-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .settings-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0;
+        background: white;
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1rem 0;
+    }
+    
+    .settings-tab {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-tab:hover {
+        color: #2563eb;
+    }
+    
+    .settings-tab.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .settings-content {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0 0 12px 12px;
+        padding: 1.5rem;
+        min-height: 400px;
+    }
+    
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+    
+    .settings-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .settings-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .settings-item:last-child {
+        border-bottom: none;
+    }
+    
+    .settings-item-label {
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .settings-item-description {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="settings-header">
+    <h1 class="settings-title">⚙️ Paramètres de l'Application</h1>
+    <p class="settings-subtitle">Gérez les paramètres globaux de votre plateforme MySindic</p>
+</div>
+
+<div class="settings-tabs">
+    <a href="{{ url_for('admin_settings_roles') }}" class="settings-tab">
+        <span>🔐</span>
+        <span>Rôles & Permissions</span>
+    </a>
+    <a href="{{ url_for('admin_settings') }}" class="settings-tab">
+        <span>⚙️</span>
+        <span>Général</span>
+    </a>
+    <a href="{{ url_for('admin_settings_notifications') }}" class="settings-tab active">
+        <span>📧</span>
+        <span>Notifications</span>
+    </a>
+    <a href="{{ url_for('admin_settings_appearance') }}" class="settings-tab">
+        <span>🎨</span>
+        <span>Apparence</span>
+    </a>
+    <a href="{{ url_for('admin_settings_security') }}" class="settings-tab">
+        <span>🔒</span>
+        <span>Sécurité</span>
+    </a>
+</div>
+
+<div class="settings-content">
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>📧</span>
+            <span>Notifications par Email</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Activer les notifications email</div>
+                    <div class="settings-item-description">Envoyer des notifications par email aux utilisateurs</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Nouvelles charges</div>
+                    <div class="settings-item-description">Notifier les résidents lors de nouvelles charges</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Rappels de paiement</div>
+                    <div class="settings-item-description">Envoyer des rappels automatiques avant échéance</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Demandes de maintenance</div>
+                    <div class="settings-item-description">Notifier les admins des nouvelles demandes</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>🔔</span>
+            <span>Notifications en temps réel</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Notifications push</div>
+                    <div class="settings-item-description">Afficher les notifications en temps réel dans l'application</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Sons de notification</div>
+                    <div class="settings-item-description">Jouer un son lors de nouvelles notifications</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Badge de compteur</div>
+                    <div class="settings-item-description">Afficher le nombre de notifications non lues</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>⏰</span>
+            <span>Fréquence des rappels</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Premier rappel</div>
+                    <div class="settings-item-description">Jours avant l'échéance pour le 1er rappel</div>
+                </div>
+                <input type="number" value="7" min="1" max="30" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Deuxième rappel</div>
+                    <div class="settings-item-description">Jours avant l'échéance pour le 2ème rappel</div>
+                </div>
+                <input type="number" value="3" min="1" max="30" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Rappel après échéance</div>
+                    <div class="settings-item-description">Jours après l'échéance pour le rappel de retard</div>
+                </div>
+                <input type="number" value="5" min="1" max="30" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            Annuler
+        </button>
+        <button class="px-6 py-2.5 border-2 border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+            Enregistrer les modifications
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+// MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+// Shabaka Syndic - Par : Aisance KALONJI - Mail : moa@myoneart.com - www.myoneart.com
+console.log('✅ Page Paramètres Notifications chargée');
+</script>
+{% endblock %}

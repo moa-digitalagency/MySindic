@@ -7,6 +7,8 @@ Shabaka Syndic
 Par : Aisance KALONJI
 Mail : moa@myoneart.com
 www.myoneart.com
+
+Point d'entrée principal de l'application MySindic.
 """
 
 from backend.app import app

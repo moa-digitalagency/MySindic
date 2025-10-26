@@ -7,6 +7,8 @@ Shabaka Syndic
 Par : Aisance KALONJI
 Mail : moa@myoneart.com
 www.myoneart.com
+
+Application principale Flask avec configuration des routes et middlewares.
 """
 
 import os
@@ -58,7 +60,7 @@ def create_app():
     
     # Initialiser Flask-Login
     login_manager.init_app(app)
-    login_manager.login_view = 'login_page'
+    login_manager.login_view = 'login_page'  # type: ignore
     login_manager.login_message = 'Veuillez vous connecter pour accéder à cette page.'
     
     @login_manager.user_loader
@@ -188,6 +190,24 @@ def create_app():
     def admin_settings_roles():
         """Gestion des rôles et permissions"""
         return render_template('admin/settings_roles.html')
+    
+    @app.route('/admin/settings/notifications')
+    @superadmin_required
+    def admin_settings_notifications():
+        """Paramètres de notifications"""
+        return render_template('admin/settings_notifications.html')
+    
+    @app.route('/admin/settings/appearance')
+    @superadmin_required
+    def admin_settings_appearance():
+        """Paramètres d'apparence"""
+        return render_template('admin/settings_appearance.html')
+    
+    @app.route('/admin/settings/security')
+    @superadmin_required
+    def admin_settings_security():
+        """Paramètres de sécurité"""
+        return render_template('admin/settings_security.html')
     
     # Routes Résidents (pages HTML)
     @app.route('/resident/dashboard')

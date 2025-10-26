@@ -1,0 +1,378 @@
+<!--
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
+-->
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Sécurité - MySindic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .settings-header {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .settings-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .settings-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .settings-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0;
+        background: white;
+        border-radius: 12px 12px 0 0;
+        padding: 1rem 1rem 0;
+    }
+    
+    .settings-tab {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-tab:hover {
+        color: #2563eb;
+    }
+    
+    .settings-tab.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+        font-weight: 600;
+    }
+    
+    .settings-content {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0 0 12px 12px;
+        padding: 1.5rem;
+        min-height: 400px;
+    }
+    
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+    
+    .settings-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .settings-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .settings-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .settings-item:last-child {
+        border-bottom: none;
+    }
+    
+    .settings-item-label {
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .settings-item-description {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    
+    .alert-security {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: start;
+        gap: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="settings-header">
+    <h1 class="settings-title">⚙️ Paramètres de l'Application</h1>
+    <p class="settings-subtitle">Gérez les paramètres globaux de votre plateforme MySindic</p>
+</div>
+
+<div class="settings-tabs">
+    <a href="{{ url_for('admin_settings_roles') }}" class="settings-tab">
+        <span>🔐</span>
+        <span>Rôles & Permissions</span>
+    </a>
+    <a href="{{ url_for('admin_settings') }}" class="settings-tab">
+        <span>⚙️</span>
+        <span>Général</span>
+    </a>
+    <a href="{{ url_for('admin_settings_notifications') }}" class="settings-tab">
+        <span>📧</span>
+        <span>Notifications</span>
+    </a>
+    <a href="{{ url_for('admin_settings_appearance') }}" class="settings-tab">
+        <span>🎨</span>
+        <span>Apparence</span>
+    </a>
+    <a href="{{ url_for('admin_settings_security') }}" class="settings-tab active">
+        <span>🔒</span>
+        <span>Sécurité</span>
+    </a>
+</div>
+
+<div class="settings-content">
+    <div class="alert-security">
+        <span style="font-size: 1.5rem;">⚠️</span>
+        <div>
+            <div style="font-weight: 600; color: #92400e; margin-bottom: 0.25rem;">Important</div>
+            <div style="font-size: 0.875rem; color: #78350f;">Les modifications de sécurité peuvent affecter tous les utilisateurs. Assurez-vous de bien comprendre les implications avant de modifier ces paramètres.</div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>🔐</span>
+            <span>Authentification</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Authentification à deux facteurs (2FA)</div>
+                    <div class="settings-item-description">Exiger la 2FA pour tous les administrateurs</div>
+                </div>
+                <label class="relative inline-flex items-cursor pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Durée de session</div>
+                    <div class="settings-item-description">Durée d'inactivité avant déconnexion automatique (en minutes)</div>
+                </div>
+                <input type="number" value="60" min="15" max="480" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Tentatives de connexion</div>
+                    <div class="settings-item-description">Nombre max de tentatives avant blocage du compte</div>
+                </div>
+                <input type="number" value="5" min="3" max="10" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Durée de blocage</div>
+                    <div class="settings-item-description">Durée de blocage après trop de tentatives (en minutes)</div>
+                </div>
+                <input type="number" value="30" min="5" max="120" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>🔑</span>
+            <span>Politique de mots de passe</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Longueur minimale</div>
+                    <div class="settings-item-description">Nombre minimum de caractères pour les mots de passe</div>
+                </div>
+                <input type="number" value="8" min="6" max="20" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Exiger des majuscules</div>
+                    <div class="settings-item-description">Le mot de passe doit contenir au moins une majuscule</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Exiger des chiffres</div>
+                    <div class="settings-item-description">Le mot de passe doit contenir au moins un chiffre</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Exiger des caractères spéciaux</div>
+                    <div class="settings-item-description">Le mot de passe doit contenir au moins un caractère spécial</div>
+                </div>
+                <label class="relative inline-flex items-cursor pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Expiration du mot de passe</div>
+                    <div class="settings-item-description">Obliger le changement de mot de passe tous les X jours (0 = jamais)</div>
+                </div>
+                <input type="number" value="90" min="0" max="365" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>📋</span>
+            <span>Audit et Logs</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Journal d'audit</div>
+                    <div class="settings-item-description">Enregistrer toutes les actions des administrateurs</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Durée de conservation des logs</div>
+                    <div class="settings-item-description">Nombre de jours avant suppression automatique des logs</div>
+                </div>
+                <input type="number" value="365" min="30" max="1825" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 100px;">
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Alertes de sécurité</div>
+                    <div class="settings-item-description">Envoyer des alertes email lors d'activités suspectes</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="settings-section">
+        <h2 class="settings-section-title">
+            <span>🛡️</span>
+            <span>Protection des données</span>
+        </h2>
+        
+        <div class="settings-card">
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Sauvegarde automatique</div>
+                    <div class="settings-item-description">Effectuer des sauvegardes automatiques de la base de données</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Fréquence des sauvegardes</div>
+                    <div class="settings-item-description">Fréquence des sauvegardes automatiques</div>
+                </div>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 150px;">
+                    <option value="daily" selected>Quotidienne</option>
+                    <option value="weekly">Hebdomadaire</option>
+                    <option value="monthly">Mensuelle</option>
+                </select>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Chiffrement des données sensibles</div>
+                    <div class="settings-item-description">Chiffrer les données sensibles dans la base de données</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            Annuler
+        </button>
+        <button class="px-6 py-2.5 border-2 border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+            Enregistrer les modifications
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+// MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+// Shabaka Syndic - Par : Aisance KALONJI - Mail : moa@myoneart.com - www.myoneart.com
+console.log('✅ Page Paramètres Sécurité chargée');
+</script>
+{% endblock %}

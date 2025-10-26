@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "admin/admin_base.html" %}
 
-{% block title %}Paramètres - MySindic{% endblock %}
+{% block title %}Apparence - MySindic{% endblock %}
 
 {% block admin_extra_css %}
 <style>
@@ -121,6 +121,26 @@ www.myoneart.com
         color: #6b7280;
         margin-top: 0.25rem;
     }
+    
+    .color-option {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .color-option:hover {
+        transform: scale(1.1);
+        border-color: #2563eb;
+    }
+    
+    .color-option.selected {
+        border-color: #2563eb;
+        border-width: 3px;
+        transform: scale(1.05);
+    }
 </style>
 {% endblock %}
 
@@ -135,7 +155,7 @@ www.myoneart.com
         <span>🔐</span>
         <span>Rôles & Permissions</span>
     </a>
-    <a href="{{ url_for('admin_settings') }}" class="settings-tab active">
+    <a href="{{ url_for('admin_settings') }}" class="settings-tab">
         <span>⚙️</span>
         <span>Général</span>
     </a>
@@ -143,7 +163,7 @@ www.myoneart.com
         <span>📧</span>
         <span>Notifications</span>
     </a>
-    <a href="{{ url_for('admin_settings_appearance') }}" class="settings-tab">
+    <a href="{{ url_for('admin_settings_appearance') }}" class="settings-tab active">
         <span>🎨</span>
         <span>Apparence</span>
     </a>
@@ -156,97 +176,88 @@ www.myoneart.com
 <div class="settings-content">
     <div class="settings-section">
         <h2 class="settings-section-title">
-            <span>🏢</span>
-            <span>Paramètres Généraux</span>
+            <span>🎨</span>
+            <span>Couleur du thème</span>
         </h2>
         
         <div class="settings-card">
             <div class="settings-item">
                 <div>
-                    <div class="settings-item-label">Nom de la plateforme</div>
-                    <div class="settings-item-description">Le nom affiché dans l'application</div>
+                    <div class="settings-item-label">Couleur principale</div>
+                    <div class="settings-item-description">Couleur utilisée pour les boutons, liens et éléments d'interface</div>
                 </div>
-                <input type="text" value="MySindic" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
-            </div>
-            
-            <div class="settings-item">
-                <div>
-                    <div class="settings-item-label">Langue par défaut</div>
-                    <div class="settings-item-description">Langue de l'interface utilisateur</div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <div class="color-option selected" style="background: #2563eb;" title="Bleu (par défaut)"></div>
+                    <div class="color-option" style="background: #7c3aed;" title="Violet"></div>
+                    <div class="color-option" style="background: #059669;" title="Vert"></div>
+                    <div class="color-option" style="background: #dc2626;" title="Rouge"></div>
+                    <div class="color-option" style="background: #ea580c;" title="Orange"></div>
                 </div>
-                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
-                    <option value="fr" selected>Français</option>
-                    <option value="ar">العربية (Arabe)</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-            
-            <div class="settings-item">
-                <div>
-                    <div class="settings-item-label">Fuseau horaire</div>
-                    <div class="settings-item-description">Fuseau horaire utilisé dans l'application</div>
-                </div>
-                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
-                    <option value="Africa/Casablanca" selected>Africa/Casablanca (GMT+1)</option>
-                    <option value="Europe/Paris">Europe/Paris (GMT+1)</option>
-                    <option value="UTC">UTC (GMT+0)</option>
-                </select>
             </div>
         </div>
     </div>
     
     <div class="settings-section">
         <h2 class="settings-section-title">
-            <span>📊</span>
-            <span>Paramètres de Gestion</span>
+            <span>🖼️</span>
+            <span>Logo et Branding</span>
         </h2>
         
         <div class="settings-card">
             <div class="settings-item">
                 <div>
-                    <div class="settings-item-label">Monnaie</div>
-                    <div class="settings-item-description">Devise utilisée pour les transactions</div>
+                    <div class="settings-item-label">Logo de l'application</div>
+                    <div class="settings-item-description">Logo affiché dans la barre de navigation (format SVG ou PNG)</div>
                 </div>
-                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
-                    <option value="MAD" selected>Dirham Marocain (MAD)</option>
-                    <option value="EUR">Euro (EUR)</option>
-                    <option value="USD">Dollar US (USD)</option>
-                </select>
+                <button class="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+                    Télécharger un logo
+                </button>
             </div>
             
             <div class="settings-item">
                 <div>
-                    <div class="settings-item-label">Format de date</div>
-                    <div class="settings-item-description">Format d'affichage des dates</div>
+                    <div class="settings-item-label">Favicon</div>
+                    <div class="settings-item-description">Icône affichée dans l'onglet du navigateur</div>
                 </div>
-                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
-                    <option value="dd/mm/yyyy" selected>JJ/MM/AAAA</option>
-                    <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
-                    <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
-                </select>
+                <button class="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+                    Télécharger
+                </button>
             </div>
             
             <div class="settings-item">
                 <div>
-                    <div class="settings-item-label">Délai de paiement par défaut</div>
-                    <div class="settings-item-description">Nombre de jours pour payer les charges</div>
+                    <div class="settings-item-label">Image de fond (page de connexion)</div>
+                    <div class="settings-item-description">Image d'arrière-plan pour la page de connexion</div>
                 </div>
-                <input type="number" value="30" min="1" max="90" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 200px;">
+                <button class="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+                    Télécharger
+                </button>
             </div>
         </div>
     </div>
     
     <div class="settings-section">
         <h2 class="settings-section-title">
-            <span>🔔</span>
-            <span>Notifications</span>
+            <span>📱</span>
+            <span>Interface</span>
         </h2>
         
         <div class="settings-card">
             <div class="settings-item">
                 <div>
-                    <div class="settings-item-label">Notifications par email</div>
-                    <div class="settings-item-description">Envoyer des notifications par email aux utilisateurs</div>
+                    <div class="settings-item-label">Mode sombre</div>
+                    <div class="settings-item-description">Permettre aux utilisateurs d'activer le mode sombre</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Animations</div>
+                    <div class="settings-item-description">Activer les animations et transitions dans l'interface</div>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" class="sr-only peer" checked>
@@ -256,13 +267,26 @@ www.myoneart.com
             
             <div class="settings-item">
                 <div>
-                    <div class="settings-item-label">Notifications en temps réel</div>
-                    <div class="settings-item-description">Afficher les notifications en temps réel dans l'application</div>
+                    <div class="settings-item-label">Taille de police</div>
+                    <div class="settings-item-description">Taille de la police par défaut dans l'application</div>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" checked>
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 150px;">
+                    <option value="small">Petite</option>
+                    <option value="medium" selected>Moyenne</option>
+                    <option value="large">Grande</option>
+                </select>
+            </div>
+            
+            <div class="settings-item">
+                <div>
+                    <div class="settings-item-label">Densité de l'interface</div>
+                    <div class="settings-item-description">Espacement des éléments dans l'interface</div>
+                </div>
+                <select class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm" style="min-width: 150px;">
+                    <option value="compact">Compacte</option>
+                    <option value="normal" selected>Normale</option>
+                    <option value="comfortable">Confortable</option>
+                </select>
             </div>
         </div>
     </div>
@@ -281,6 +305,16 @@ www.myoneart.com
 
 {% block admin_extra_js %}
 <script>
-console.log('✅ Page Paramètres chargée');
+// MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+// Shabaka Syndic - Par : Aisance KALONJI - Mail : moa@myoneart.com - www.myoneart.com
+console.log('✅ Page Paramètres Apparence chargée');
+
+// Gestion de la sélection de couleur
+document.querySelectorAll('.color-option').forEach(option => {
+    option.addEventListener('click', function() {
+        document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+    });
+});
 </script>
 {% endblock %}
