@@ -331,6 +331,71 @@
         font-size: 1rem;
     }
     
+    /* Distribution Type Cards */
+    .distribution-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .distribution-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: white;
+        text-align: center;
+    }
+    
+    .distribution-card:hover {
+        border-color: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    }
+    
+    .distribution-card.selected {
+        border-color: #2563eb;
+        background: linear-gradient(to bottom, rgba(37, 99, 235, 0.05), white);
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+    }
+    
+    .distribution-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .distribution-title {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .distribution-desc {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+    
+    .sub-unit-config {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .config-section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
     /* Admin Selection */
     .admin-select-card {
         border: 2px solid #e5e7eb;
@@ -938,15 +1003,99 @@ function loadUnitsConfiguration() {
                 <div class="text-6xl mb-4">⚠️</div>
                 <p class="text-gray-700 font-semibold mb-2">Aucune division configurée</p>
                 <p class="text-gray-500 mb-4">Les données de l'étape 2 n'ont pas été sauvegardées correctement.</p>
-                <p class="text-sm text-gray-400">Debug: divisions=${JSON.stringify(wizardData.divisions)}, type=${wizardData.divisionType}</p>
+                <button onclick="previousStep()" class="btn-wizard btn-wizard-prev">
+                    <i data-feather="arrow-left" class="w-4 h-4"></i>
+                    Retour à l'étape précédente
+                </button>
             </div>
         `;
+        feather.replace();
         return;
+    }
+    
+    // Initialize distributionMode if not set
+    if (!wizardData.distributionMode) {
+        wizardData.distributionMode = 'equal';
     }
     
     const unitTypes = [
         { value: 'appartement', label: 'Appartement', icon: '🏠' },
         { value: 'villa', label: 'Villa', icon: '🏡' },
+        { value: 'maison', label: 'Maison', icon: '🏘️' },
+        { value: 'commerce', label: 'Commerce', icon: '🏪' },
+        { value: 'bureau', label: 'Bureau', icon: '🏢' },
+        { value: 'parking', label: 'Parking', icon: '🚗' },
+        { value: 'cave', label: 'Cave', icon: '📦' }
+    ];
+    
+    const divisionLabel = wizardData.divisionType === 'immeuble' ? 'immeubles' :
+                          wizardData.divisionType === 'batiment' ? 'bâtiments' :
+                          wizardData.divisionType === 'zone' ? 'zones' : 'lots';
+    
+    let html = `
+        <div class="mb-6">
+            <h3 class="config-section-title">
+                <span>⚙️</span>
+                Mode de découpage des sous-unités
+            </h3>
+            <p class="text-gray-600 text-sm mb-4">
+                Choisissez comment répartir les unités dans vos ${wizardData.divisions.length} ${divisionLabel}
+            </p>
+            
+            <div class="distribution-cards">
+                <div class="distribution-card ${wizardData.distributionMode === 'equal' ? 'selected' : ''}" 
+                     onclick="selectDistributionMode('equal')">
+                    <div class="distribution-icon">⚖️</div>
+                    <div class="distribution-title">Découpage Égal</div>
+                    <div class="distribution-desc">
+                        Tous les ${divisionLabel} ont le même nombre d'unités
+                    </div>
+                </div>
+                
+                <div class="distribution-card ${wizardData.distributionMode === 'unequal' ? 'selected' : ''}" 
+                     onclick="selectDistributionMode('unequal')">
+                    <div class="distribution-icon">📊</div>
+                    <div class="distribution-title">Découpage Inégal</div>
+                    <div class="distribution-desc">
+                        Chaque ${wizardData.divisionType || 'division'} a un nombre différent d'unités
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sub-unit-configuration" class="sub-unit-config">
+            <!-- Will be populated based on distribution mode -->
+        </div>
+    `;
+    
+    container.innerHTML = html;
+    feather.replace();
+    
+    // Load the appropriate sub-configuration
+    loadSubUnitConfiguration();
+}
+
+function selectDistributionMode(mode) {
+    wizardData.distributionMode = mode;
+    
+    // Update UI
+    document.querySelectorAll('.distribution-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    event.target.closest('.distribution-card').classList.add('selected');
+    
+    // Reload sub-configuration
+    loadSubUnitConfiguration();
+}
+
+function loadSubUnitConfiguration() {
+    const container = document.getElementById('sub-unit-configuration');
+    if (!container) return;
+    
+    const unitTypes = [
+        { value: 'appartement', label: 'Appartement', icon: '🏠' },
+        { value: 'villa', label: 'Villa', icon: '🏡' },
+        { value: 'maison', label: 'Maison', icon: '🏘️' },
         { value: 'commerce', label: 'Commerce', icon: '🏪' },
         { value: 'bureau', label: 'Bureau', icon: '🏢' },
         { value: 'parking', label: 'Parking', icon: '🚗' },
@@ -954,71 +1103,170 @@ function loadUnitsConfiguration() {
     ];
     
     let html = '';
-    wizardData.divisions.forEach((division, divIndex) => {
-        html += `
-            <div class="unit-config-item">
-                <h4 class="unit-config-title">${division.name}</h4>
+    
+    if (wizardData.distributionMode === 'equal') {
+        // Equal distribution: one configuration for all divisions
+        html = `
+            <h3 class="config-section-title">
+                <span>🔧</span>
+                Configuration globale des unités
+            </h3>
+            <p class="text-gray-600 text-sm mb-4">
+                Cette configuration s'appliquera à tous les ${wizardData.divisions.length} ${wizardData.divisionType || 'divisions'}
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Type d'unités <span class="required">*</span></label>
+                    <select id="global_unit_type" class="form-input form-select" onchange="saveUnitsConfiguration()">
+                        ${unitTypes.map(type => `<option value="${type.value}">${type.icon} ${type.label}</option>`).join('')}
+                    </select>
+                    <p class="form-hint">Type d'unités dans chaque ${wizardData.divisionType || 'division'}</p>
+                </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label class="form-label">Type d'unités</label>
-                        <select id="unit_type_${divIndex}" class="form-input form-select">
-                            ${unitTypes.map(type => `<option value="${type.value}">${type.icon} ${type.label}</option>`).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Nombre d'unités <span class="required">*</span></label>
-                        <input type="number" id="unit_count_${divIndex}" class="form-input" min="1" value="5">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Numéro de départ</label>
-                        <input type="number" id="unit_start_${divIndex}" class="form-input" value="1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Tantièmes par défaut</label>
-                        <input type="number" id="unit_tantiemes_${divIndex}" class="form-input" value="50">
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Nombre d'unités par ${wizardData.divisionType || 'division'} <span class="required">*</span></label>
+                    <input type="number" id="global_unit_count" class="form-input" min="1" value="5" onchange="saveUnitsConfiguration()">
+                    <p class="form-hint">Chaque ${wizardData.divisionType || 'division'} aura ce nombre d'unités</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Numéro de départ</label>
+                    <input type="number" id="global_unit_start" class="form-input" value="1" onchange="saveUnitsConfiguration()">
+                    <p class="form-hint">Numéro de la première unité (ex: 1 = 101, 102...)</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tantièmes par unité</label>
+                    <input type="number" id="global_unit_tantiemes" class="form-input" value="50" onchange="saveUnitsConfiguration()">
+                    <p class="form-hint">Millièmes pour la répartition des charges</p>
                 </div>
             </div>
+            
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800">
+                    <strong>📋 Aperçu :</strong> 
+                    Chacun des ${wizardData.divisions.length} ${wizardData.divisionType || 'divisions'} contiendra 
+                    <span id="preview-count" class="font-semibold">5</span> 
+                    <span id="preview-type" class="font-semibold">appartements</span>, 
+                    pour un total de <span id="preview-total" class="font-semibold">${wizardData.divisions.length * 5}</span> unités.
+                </p>
+            </div>
         `;
-    });
+    } else {
+        // Unequal distribution: individual configuration for each division
+        html = `
+            <h3 class="config-section-title">
+                <span>🔧</span>
+                Configuration individuelle des unités
+            </h3>
+            <p class="text-gray-600 text-sm mb-4">
+                Configurez le contenu de chaque ${wizardData.divisionType || 'division'} individuellement
+            </p>
+        `;
+        
+        wizardData.divisions.forEach((division, divIndex) => {
+            html += `
+                <div class="unit-config-item">
+                    <h4 class="unit-config-title">📍 ${division.name}</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label">Type d'unités</label>
+                            <select id="unit_type_${divIndex}" class="form-input form-select" onchange="saveUnitsConfiguration()">
+                                ${unitTypes.map(type => `<option value="${type.value}">${type.icon} ${type.label}</option>`).join('')}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nombre d'unités <span class="required">*</span></label>
+                            <input type="number" id="unit_count_${divIndex}" class="form-input" min="1" value="5" onchange="saveUnitsConfiguration()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Numéro de départ</label>
+                            <input type="number" id="unit_start_${divIndex}" class="form-input" value="1" onchange="saveUnitsConfiguration()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Tantièmes par unité</label>
+                            <input type="number" id="unit_tantiemes_${divIndex}" class="form-input" value="50" onchange="saveUnitsConfiguration()">
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
     
     container.innerHTML = html;
-    
-    // Save units on change
-    wizardData.divisions.forEach((division, divIndex) => {
-        ['unit_type', 'unit_count', 'unit_start', 'unit_tantiemes'].forEach(field => {
-            const element = document.getElementById(`${field}_${divIndex}`);
-            if (element) {
-                element.addEventListener('change', () => saveUnitsConfiguration());
-            }
-        });
-    });
-    
     saveUnitsConfiguration();
 }
 
 function saveUnitsConfiguration() {
     wizardData.units = [];
     
-    wizardData.divisions.forEach((division, divIndex) => {
-        const type = document.getElementById(`unit_type_${divIndex}`)?.value || 'appartement';
-        const count = parseInt(document.getElementById(`unit_count_${divIndex}`)?.value) || 0;
-        const start = parseInt(document.getElementById(`unit_start_${divIndex}`)?.value) || 1;
-        const tantiemes = parseInt(document.getElementById(`unit_tantiemes_${divIndex}`)?.value) || 50;
+    if (wizardData.distributionMode === 'equal') {
+        // Equal distribution: use global configuration for all divisions
+        const type = document.getElementById('global_unit_type')?.value || 'appartement';
+        const count = parseInt(document.getElementById('global_unit_count')?.value) || 5;
+        const start = parseInt(document.getElementById('global_unit_start')?.value) || 1;
+        const tantiemes = parseInt(document.getElementById('global_unit_tantiemes')?.value) || 50;
         
-        for (let i = 0; i < count; i++) {
-            wizardData.units.push({
-                division: division.name,
-                unit_number: `${division.name}${start + i}`,
-                unit_type: type,
-                tantiemes: tantiemes
-            });
+        // Update preview
+        const previewCount = document.getElementById('preview-count');
+        const previewType = document.getElementById('preview-type');
+        const previewTotal = document.getElementById('preview-total');
+        
+        if (previewCount) previewCount.textContent = count;
+        if (previewType) {
+            const unitTypes = {
+                'appartement': 'appartements',
+                'villa': 'villas',
+                'maison': 'maisons',
+                'commerce': 'commerces',
+                'bureau': 'bureaux',
+                'parking': 'parkings',
+                'cave': 'caves'
+            };
+            previewType.textContent = unitTypes[type] || type + 's';
         }
-    });
+        if (previewTotal) previewTotal.textContent = wizardData.divisions.length * count;
+        
+        // Create units for all divisions
+        wizardData.divisions.forEach((division, divIndex) => {
+            for (let i = 0; i < count; i++) {
+                const unitNumber = start + i;
+                wizardData.units.push({
+                    division: division.name,
+                    unit_number: `${division.name}-${unitNumber}`,
+                    unit_type: type,
+                    tantiemes: tantiemes,
+                    floor: Math.floor(unitNumber / 10) || null
+                });
+            }
+        });
+    } else {
+        // Unequal distribution: individual configuration for each division
+        wizardData.divisions.forEach((division, divIndex) => {
+            const type = document.getElementById(`unit_type_${divIndex}`)?.value || 'appartement';
+            const count = parseInt(document.getElementById(`unit_count_${divIndex}`)?.value) || 0;
+            const start = parseInt(document.getElementById(`unit_start_${divIndex}`)?.value) || 1;
+            const tantiemes = parseInt(document.getElementById(`unit_tantiemes_${divIndex}`)?.value) || 50;
+            
+            for (let i = 0; i < count; i++) {
+                const unitNumber = start + i;
+                wizardData.units.push({
+                    division: division.name,
+                    unit_number: `${division.name}-${unitNumber}`,
+                    unit_type: type,
+                    tantiemes: tantiemes,
+                    floor: Math.floor(unitNumber / 10) || null
+                });
+            }
+        });
+    }
+    
+    console.log(`Configuration saved: ${wizardData.units.length} units created`);
 }
 
 async function loadAdmins() {
