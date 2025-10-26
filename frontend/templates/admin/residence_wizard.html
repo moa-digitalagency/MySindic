@@ -844,6 +844,20 @@ function validateStep(step) {
                 MySindic.showToast('Veuillez spécifier le nombre de divisions', 'error');
                 return false;
             }
+            
+            // Force la création des divisions si elles n'existent pas
+            if (!wizardData.divisions || wizardData.divisions.length === 0) {
+                console.log('⚠️ Divisions vides lors de la validation, création forcée...');
+                createDivisionsFromCurrentValues();
+            }
+            
+            // Vérifier que les divisions ont bien été créées
+            if (!wizardData.divisions || wizardData.divisions.length === 0) {
+                MySindic.showToast('Erreur lors de la création des divisions', 'error');
+                return false;
+            }
+            
+            console.log('✅ Validation étape 2 OK - ' + wizardData.divisions.length + ' divisions créées');
             return true;
             
         case 3:
@@ -956,6 +970,11 @@ function createDivisionsFromCurrentValues() {
     const divCount = divCountEl ? (parseInt(divCountEl.value) || 3) : 3;
     const prefix = prefixEl ? (prefixEl.value || 'A') : 'A';
     
+    console.log('🔧 createDivisionsFromCurrentValues appelée:');
+    console.log('  - Type:', wizardData.divisionType);
+    console.log('  - Nombre:', divCount);
+    console.log('  - Préfixe:', prefix);
+    
     // Réinitialiser et créer les divisions
     wizardData.divisions = [];
     
@@ -966,7 +985,7 @@ function createDivisionsFromCurrentValues() {
         });
     }
     
-    console.log('Divisions créées:', wizardData.divisions);
+    console.log('✅ ' + wizardData.divisions.length + ' divisions créées:', wizardData.divisions);
 }
 
 function updateDivisionPreview() {
@@ -994,24 +1013,29 @@ function updateDivisionPreview() {
 function loadUnitsConfiguration() {
     const container = document.getElementById('units-configuration');
     
-    console.log('Loading units configuration. Divisions:', wizardData.divisions);
-    console.log('wizardData:', wizardData);
+    console.log('📋 Loading units configuration...');
+    console.log('  - Division type:', wizardData.divisionType);
+    console.log('  - Divisions:', wizardData.divisions);
+    console.log('  - Full wizardData:', wizardData);
     
     if (!wizardData.divisions || wizardData.divisions.length === 0) {
+        console.error('❌ Erreur: Aucune division trouvée!');
         container.innerHTML = `
             <div class="text-center py-12">
                 <div class="text-6xl mb-4">⚠️</div>
-                <p class="text-gray-700 font-semibold mb-2">Aucune division configurée</p>
-                <p class="text-gray-500 mb-4">Les données de l'étape 2 n'ont pas été sauvegardées correctement.</p>
-                <button onclick="previousStep()" class="btn-wizard btn-wizard-prev">
+                <p class="text-gray-700 font-semibold mb-2 text-xl">Aucune division configurée</p>
+                <p class="text-gray-600 mb-6">Vous devez d'abord configurer le type de découpe et le nombre de divisions à l'étape 2.</p>
+                <button onclick="previousStep()" class="btn-wizard btn-wizard-prev" style="display: inline-flex;">
                     <i data-feather="arrow-left" class="w-4 h-4"></i>
-                    Retour à l'étape précédente
+                    Retour à l'étape 2
                 </button>
             </div>
         `;
-        feather.replace();
+        setTimeout(() => feather.replace(), 100);
         return;
     }
+    
+    console.log('✅ Configuration chargée avec', wizardData.divisions.length, 'division(s)');
     
     // Initialize distributionMode if not set
     if (!wizardData.distributionMode) {
