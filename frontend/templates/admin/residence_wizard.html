@@ -1044,7 +1044,7 @@ function loadUnitsConfiguration() {
             
             <div class="distribution-cards">
                 <div class="distribution-card ${wizardData.distributionMode === 'equal' ? 'selected' : ''}" 
-                     onclick="selectDistributionMode('equal')">
+                     onclick="selectDistributionMode(event, 'equal')">
                     <div class="distribution-icon">⚖️</div>
                     <div class="distribution-title">Découpage Égal</div>
                     <div class="distribution-desc">
@@ -1053,7 +1053,7 @@ function loadUnitsConfiguration() {
                 </div>
                 
                 <div class="distribution-card ${wizardData.distributionMode === 'unequal' ? 'selected' : ''}" 
-                     onclick="selectDistributionMode('unequal')">
+                     onclick="selectDistributionMode(event, 'unequal')">
                     <div class="distribution-icon">📊</div>
                     <div class="distribution-title">Découpage Inégal</div>
                     <div class="distribution-desc">
@@ -1075,14 +1075,14 @@ function loadUnitsConfiguration() {
     loadSubUnitConfiguration();
 }
 
-function selectDistributionMode(mode) {
+function selectDistributionMode(event, mode) {
     wizardData.distributionMode = mode;
     
     // Update UI
     document.querySelectorAll('.distribution-card').forEach(card => {
         card.classList.remove('selected');
     });
-    event.target.closest('.distribution-card').classList.add('selected');
+    event.currentTarget.classList.add('selected');
     
     // Reload sub-configuration
     loadSubUnitConfiguration();
