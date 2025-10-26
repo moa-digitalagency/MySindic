@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Configuration de l'Application
-Gestion des configurations pour différents environnements
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
-Date: 24 octobre 2025
-Version: 0.1.0
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
 """
 
 import os

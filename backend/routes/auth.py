@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Routes d'Authentification
-Gestion de l'inscription, connexion et déconnexion
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
-Date: 24 octobre 2025
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
 """
 
 from flask import Blueprint, request, jsonify

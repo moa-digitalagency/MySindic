@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Script d'Initialisation avec Données de Démonstration Complètes
-Crée les tables et toutes les données de test nécessaires
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
 """
 
 import os

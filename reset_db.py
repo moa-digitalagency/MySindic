@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Script de Réinitialisation Complète de la Base de Données
-Supprime toutes les données et réinitialise avec les données de démonstration
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
-ATTENTION: Ce script supprime TOUTES les données existantes!
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
 """
 
 import sys

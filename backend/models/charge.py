@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Modèles Charges
-Gestion des charges et de leur répartition
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
-Date: 24 octobre 2025
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
 """
 
 from datetime import datetime

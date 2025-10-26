@@ -1,10 +1,12 @@
-DANS L#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Script d'Initialisation de la Base de Données
-Wrapper pour initialiser manuellement la base de données avec toutes les données de démonstration
+MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
-Date: 24 octobre 2025
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
 """
 
 import sys
