@@ -717,7 +717,9 @@
             <p class="panel-description">Définissez les types d'unités pour chaque division</p>
             
             <div id="units-configuration">
-                <!-- Will be populated dynamically -->
+                <div class="flex justify-center py-12">
+                    <div class="loading-spinner"></div>
+                </div>
             </div>
         </div>
 
@@ -1023,7 +1025,12 @@ function loadUnitsConfiguration() {
     console.log('📋 Loading units configuration...');
     console.log('  - Division type:', wizardData.divisionType);
     console.log('  - Divisions:', wizardData.divisions);
-    console.log('  - Full wizardData:', wizardData);
+    console.log('  - Full wizardData:', JSON.stringify(wizardData, null, 2));
+    
+    if (!container) {
+        console.error('❌ Container units-configuration not found!');
+        return;
+    }
     
     if (!wizardData.divisions || wizardData.divisions.length === 0) {
         console.error('❌ Erreur: Aucune division trouvée!');
@@ -1102,10 +1109,12 @@ function loadUnitsConfiguration() {
     `;
     
     container.innerHTML = html;
+    console.log('✅ HTML inséré dans le container, longueur:', html.length);
     feather.replace();
     
     // Load the appropriate sub-configuration
     loadSubUnitConfiguration();
+    console.log('✅ loadUnitsConfiguration terminée');
 }
 
 function selectDistributionMode(event, mode) {
