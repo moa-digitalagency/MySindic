@@ -1,5 +1,57 @@
 # Changelog - MySindic
 
+## 2025-10-26
+
+### 🎨 Améliorations de Design
+
+#### Landing Page - Hero Slider et Images Professionnelles
+**Changements:**
+- Ajout d'un hero slider avec 3 slides auto-transitionnés (toutes les 5 secondes)
+- Téléchargement de 7 images stock professionnelles pour landing page et features
+- Navigation par dots en bas du slider
+- Transitions fluides entre les slides avec overlay gradient
+- Suppression du bouton "S'inscrire" du slider (remplacé par "Se connecter" et "En savoir plus")
+- Images ajoutées : immeubles modernes, communautés de résidents, technologie professionnelle
+
+**Fichiers modifiés:**
+- `frontend/templates/index.html` - Slider et images ajoutées
+- `frontend/static/images/` - 7 nouvelles images stock
+
+#### Dashboard Résident - Version Mobile Responsive
+**Changements:**
+- Ajout d'un menu hamburger pour mobile (panneau de gauche accessible via hamburger)
+- Réorganisation du contenu en mobile : fil d'actualité et sondages apparaissent en premier
+- Menu drawer avec overlay pour la navigation mobile
+- Duplication des informations de résidence dans le menu mobile
+- CSS responsive amélioré avec media queries pour < 768px
+- Navigation fluide avec transitions CSS
+
+**Fichiers modifiés:**
+- `frontend/templates/resident/dashboard.html` - Menu hamburger et responsive mobile
+
+#### Admin Settings - Navigation Code Personnalisé
+**Changements:**
+- Ajout d'un onglet "💻 Code Personnalisé" dans la navigation des paramètres
+- Lien direct vers `/admin/settings/custom-code` pour faciliter l'accès
+- Amélioration de la découvrabilité de la fonctionnalité d'injection de code
+
+**Fichiers modifiés:**
+- `frontend/templates/admin/settings.html` - Nouvel onglet de navigation
+
+### 🔧 Améliorations Techniques
+
+#### API Settings - Validation JSON Robuste
+**Changements:**
+- Utilisation de `request.get_json(silent=True)` pour éviter les erreurs 500
+- Validation des données JSON avant traitement
+- Messages d'erreur 400 clairs pour requêtes malformées
+- Vérification du type de données (dict) pour la sécurité
+
+**Fichiers modifiés:**
+- `backend/routes/admin.py` - Routes POST /api/admin/settings et /api/admin/settings/custom-head
+
+---
+
 ## 2025-10-25
 
 ### 🐛 Corrections de Bugs
