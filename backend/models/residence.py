@@ -37,8 +37,6 @@ class Residence(db.Model):
     syndic_email = db.Column(db.String(120))
     syndic_phone = db.Column(db.String(20))
     
-    # Informations financières
-    total_tantiemes = db.Column(db.Integer, default=1000)  # Total des tantièmes (base 1000)
     
     # Statut
     is_active = db.Column(db.Boolean, default=True, nullable=False)
@@ -69,7 +67,6 @@ class Residence(db.Model):
             'syndic_name': self.syndic_name,
             'syndic_email': self.syndic_email,
             'syndic_phone': self.syndic_phone,
-            'total_tantiemes': self.total_tantiemes,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
@@ -102,9 +99,6 @@ class Unit(db.Model):
     # Superficie
     surface_area = db.Column(db.Float)  # en m²
     
-    # Tantièmes (quote-part dans les charges)
-    tantiemes = db.Column(db.Integer, nullable=False, default=10)
-    
     # Propriétaire
     owner_name = db.Column(db.String(200))
     owner_email = db.Column(db.String(120))
@@ -131,7 +125,6 @@ class Unit(db.Model):
             'building': self.building,
             'unit_type': self.unit_type,
             'surface_area': self.surface_area,
-            'tantiemes': self.tantiemes,
             'owner_name': self.owner_name,
             'owner_email': self.owner_email,
             'owner_phone': self.owner_phone,

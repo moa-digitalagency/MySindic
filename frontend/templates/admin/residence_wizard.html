@@ -647,12 +647,6 @@
                     <label class="form-label">Téléphone du syndic</label>
                     <input type="tel" id="syndic_phone" class="form-input" placeholder="+212 522 000 000">
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Total tantièmes</label>
-                    <input type="number" id="residence_tantiemes" class="form-input" value="1000" min="1">
-                    <p class="form-hint">Total des millièmes pour la répartition des charges</p>
-                </div>
             </div>
         </div>
 
@@ -922,8 +916,7 @@ function saveStepData(step) {
                 description: document.getElementById('residence_description').value,
                 syndic_name: document.getElementById('syndic_name').value,
                 syndic_email: document.getElementById('syndic_email').value,
-                syndic_phone: document.getElementById('syndic_phone').value,
-                total_tantiemes: parseInt(document.getElementById('residence_tantiemes').value) || 1000
+                syndic_phone: document.getElementById('syndic_phone').value
             };
             break;
             
@@ -1208,12 +1201,6 @@ function loadSubUnitConfiguration() {
                     <input type="number" id="global_unit_start" class="form-input" value="1" onchange="saveUnitsConfiguration()">
                     <p class="form-hint">Numéro de la première unité (ex: 1 = 101, 102...)</p>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Tantièmes par unité</label>
-                    <input type="number" id="global_unit_tantiemes" class="form-input" value="50" onchange="saveUnitsConfiguration()">
-                    <p class="form-hint">Millièmes pour la répartition des charges</p>
-                </div>
             </div>
             
             <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -1260,11 +1247,6 @@ function loadSubUnitConfiguration() {
                             <label class="form-label">Numéro de départ</label>
                             <input type="number" id="unit_start_${divIndex}" class="form-input" value="1" onchange="saveUnitsConfiguration()">
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Tantièmes par unité</label>
-                            <input type="number" id="unit_tantiemes_${divIndex}" class="form-input" value="50" onchange="saveUnitsConfiguration()">
-                        </div>
                     </div>
                 </div>
             `;
@@ -1283,7 +1265,6 @@ function saveUnitsConfiguration() {
         const type = document.getElementById('global_unit_type')?.value || 'appartement';
         const count = parseInt(document.getElementById('global_unit_count')?.value) || 5;
         const start = parseInt(document.getElementById('global_unit_start')?.value) || 1;
-        const tantiemes = parseInt(document.getElementById('global_unit_tantiemes')?.value) || 50;
         
         // Update preview
         const previewCount = document.getElementById('preview-count');
@@ -1313,7 +1294,6 @@ function saveUnitsConfiguration() {
                     division: division.name,
                     unit_number: `${division.name}-${unitNumber}`,
                     unit_type: type,
-                    tantiemes: tantiemes,
                     floor: Math.floor(unitNumber / 10) || null
                 });
             }
@@ -1324,7 +1304,6 @@ function saveUnitsConfiguration() {
             const type = document.getElementById(`unit_type_${divIndex}`)?.value || 'appartement';
             const count = parseInt(document.getElementById(`unit_count_${divIndex}`)?.value) || 0;
             const start = parseInt(document.getElementById(`unit_start_${divIndex}`)?.value) || 1;
-            const tantiemes = parseInt(document.getElementById(`unit_tantiemes_${divIndex}`)?.value) || 50;
             
             for (let i = 0; i < count; i++) {
                 const unitNumber = start + i;
@@ -1332,7 +1311,6 @@ function saveUnitsConfiguration() {
                     division: division.name,
                     unit_number: `${division.name}-${unitNumber}`,
                     unit_type: type,
-                    tantiemes: tantiemes,
                     floor: Math.floor(unitNumber / 10) || null
                 });
             }

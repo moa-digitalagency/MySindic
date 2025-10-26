@@ -21,7 +21,7 @@ class ChargeCalculator:
     @staticmethod
     def calculate_distribution(charge_id):
         """
-        Calcule la répartition des charges pour tous les lots
+        Calcule la répartition égale des charges pour tous les lots
         
         Args:
             charge_id: ID de la charge à répartir
@@ -39,17 +39,14 @@ class ChargeCalculator:
         if not units:
             raise ValueError("Aucun lot trouvé pour cette résidence")
         
-        # Calculer le total des tantièmes
-        total_tantiemes = sum(unit.tantiemes for unit in units)
-        
-        if total_tantiemes == 0:
-            raise ValueError("Total des tantièmes est 0")
+        # Calculer le nombre total de lots
+        total_units = len(units)
         
         distributions = []
         
         for unit in units:
-            # Calculer le montant pour ce lot
-            amount = (Decimal(str(unit.tantiemes)) / Decimal(str(total_tantiemes))) * charge.total_amount
+            # Calculer le montant égal pour chaque lot
+            amount = charge.total_amount / Decimal(str(total_units))
             
             # Créer ou mettre à jour la distribution
             distribution = ChargeDistribution.query.filter_by(

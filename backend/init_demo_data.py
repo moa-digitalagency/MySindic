@@ -71,8 +71,7 @@ def init_demo_data(app, db):
             description="Résidence moderne avec espaces verts et piscine",
             syndic_name="MySindic",
             syndic_email="contact@mysindic.ma",
-            syndic_phone="+212522000000",
-            total_tantiemes=1000
+            syndic_phone="+212522000000"
         )
         db.session.add(residence)
         db.session.commit()
@@ -81,11 +80,11 @@ def init_demo_data(app, db):
         # 3. Créer des unités
         print("🏠 Création des unités...")
         units_data = [
-            {"number": "A101", "floor": 1, "type": "F3", "area": 85.5, "tantiemes": 50, "owner": "Ahmed Alami"},
-            {"number": "A102", "floor": 1, "type": "F2", "area": 65.0, "tantiemes": 40, "owner": "Fatima El Amrani"},
-            {"number": "A201", "floor": 2, "type": "F4", "area": 110.0, "tantiemes": 65, "owner": "Karim Bennani"},
-            {"number": "A202", "floor": 2, "type": "F3", "area": 85.0, "tantiemes": 50, "owner": "Sarah Idrissi"},
-            {"number": "B101", "floor": 1, "type": "F2", "area": 60.0, "tantiemes": 35, "owner": "Youssef Lahlou"},
+            {"number": "A101", "floor": 1, "type": "F3", "area": 85.5, "owner": "Ahmed Alami"},
+            {"number": "A102", "floor": 1, "type": "F2", "area": 65.0, "owner": "Fatima El Amrani"},
+            {"number": "A201", "floor": 2, "type": "F4", "area": 110.0, "owner": "Karim Bennani"},
+            {"number": "A202", "floor": 2, "type": "F3", "area": 85.0, "owner": "Sarah Idrissi"},
+            {"number": "B101", "floor": 1, "type": "F2", "area": 60.0, "owner": "Youssef Lahlou"},
         ]
         
         units = []
@@ -96,7 +95,6 @@ def init_demo_data(app, db):
                 floor=unit_data["floor"],
                 unit_type=unit_data["type"],
                 surface_area=unit_data["area"],
-                tantiemes=unit_data["tantiemes"],
                 owner_name=unit_data["owner"],
                 owner_email=f"{unit_data['number'].lower()}@mysindic.ma"
             )
@@ -180,12 +178,13 @@ def init_demo_data(app, db):
         db.session.add(charge1)
         db.session.commit()
         
-        # Créer les distributions de charges
+        # Créer les distributions de charges (répartition égale)
+        amount_per_unit = charge1.total_amount / len(units)
         for unit in units:
             distribution = ChargeDistribution(
                 charge_id=charge1.id,
                 unit_id=unit.id,
-                amount=(charge1.total_amount * unit.tantiemes / residence.total_tantiemes)
+                amount=amount_per_unit
             )
             db.session.add(distribution)
         

@@ -124,8 +124,7 @@ def create_residence():
                 description=residence_data.get('description'),
                 syndic_name=residence_data.get('syndic_name'),
                 syndic_email=residence_data.get('syndic_email'),
-                syndic_phone=residence_data.get('syndic_phone'),
-                total_tantiemes=residence_data.get('total_tantiemes', 1000)
+                syndic_phone=residence_data.get('syndic_phone')
             )
             
             db.session.add(residence)
@@ -139,8 +138,7 @@ def create_residence():
                     unit_number=unit_data['unit_number'],
                     floor=unit_data.get('floor'),
                     building=unit_data.get('division'),  # Stocker la division/bâtiment
-                    unit_type=unit_data.get('unit_type', 'appartement'),
-                    tantiemes=unit_data.get('tantiemes', 50)
+                    unit_type=unit_data.get('unit_type', 'appartement')
                 )
                 db.session.add(unit)
                 created_units.append(unit)
@@ -169,8 +167,7 @@ def create_residence():
                 description=data.get('description'),
                 syndic_name=data.get('syndic_name'),
                 syndic_email=data.get('syndic_email'),
-                syndic_phone=data.get('syndic_phone'),
-                total_tantiemes=data.get('total_tantiemes', 1000)
+                syndic_phone=data.get('syndic_phone')
             )
             
             db.session.add(residence)
@@ -226,7 +223,7 @@ def create_unit(residence_id):
     """Crée un nouveau lot"""
     try:
         data = request.get_json()
-        required_fields = ['unit_number', 'tantiemes']
+        required_fields = ['unit_number']
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
@@ -238,7 +235,6 @@ def create_unit(residence_id):
             building=data.get('building'),
             unit_type=data.get('unit_type'),
             surface_area=data.get('surface_area'),
-            tantiemes=data['tantiemes'],
             owner_name=data.get('owner_name'),
             owner_email=data.get('owner_email'),
             owner_phone=data.get('owner_phone'),
@@ -261,7 +257,7 @@ def create_unit_simple():
     """Crée un nouveau lot (endpoint simplifié)"""
     try:
         data = request.get_json()
-        required_fields = ['residence_id', 'unit_number', 'tantiemes']
+        required_fields = ['residence_id', 'unit_number']
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
@@ -273,7 +269,6 @@ def create_unit_simple():
             building=data.get('building'),
             unit_type=data.get('unit_type'),
             surface_area=data.get('surface_area'),
-            tantiemes=data['tantiemes'],
             owner_name=data.get('owner_name'),
             owner_email=data.get('owner_email'),
             owner_phone=data.get('owner_phone'),
@@ -1086,8 +1081,7 @@ def create_residence_wizard():
             total_units=data.get('total_units', 0),
             syndic_name=data.get('syndic_name'),
             syndic_email=data.get('syndic_email'),
-            syndic_phone=data.get('syndic_phone'),
-            total_tantiemes=data.get('total_tantiemes', 1000)
+            syndic_phone=data.get('syndic_phone')
         )
         
         db.session.add(residence)
@@ -1105,7 +1099,6 @@ def create_residence_wizard():
                 building=unit_data.get('building') or unit_data.get('division'),
                 unit_type=unit_data.get('unit_type'),
                 surface_area=unit_data.get('surface_area'),
-                tantiemes=unit_data.get('tantiemes', 10),
                 owner_name=unit_data.get('owner_name'),
                 owner_email=unit_data.get('owner_email'),
                 owner_phone=unit_data.get('owner_phone'),
