@@ -552,6 +552,75 @@ www.myoneart.com
         color: #1e40af;
     }
     
+    /* Menu Hamburger pour mobile */
+    .mobile-menu-toggle {
+        display: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        transition: all 0.3s;
+    }
+    
+    .mobile-menu-toggle:hover {
+        background: #e5e7eb;
+    }
+    
+    .mobile-menu-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+    
+    .mobile-menu-drawer {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100%;
+        background: white;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .mobile-menu-drawer.open {
+        left: 0;
+    }
+    
+    .mobile-menu-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .mobile-menu-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #f9fafb;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+    
     @media (max-width: 1024px) {
         .dashboard-layout {
             grid-template-columns: 1fr;
@@ -568,8 +637,17 @@ www.myoneart.com
     }
     
     @media (max-width: 768px) {
+        .mobile-menu-toggle {
+            display: flex;
+        }
+        
+        .left-sidebar {
+            display: none;
+        }
+        
         .dashboard-layout {
             padding: 0.75rem;
+            grid-template-columns: 1fr;
         }
         
         .header-container {
@@ -583,6 +661,14 @@ www.myoneart.com
         .user-name {
             display: none;
         }
+        
+        .right-sidebar {
+            order: 2;
+        }
+        
+        .main-content {
+            order: 1;
+        }
     }
 </style>
 {% endblock %}
@@ -590,6 +676,7 @@ www.myoneart.com
 {% block content %}
 <div class="modern-header">
     <div class="header-container">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         <div class="logo">🏢 MySindic</div>
         
         <div class="search-bar">
@@ -608,6 +695,74 @@ www.myoneart.com
                 <div class="user-avatar" id="header-avatar">👤</div>
                 <span class="user-name" id="header-name">Chargement...</span>
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Menu Mobile Overlay et Drawer -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+<div class="mobile-menu-drawer" id="mobileMenuDrawer">
+    <div class="mobile-menu-header">
+        <div class="logo">🏢 MySindic</div>
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
+    </div>
+    
+    <div class="nav-tabs-card" style="margin-bottom: 1rem;">
+        <a href="#actualite" class="nav-tab active" data-tab="actualite" onclick="switchTab(event, 'actualite'); toggleMobileMenu();">
+            <span class="nav-tab-icon">📰</span>
+            <span>Actualité</span>
+        </a>
+        <a href="#maintenance" class="nav-tab" data-tab="maintenance" onclick="switchTab(event, 'maintenance'); toggleMobileMenu();">
+            <span class="nav-tab-icon">🔧</span>
+            <span>Maintenance</span>
+        </a>
+        <a href="#assemblies" class="nav-tab" data-tab="assemblies" onclick="switchTab(event, 'assemblies'); toggleMobileMenu();">
+            <span class="nav-tab-icon">🗳️</span>
+            <span>Assemblées Générales</span>
+        </a>
+        <a href="#finances" class="nav-tab" data-tab="finances" onclick="switchTab(event, 'finances'); toggleMobileMenu();">
+            <span class="nav-tab-icon">💰</span>
+            <span>Finances</span>
+        </a>
+        <a href="#documents" class="nav-tab" data-tab="documents" onclick="switchTab(event, 'documents'); toggleMobileMenu();">
+            <span class="nav-tab-icon">📄</span>
+            <span>Documents</span>
+        </a>
+        <a href="#profile" class="nav-tab" data-tab="profile" onclick="switchTab(event, 'profile'); toggleMobileMenu();">
+            <span class="nav-tab-icon">👤</span>
+            <span>Mon Profil</span>
+        </a>
+        <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
+            <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
+                <span class="nav-tab-icon">🚪</span>
+                <span>Déconnexion</span>
+            </a>
+        </div>
+    </div>
+    
+    <div class="profile-card">
+        <div class="section-title">🏢 Ma Résidence</div>
+        <div id="mobile-residence-info">
+            <div class="info-item">
+                <span class="info-label">Résidence</span>
+                <span class="info-value" id="mobile-residence-name">-</span>
+            </div>
+            <div class="info-item" id="mobile-building-row" style="display: none;">
+                <span class="info-label">Immeuble</span>
+                <span class="info-value" id="mobile-unit-building">-</span>
+            </div>
+            <div class="info-item" id="mobile-floor-row" style="display: none;">
+                <span class="info-label">Étage</span>
+                <span class="info-value" id="mobile-unit-floor">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Unité</span>
+                <span class="info-value" id="mobile-unit-number">-</span>
+            </div>
+            <div class="info-item" id="mobile-unit-type-row" style="display: none;">
+                <span class="info-label">Type</span>
+                <span class="info-value" id="mobile-unit-type">-</span>
+            </div>
         </div>
     </div>
 </div>
@@ -1141,6 +1296,19 @@ async function publishPost() {
     }
 }
 
+function toggleMobileMenu() {
+    const overlay = document.getElementById('mobileMenuOverlay');
+    const drawer = document.getElementById('mobileMenuDrawer');
+    
+    if (drawer.classList.contains('open')) {
+        drawer.classList.remove('open');
+        overlay.style.display = 'none';
+    } else {
+        drawer.classList.add('open');
+        overlay.style.display = 'block';
+    }
+}
+
 function updateProfile(data) {
     const user = data.user || {};
     const residence = data.residence || {};
@@ -1159,6 +1327,7 @@ function updateProfile(data) {
         headerAvatar.textContent = initials;
     }
     
+    // Desktop sidebar
     if (residence.name) {
         document.getElementById('residence-name').textContent = residence.name;
     }
@@ -1181,6 +1350,31 @@ function updateProfile(data) {
     if (unit.unit_type) {
         document.getElementById('unit-type-row').style.display = 'block';
         document.getElementById('unit-type').textContent = unit.unit_type;
+    }
+    
+    // Mobile menu (dupliquer les données)
+    if (residence.name) {
+        document.getElementById('mobile-residence-name').textContent = residence.name;
+    }
+    
+    if (unit.unit_number) {
+        document.getElementById('mobile-unit-number').textContent = unit.unit_number;
+    }
+    
+    if (unit.building) {
+        document.getElementById('mobile-building-row').style.display = 'block';
+        document.getElementById('mobile-unit-building').textContent = unit.building;
+    }
+    
+    if (unit.floor !== null && unit.floor !== undefined) {
+        document.getElementById('mobile-floor-row').style.display = 'block';
+        const floorText = unit.floor === 0 ? 'RDC' : `${unit.floor}`;
+        document.getElementById('mobile-unit-floor').textContent = floorText;
+    }
+    
+    if (unit.unit_type) {
+        document.getElementById('mobile-unit-type-row').style.display = 'block';
+        document.getElementById('mobile-unit-type').textContent = unit.unit_type;
     }
 }
 
