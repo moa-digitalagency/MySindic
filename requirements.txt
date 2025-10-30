@@ -50,3 +50,8 @@ pyjwt==2.8.0
 python-dotenv==1.0.0
 sqlalchemy==2.0.23
 werkzeug==3.0.1
+email_validator
+flask
+flask-sqlalchemy
+gunicorn
+psycopg2-binary
