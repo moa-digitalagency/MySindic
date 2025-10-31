@@ -50,7 +50,7 @@ Le projet est organisé en deux dossiers principaux:
   - `admin_base.html`: Unified admin shell with persistent sidebar, header, and quick actions
   - Block structure: `admin_content`, `admin_extra_css`, `admin_extra_js` for page-specific content
   - Eliminates code duplication across all 9 admin pages (including news management)
-- **Data Models:** 17 core data models cover users, residences, residence-admin assignments, financial management, maintenance, communication, documents, general assemblies, and litigation.
+- **Data Models:** 19 core data models cover users, residences, residence-admin assignments, financial management, maintenance (with tracking numbers, comments, and documents), communication, documents, general assemblies, and litigation.
 - **Business Services:**
     - **ChargeCalculator:** Automates charge distribution.
     - **NotificationService:** Centralized service for sending email notifications.
@@ -59,7 +59,8 @@ Le projet est organisé en deux dossiers principaux:
       - **Residence Creation Wizard (`/api/admin/residences/wizard`):** Transactional endpoint that creates residence, units, and admin assignments in a single commit with rollback on failure.
       - **Admin Assignment Routes:** CRUD operations for managing many-to-many admin-residence assignments.
       - **News Management (`/admin/news`):** Superadmin interface for viewing and publishing actualités (Oct 2025)
-    - **Resident Routes (`/api/resident/*`):** Secure, personalized dashboards for residents.
+      - **Maintenance Management (Oct 2025):** Full-featured system with unique tracking numbers, comments with @mentions, document attachments, residence filtering, and admin assignment workflow.
+    - **Resident Routes (`/api/resident/*`):** Secure, personalized dashboards for residents with maintenance request tracking.
 - **Role Management System:** Supports `superadmin`, `admin`, `owner`, `resident` roles with dedicated management interfaces and permission checks.
 
 ### System Design Choices
