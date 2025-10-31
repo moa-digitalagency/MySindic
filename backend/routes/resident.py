@@ -23,8 +23,8 @@ from backend.models.charge import ChargeDistribution
 from backend.models.payment import Payment
 from backend.models.general_assembly import GeneralAssembly, Resolution, Vote, Attendance
 from backend.models.maintenance_log import MaintenanceLog
-from backend.utils.charge_calculator import ChargeCalculator
-from backend.utils.notification_service import NotificationService
+from backend.services.charge_calculator import ChargeCalculator
+from backend.services.notification_service import NotificationService
 
 # Créer le blueprint
 resident_bp = Blueprint('resident', __name__)
