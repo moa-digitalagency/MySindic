@@ -52,7 +52,7 @@ class NotificationService:
                 Une nouvelle demande de maintenance a été créée.
                 
                 Titre: {maintenance_request.title}
-                Catégorie: {maintenance_request.category}
+                Zone: {maintenance_request.zone}
                 Priorité: {maintenance_request.priority}
                 Description: {maintenance_request.description}
                 """
@@ -64,7 +64,7 @@ class NotificationService:
         Notifie le résident d'un changement de statut de sa demande
         """
         NotificationService.send_email(
-            to_email=maintenance_request.requester.email,
+            to_email=maintenance_request.author.email,
             subject=f"Mise à jour: {maintenance_request.title}",
             body=f"""
             Votre demande de maintenance a été mise à jour.

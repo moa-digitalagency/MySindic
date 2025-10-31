@@ -304,7 +304,7 @@ def create_maintenance():
     data = request.get_json()
     maintenance = MaintenanceRequest(
         residence_id=current_user.residence_id,  # SÉCURISÉ
-        requester_id=current_user.id              # SÉCURISÉ
+        author_id=current_user.id              # SÉCURISÉ
     )
 ```
 
