@@ -81,21 +81,25 @@ www.myoneart.com
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="label-field">Catégorie</label>
-                        <select id="request-category" class="input-field">
+                        <label class="label-field">Zone concernée *</label>
+                        <select id="request-zone" class="input-field" required>
                             <option value="">Sélectionner</option>
-                            <option value="plumbing">Plomberie</option>
-                            <option value="electrical">Électricité</option>
-                            <option value="heating">Chauffage</option>
-                            <option value="structure">Structure</option>
-                            <option value="common_area">Parties communes</option>
-                            <option value="other">Autre</option>
+                            <option value="appartement">🏠 Appartement</option>
+                            <option value="escalier">🪜 Escalier</option>
+                            <option value="ascenseur">🛗 Ascenseur</option>
+                            <option value="parking">🚗 Parking</option>
+                            <option value="jardin">🌳 Jardin / Espace vert</option>
+                            <option value="toiture">🏚️ Toiture</option>
+                            <option value="facade">🏗️ Façade</option>
+                            <option value="plomberie">🚰 Plomberie commune</option>
+                            <option value="electricite">💡 Électricité commune</option>
+                            <option value="autre">📦 Autre</option>
                         </select>
                     </div>
                     <div>
                         <label class="label-field">Priorité *</label>
                         <select id="request-priority" class="input-field" required>
-                            <option value="normal">Normale</option>
+                            <option value="medium">Normale</option>
                             <option value="high">Haute</option>
                             <option value="urgent">Urgente</option>
                             <option value="low">Basse</option>
@@ -104,8 +108,28 @@ www.myoneart.com
                 </div>
                 
                 <div>
-                    <label class="label-field">Localisation</label>
-                    <input type="text" id="request-location" class="input-field" placeholder="Ex: Appartement A101, Salle de bain">
+                    <label class="label-field">Détails de localisation</label>
+                    <input type="text" id="request-zone-details" class="input-field" placeholder="Ex: Appartement A101, 3ème étage côté gauche">
+                </div>
+                
+                <div>
+                    <label class="label-field">Photo (optionnel)</label>
+                    <div class="mt-1">
+                        <input type="file" id="request-image" accept="image/*" class="block w-full text-sm text-gray-500
+                            file:mr-4 file:py-2 file:px-4
+                            file:rounded-md file:border-0
+                            file:text-sm file:font-semibold
+                            file:bg-indigo-50 file:text-indigo-700
+                            hover:file:bg-indigo-100
+                            cursor-pointer">
+                        <p class="mt-1 text-xs text-gray-500">PNG, JPG, JPEG jusqu'à 5MB</p>
+                    </div>
+                    <div id="image-preview" class="mt-2 hidden">
+                        <img id="preview-img" class="rounded-lg max-h-48 border border-gray-300" />
+                        <button type="button" onclick="clearImage()" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                            ✕ Supprimer la photo
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -182,11 +206,11 @@ async function loadMyRequests() {
 function updateStats() {
     const pending = myRequests.filter(r => r.status === 'pending').length;
     const inProgress = myRequests.filter(r => r.status === 'in_progress').length;
-    const completed = myRequests.filter(r => r.status === 'completed').length;
+    const resolved = myRequests.filter(r => r.status === 'resolved').length;
     
     document.getElementById('stat-pending').textContent = pending;
     document.getElementById('stat-progress').textContent = inProgress;
-    document.getElementById('stat-completed').textContent = completed;
+    document.getElementById('stat-completed').textContent = resolved;
 }
 
 function displayRequests() {
@@ -214,8 +238,19 @@ function displayRequests() {
         switch(status) {
             case 'pending': return 'badge-warning';
             case 'in_progress': return 'badge-info';
-            case 'completed': return 'badge-success';
-            default: return 'badge-danger';
+            case 'resolved': return 'badge-success';
+            case 'rejected': return 'badge-danger';
+            default: return 'badge-warning';
+        }
+    };
+    
+    const getStatusLabel = (status) => {
+        switch(status) {
+            case 'pending': return 'En attente';
+            case 'in_progress': return 'En cours';
+            case 'resolved': return 'Résolue';
+            case 'rejected': return 'Rejetée';
+            default: return status;
         }
     };
     
@@ -223,9 +258,26 @@ function displayRequests() {
         switch(priority) {
             case 'urgent': return '🔴';
             case 'high': return '🟡';
-            case 'normal': return '🟢';
-            default: return '⚪';
+            case 'medium': return '🟢';
+            case 'low': return '⚪';
+            default: return '🟢';
         }
+    };
+    
+    const getZoneIcon = (zone) => {
+        const icons = {
+            'appartement': '🏠',
+            'escalier': '🪜',
+            'ascenseur': '🛗',
+            'parking': '🚗',
+            'jardin': '🌳',
+            'toiture': '🏚️',
+            'facade': '🏗️',
+            'plomberie': '🚰',
+            'electricite': '💡',
+            'autre': '📦'
+        };
+        return icons[zone] || '📦';
     };
     
     container.innerHTML = myRequests.map(request => `
@@ -238,14 +290,15 @@ function displayRequests() {
                     </div>
                     <p class="mt-1 text-sm text-gray-500">${request.description.substring(0, 100)}${request.description.length > 100 ? '...' : ''}</p>
                     
-                    <div class="mt-3 flex flex-wrap gap-2">
-                        ${request.category ? `<span class="badge badge-info">${request.category}</span>` : ''}
-                        ${request.location ? `<span class="text-xs text-gray-500">📍 ${request.location}</span>` : ''}
+                    <div class="mt-3 flex flex-wrap gap-2 items-center">
+                        ${request.zone ? `<span class="badge badge-info">${getZoneIcon(request.zone)} ${request.zone}</span>` : ''}
+                        ${request.zone_details ? `<span class="text-xs text-gray-500">📍 ${request.zone_details}</span>` : ''}
+                        ${request.image_path ? `<span class="text-xs text-gray-500">📷 Photo jointe</span>` : ''}
                     </div>
                 </div>
                 
                 <div class="ml-4 flex flex-col items-end space-y-2">
-                    <span class="badge ${getStatusColor(request.status)}">${request.status}</span>
+                    <span class="badge ${getStatusColor(request.status)}">${getStatusLabel(request.status)}</span>
                     <span class="text-xs text-gray-500">${MySindic.formatDate(request.created_at)}</span>
                 </div>
             </div>
@@ -276,9 +329,36 @@ async function viewRequestDetails(requestId) {
         switch(status) {
             case 'pending': return 'bg-yellow-100 text-yellow-800';
             case 'in_progress': return 'bg-blue-100 text-blue-800';
-            case 'completed': return 'bg-green-100 text-green-800';
-            default: return 'bg-red-100 text-red-800';
+            case 'resolved': return 'bg-green-100 text-green-800';
+            case 'rejected': return 'bg-red-100 text-red-800';
+            default: return 'bg-yellow-100 text-yellow-800';
         }
+    };
+    
+    const getStatusLabel = (status) => {
+        switch(status) {
+            case 'pending': return 'En attente';
+            case 'in_progress': return 'En cours';
+            case 'resolved': return 'Résolue';
+            case 'rejected': return 'Rejetée';
+            default: return status;
+        }
+    };
+    
+    const getZoneIcon = (zone) => {
+        const icons = {
+            'appartement': '🏠',
+            'escalier': '🪜',
+            'ascenseur': '🛗',
+            'parking': '🚗',
+            'jardin': '🌳',
+            'toiture': '🏚️',
+            'facade': '🏗️',
+            'plomberie': '🚰',
+            'electricite': '💡',
+            'autre': '📦'
+        };
+        return icons[zone] || '📦';
     };
     
     const details = `
@@ -287,31 +367,40 @@ async function viewRequestDetails(requestId) {
                 <label class="text-sm font-medium text-gray-500">Statut</label>
                 <div class="mt-1">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}">
-                        ${request.status}
+                        ${getStatusLabel(request.status)}
                     </span>
                 </div>
             </div>
             
             <div>
                 <label class="text-sm font-medium text-gray-500">Description</label>
-                <p class="mt-1 text-gray-900">${request.description}</p>
+                <p class="mt-1 text-gray-900 whitespace-pre-wrap">${request.description}</p>
             </div>
             
+            ${request.image_path ? `
+                <div>
+                    <label class="text-sm font-medium text-gray-500">Photo</label>
+                    <div class="mt-2">
+                        <img src="${request.image_path}" alt="Photo de la demande" class="rounded-lg max-h-64 border border-gray-300" />
+                    </div>
+                </div>
+            ` : ''}
+            
             <div class="grid grid-cols-2 gap-4">
-                ${request.category ? `
+                ${request.zone ? `
                     <div>
-                        <label class="text-sm font-medium text-gray-500">Catégorie</label>
-                        <p class="mt-1 text-gray-900">${request.category}</p>
+                        <label class="text-sm font-medium text-gray-500">Zone</label>
+                        <p class="mt-1 text-gray-900">${getZoneIcon(request.zone)} ${request.zone}</p>
                     </div>
                 ` : ''}
                 <div>
                     <label class="text-sm font-medium text-gray-500">Priorité</label>
                     <p class="mt-1 text-gray-900">${request.priority}</p>
                 </div>
-                ${request.location ? `
+                ${request.zone_details ? `
                     <div>
-                        <label class="text-sm font-medium text-gray-500">Localisation</label>
-                        <p class="mt-1 text-gray-900">${request.location}</p>
+                        <label class="text-sm font-medium text-gray-500">Détails de localisation</label>
+                        <p class="mt-1 text-gray-900">${request.zone_details}</p>
                     </div>
                 ` : ''}
                 <div>
@@ -341,14 +430,7 @@ async function viewRequestDetails(requestId) {
             ${request.admin_notes ? `
                 <div class="border-t pt-4">
                     <label class="text-sm font-medium text-gray-500">Notes administrateur</label>
-                    <p class="mt-1 text-gray-900">${request.admin_notes}</p>
-                </div>
-            ` : ''}
-            
-            ${request.resolution_notes ? `
-                <div class="border-t pt-4">
-                    <label class="text-sm font-medium text-gray-500">Résolution</label>
-                    <p class="mt-1 text-gray-900">${request.resolution_notes}</p>
+                    <p class="mt-1 text-gray-900 whitespace-pre-wrap">${request.admin_notes}</p>
                 </div>
             ` : ''}
         </div>
@@ -358,22 +440,42 @@ async function viewRequestDetails(requestId) {
     MySindic.openModal('detailsModal');
 }
 
+function clearImage() {
+    document.getElementById('request-image').value = '';
+    document.getElementById('image-preview').classList.add('hidden');
+}
+
+document.getElementById('request-image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('image-preview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 document.getElementById('requestForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = {
-        title: document.getElementById('request-title').value,
-        description: document.getElementById('request-description').value,
-        category: document.getElementById('request-category').value,
-        priority: document.getElementById('request-priority').value,
-        location: document.getElementById('request-location').value
-    };
+    const formData = new FormData();
+    formData.append('title', document.getElementById('request-title').value);
+    formData.append('description', document.getElementById('request-description').value);
+    formData.append('zone', document.getElementById('request-zone').value);
+    formData.append('zone_details', document.getElementById('request-zone-details').value);
+    formData.append('priority', document.getElementById('request-priority').value);
+    
+    const imageFile = document.getElementById('request-image').files[0];
+    if (imageFile) {
+        formData.append('image', imageFile);
+    }
     
     try {
         const response = await fetch('/api/resident/maintenance', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
+            body: formData
         });
         
         const data = await response.json();
@@ -382,6 +484,7 @@ document.getElementById('requestForm').addEventListener('submit', async (e) => {
             MySindic.showToast('Demande créée avec succès', 'success');
             MySindic.closeModal('createRequestModal');
             document.getElementById('requestForm').reset();
+            clearImage();
             loadMyRequests();
         } else {
             MySindic.showToast(data.error || 'Erreur lors de la création', 'error');

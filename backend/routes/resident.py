@@ -37,9 +37,9 @@ resident_bp = Blueprint('resident', __name__)
 def dashboard():
     """Tableau de bord du résident"""
     try:
-        # Demandes de maintenance récentes (filtrées par residence_id et requester_id)
+        # Demandes de maintenance récentes (filtrées par residence_id et author_id)
         maintenance_requests = MaintenanceRequest.query.filter_by(
-            requester_id=current_user.id
+            author_id=current_user.id
         ).order_by(MaintenanceRequest.created_at.desc()).limit(5).all()
         
         # Actualités de la résidence (filtrées par residence_id)
@@ -125,11 +125,20 @@ def get_news_detail(news_id):
 @login_required
 def create_maintenance_request():
     """Crée une nouvelle demande de maintenance"""
+    import os
+    from werkzeug.utils import secure_filename
+    
     try:
-        data = request.get_json()
+        # Gérer les données multipart/form-data pour l'upload d'images
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            data = request.form.to_dict()
+            image_file = request.files.get('image')
+        else:
+            data = request.get_json()
+            image_file = None
         
         # Validation
-        required_fields = ['title', 'description']
+        required_fields = ['title', 'description', 'zone']
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
@@ -138,15 +147,34 @@ def create_maintenance_request():
         if not current_user.residence_id:
             return jsonify({'success': False, 'error': 'Vous devez être associé à une résidence'}), 400
         
-        # SÉCURITÉ: Utiliser residence_id et requester_id de current_user (pas de la requête)
+        # Gérer l'upload d'image
+        image_path = None
+        if image_file and image_file.filename:
+            # Créer le dossier uploads si nécessaire
+            upload_folder = os.path.join('frontend', 'static', 'uploads', 'maintenance')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            # Sécuriser le nom de fichier
+            filename = secure_filename(image_file.filename)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"{timestamp}_{filename}"
+            
+            # Sauvegarder le fichier
+            file_path = os.path.join(upload_folder, filename)
+            image_file.save(file_path)
+            image_path = f"/static/uploads/maintenance/{filename}"
+        
+        # SÉCURITÉ: Utiliser residence_id et author_id de current_user (pas de la requête)
         maintenance_request = MaintenanceRequest(
-            residence_id=current_user.residence_id,  # Dérivé de l'utilisateur authentifié
-            requester_id=current_user.id,  # Dérivé de l'utilisateur authentifié
+            request_type='resident_request',
+            residence_id=current_user.residence_id,
+            author_id=current_user.id,
+            zone=data['zone'],
+            zone_details=data.get('zone_details'),
             title=data['title'],
             description=data['description'],
-            category=data.get('category'),
-            location=data.get('location'),
-            priority=data.get('priority', 'normal')
+            priority=data.get('priority', 'medium'),
+            image_path=image_path
         )
         
         db.session.add(maintenance_request)
@@ -171,9 +199,9 @@ def create_maintenance_request():
 def get_maintenance_requests():
     """Récupère les demandes de maintenance du résident"""
     try:
-        # SÉCURISÉ: Filtre par requester_id
+        # SÉCURISÉ: Filtre par author_id
         requests = MaintenanceRequest.query.filter_by(
-            requester_id=current_user.id
+            author_id=current_user.id
         ).order_by(MaintenanceRequest.created_at.desc()).all()
         
         return jsonify({'success': True, 'maintenance_requests': [r.to_dict() for r in requests]}), 200
@@ -193,7 +221,7 @@ def get_maintenance_detail(request_id):
         if not maintenance_request:
             return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
         
-        if maintenance_request.requester_id != current_user.id:
+        if maintenance_request.author_id != current_user.id:
             return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         return jsonify({'success': True, 'maintenance_request': maintenance_request.to_dict()}), 200

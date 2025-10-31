@@ -544,8 +544,11 @@ def update_maintenance(request_id):
         # Mettre à jour les champs
         if 'status' in data:
             maintenance_request.status = data['status']
-            if data['status'] == 'completed':
-                maintenance_request.completed_at = datetime.utcnow()
+            if data['status'] == 'resolved':
+                maintenance_request.resolved_at = datetime.utcnow()
+        
+        if 'priority' in data:
+            maintenance_request.priority = data['priority']
         
         if 'assigned_to' in data:
             maintenance_request.assigned_to = data['assigned_to']
@@ -557,15 +560,58 @@ def update_maintenance(request_id):
         if 'admin_notes' in data:
             maintenance_request.admin_notes = data['admin_notes']
         
-        if 'resolution_notes' in data:
-            maintenance_request.resolution_notes = data['resolution_notes']
-        
         db.session.commit()
         
         # Notifier le résident
         NotificationService.notify_maintenance_status_update(maintenance_request)
         
-        return jsonify({'success': True, 'message': 'Demande mise à jour'}), 200
+        return jsonify({'success': True, 'message': 'Demande mise à jour', 'maintenance_request': maintenance_request.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/maintenance/announcement', methods=['POST'])
+@login_required
+@superadmin_required
+def create_maintenance_announcement():
+    """Crée une annonce de maintenance planifiée"""
+    try:
+        data = request.get_json()
+        
+        # Validation
+        required_fields = ['residence_id', 'title', 'description', 'zone']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Créer l'annonce
+        announcement = MaintenanceRequest(
+            request_type='admin_announcement',
+            residence_id=data['residence_id'],
+            author_id=current_user.id,
+            zone=data['zone'],
+            zone_details=data.get('zone_details'),
+            title=data['title'],
+            description=data['description'],
+            priority=data.get('priority', 'medium'),
+            scheduled_date=datetime.fromisoformat(data['scheduled_date']) if data.get('scheduled_date') else None,
+            assigned_to=data.get('assigned_to'),
+            status='in_progress'
+        )
+        
+        db.session.add(announcement)
+        db.session.commit()
+        
+        # Notifier les résidents
+        NotificationService.notify_maintenance_announcement(announcement)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Annonce créée avec succès',
+            'announcement': announcement.to_dict()
+        }), 201
+        
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
