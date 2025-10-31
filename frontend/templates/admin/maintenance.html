@@ -246,6 +246,14 @@ let allRequests = [];
 async function loadMaintenanceRequests() {
     try {
         const response = await fetch('/api/admin/maintenance', { credentials: 'same-origin' });
+        
+        if (!response.ok) {
+            const container = document.getElementById('maintenance-list');
+            container.innerHTML = `<p class="text-center text-red-600 py-8">Erreur: ${response.status === 401 ? 'Authentification requise' : 'Impossible de charger les données'}</p>`;
+            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            return;
+        }
+        
         const data = await response.json();
         
         if (data.success) {
@@ -253,10 +261,14 @@ async function loadMaintenanceRequests() {
             loadResidenceFilter();
             filterRequests();
         } else {
-            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            const container = document.getElementById('maintenance-list');
+            container.innerHTML = `<p class="text-center text-red-600 py-8">Erreur: ${data.error || 'Une erreur est survenue'}</p>`;
+            Shabaka Syndic.showToast(data.error || 'Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
+        const container = document.getElementById('maintenance-list');
+        container.innerHTML = '<p class="text-center text-red-600 py-8">Erreur de connexion au serveur</p>';
         Shabaka Syndic.showToast('Erreur de connexion', 'error');
     }
 }
