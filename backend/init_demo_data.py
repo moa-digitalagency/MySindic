@@ -228,25 +228,45 @@ def init_demo_data(app, db):
         print("🔧 Création des demandes de maintenance...")
         maintenance1 = MaintenanceRequest(
             residence_id=residence.id,
-            requester_id=residents[0].id,
+            author_id=residents[0].id,
+            tracking_number=MaintenanceRequest.generate_tracking_number(residence.id),
+            request_type="resident_request",
             title="Fuite d'eau dans la salle de bain",
-            description="Il y a une fuite sous le lavabo de la salle de bain principale",
-            category="plumbing",
+            description="Il y a une fuite sous le lavabo de la salle de bain principale. L'eau coule lentement mais constamment.",
+            zone="appartement",
+            zone_details=f"Appartement {units[1].unit_number}",
             priority="high",
             status="in_progress"
         )
         
         maintenance2 = MaintenanceRequest(
             residence_id=residence.id,
-            requester_id=residents[1].id,
+            author_id=residents[1].id,
+            tracking_number=MaintenanceRequest.generate_tracking_number(residence.id),
+            request_type="resident_request",
             title="Problème électrique - disjoncteur",
-            description="Le disjoncteur saute fréquemment",
-            category="electrical",
+            description="Le disjoncteur saute fréquemment, surtout quand plusieurs appareils sont allumés en même temps.",
+            zone="appartement",
+            zone_details=f"Appartement {units[2].unit_number}",
             priority="urgent",
             status="pending"
         )
         
-        db.session.add_all([maintenance1, maintenance2])
+        maintenance3 = MaintenanceRequest(
+            residence_id=residence.id,
+            author_id=admin.id,
+            tracking_number=MaintenanceRequest.generate_tracking_number(residence.id),
+            request_type="admin_announcement",
+            title="Travaux d'entretien de l'ascenseur",
+            description="L'ascenseur sera indisponible le 15 novembre de 8h à 17h pour maintenance annuelle obligatoire.",
+            zone="ascenseur",
+            zone_details="Ascenseur principal",
+            priority="medium",
+            status="pending",
+            scheduled_date=datetime.now() + timedelta(days=15)
+        )
+        
+        db.session.add_all([maintenance1, maintenance2, maintenance3])
         db.session.commit()
         print(f"✅ Demandes de maintenance créées\n")
         
@@ -326,7 +346,7 @@ def init_demo_data(app, db):
         print(f"   • 5 utilisateurs (1 superadmin, 1 admin syndic, 1 propriétaire, 2 résidents)")
         print(f"   • 1 appel de fonds avec répartition")
         print(f"   • 2 paiements validés")
-        print(f"   • 2 demandes de maintenance")
+        print(f"   • 3 demandes de maintenance")
         print(f"   • 2 entrées du carnet d'entretien")
         print(f"   • 2 actualités")
         print("\n💡 Système de gestion de rôles:")
