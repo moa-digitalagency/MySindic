@@ -15,86 +15,101 @@ www.myoneart.com
     <div class="card-header">
         <div>
             <h1 class="page-title">📰 Fil d'Actualité</h1>
-            <p class="page-subtitle">Dernières nouvelles de toutes les résidences</p>
+            <p class="page-subtitle">Gérez les actualités par résidence</p>
         </div>
     </div>
 
-    <!-- Zone de publication -->
-    <div style="padding: 1rem; background: #f9fafb; border-radius: 12px; margin-bottom: 1.5rem;">
-        <select id="residence_id" required style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; margin-bottom: 0.75rem; background: white; outline: none;">
+    <!-- Filtre par résidence -->
+    <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+            🏢 Résidence
+        </label>
+        <select id="residence-filter" onchange="onResidenceChange()" style="width: 100%; max-width: 400px; padding: 0.625rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; background: white; outline: none; cursor: pointer;">
             <option value="">Sélectionner une résidence...</option>
         </select>
-        
-        <input type="text" id="news-title" placeholder="Titre de l'actualité..." style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; margin-bottom: 0.75rem; background: white; outline: none;">
-        
-        <textarea id="news-content" placeholder="Contenu de l'actualité..." style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; min-height: 100px; outline: none; background: white;"></textarea>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <label style="display: flex; align-items: center; gap: 0.375rem; cursor: pointer;">
-                    <input type="checkbox" id="is_important" style="border-radius: 4px;">
-                    <span style="font-size: 0.875rem; font-weight: 500;">★ Important</span>
-                </label>
+    </div>
+
+    <!-- Zone de publication (visible uniquement si résidence sélectionnée) -->
+    <div id="publish-section" style="display: none; margin-bottom: 2rem;">
+        <div style="background: white; border: 2px solid #667eea; border-radius: 16px; padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <span style="font-size: 1.25rem;">📝</span>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: #111827;">Fil d'Actualité</h3>
+            </div>
+            <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">Dernières nouvelles de votre résidence</p>
+            
+            <textarea id="news-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.875rem; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 0.9375rem; resize: vertical; min-height: 100px; outline: none; background: #f9fafb; margin-bottom: 0.75rem;"></textarea>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button onclick="MySindic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>🖼️</span> Photo
+                    </button>
+                    <button onclick="MySindic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>🎥</span> Vidéo
+                    </button>
+                    <button onclick="MySindic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>😊</span> Emoji
+                    </button>
+                    <button onclick="toggleAdvancedOptions()" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>⚙️</span> Format
+                    </button>
+                </div>
                 
-                <label style="display: flex; align-items: center; gap: 0.375rem; cursor: pointer;">
-                    <input type="checkbox" id="is_pinned" style="border-radius: 4px;">
-                    <span style="font-size: 0.875rem; font-weight: 500;">📌 Épingler</span>
-                </label>
+                <button onclick="publishNews()" style="padding: 0.625rem 2rem; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#5568d3'" onmouseout="this.style.background='#667eea'">
+                    Publier
+                </button>
             </div>
             
-            <button onclick="publishNews()" class="btn-primary" style="padding: 0.625rem 1.5rem;">
-                Publier
-            </button>
+            <!-- Options avancées -->
+            <div id="advanced-options" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="is_important" style="width: 1.125rem; height: 1.125rem; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 0.875rem; font-weight: 500;">⭐ Important</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="is_pinned" style="width: 1.125rem; height: 1.125rem; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 0.875rem; font-weight: 500;">📌 Épingler</span>
+                    </label>
+                    
+                    <select id="category" style="padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; outline: none; cursor: pointer;">
+                        <option value="info">ℹ️ Info</option>
+                        <option value="announcement">📢 Annonce</option>
+                        <option value="warning">⚠️ Alerte</option>
+                        <option value="maintenance">🔧 Travaux</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Filtres -->
-    <div style="margin-bottom: 1.5rem;">
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            <button onclick="filterByCategory('')" id="filter-all" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #667eea; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: #667eea; color: white; transition: all 0.2s;">
-                Toutes
-            </button>
-            <button onclick="filterByCategory('info')" id="filter-info" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
-                Info
-            </button>
-            <button onclick="filterByCategory('announcement')" id="filter-announcement" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
-                Annonce
-            </button>
-            <button onclick="filterByCategory('warning')" id="filter-warning" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
-                Alerte
-            </button>
-            <button onclick="filterByCategory('maintenance')" id="filter-maintenance" class="btn-filter" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.2s;">
-                Travaux
-            </button>
-        </div>
+    <!-- Message si aucune résidence sélectionnée -->
+    <div id="no-residence-message" style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 12px; border: 2px dashed #e5e7eb;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🏢</div>
+        <p style="color: #6b7280; font-size: 1rem; font-weight: 500;">Sélectionnez une résidence pour voir son fil d'actualité</p>
     </div>
 
     <!-- Fil d'actualités -->
-    <div id="news-feed">
+    <div id="news-feed" style="display: none;">
         <div style="text-align: center; padding: 3rem;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
             <p style="color: #9ca3af;">Aucune actualité pour le moment</p>
         </div>
     </div>
 </div>
-
-<style>
-.btn-filter:hover {
-    background: #f3f4f6 !important;
-}
-
-.btn-filter.active {
-    background: #667eea !important;
-    color: white !important;
-    border-color: #667eea !important;
-}
-</style>
 {% endblock %}
 
 {% block admin_extra_js %}
 <script>
 let allNews = [];
-let currentCategory = '';
+let selectedResidenceId = null;
+
+function toggleAdvancedOptions() {
+    const options = document.getElementById('advanced-options');
+    options.style.display = options.style.display === 'none' ? 'block' : 'none';
+}
 
 async function loadResidences() {
     try {
@@ -102,7 +117,7 @@ async function loadResidences() {
         const data = await response.json();
         
         if (data.success) {
-            const select = document.getElementById('residence_id');
+            const select = document.getElementById('residence-filter');
             select.innerHTML = '<option value="">Sélectionner une résidence...</option>';
             data.residences.forEach(res => {
                 select.innerHTML += `<option value="${res.id}">${res.name}</option>`;
@@ -113,14 +128,31 @@ async function loadResidences() {
     }
 }
 
+function onResidenceChange() {
+    const select = document.getElementById('residence-filter');
+    selectedResidenceId = select.value ? parseInt(select.value) : null;
+    
+    if (selectedResidenceId) {
+        document.getElementById('publish-section').style.display = 'block';
+        document.getElementById('no-residence-message').style.display = 'none';
+        loadNews();
+    } else {
+        document.getElementById('publish-section').style.display = 'none';
+        document.getElementById('news-feed').style.display = 'none';
+        document.getElementById('no-residence-message').style.display = 'block';
+    }
+}
+
 async function loadNews() {
+    if (!selectedResidenceId) return;
+    
     try {
         const response = await fetch('/api/admin/news');
         const data = await response.json();
         
         if (data.success) {
-            allNews = data.news || [];
-            filterByCategory(currentCategory);
+            allNews = data.news.filter(n => n.residence_id === selectedResidenceId);
+            displayNews(allNews);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -128,85 +160,114 @@ async function loadNews() {
     }
 }
 
-function filterByCategory(category) {
-    currentCategory = category;
-    
-    document.querySelectorAll('.btn-filter').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    const activeBtn = category ? document.getElementById(`filter-${category}`) : document.getElementById('filter-all');
-    if (activeBtn) {
-        activeBtn.classList.add('active');
-    }
-    
-    const filtered = category ? allNews.filter(n => n.category === category) : allNews;
-    displayNews(filtered);
-}
-
 function displayNews(newsList) {
     const container = document.getElementById('news-feed');
+    container.style.display = 'block';
     
     if (newsList.length === 0) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 3rem;">
+            <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 12px; margin-top: 1rem;">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
-                <p style="color: #9ca3af;">Aucune actualité dans cette catégorie</p>
+                <p style="color: #9ca3af; font-size: 0.9375rem;">Aucune actualité pour le moment</p>
+                <p style="color: #d1d5db; font-size: 0.8125rem; margin-top: 0.5rem;">Publiez la première actualité de cette résidence</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = newsList.map(news => {
-        const categoryEmoji = {
-            'info': 'ℹ️',
-            'announcement': '📢',
-            'warning': '⚠️',
-            'maintenance': '🔧'
-        };
-        
-        return `
-            <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                            ${news.is_pinned ? '<span style="font-size: 1.125rem;">📌</span>' : ''}
-                            ${news.is_important ? '<span style="font-size: 1.125rem;">★</span>' : ''}
-                            <span style="background: #f3f4f6; padding: 0.25rem 0.625rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
-                                ${categoryEmoji[news.category] || 'ℹ️'} ${news.category}
-                            </span>
-                        </div>
-                        <h3 style="font-size: 1.125rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;">${news.title}</h3>
-                        <p style="color: #6b7280; font-size: 0.875rem; line-height: 1.5;">${news.content}</p>
-                    </div>
+    const pinnedNews = newsList.filter(n => n.is_pinned).sort((a, b) => new Date(b.published_at || b.created_at) - new Date(a.published_at || a.created_at));
+    const regularNews = newsList.filter(n => !n.is_pinned).sort((a, b) => new Date(b.published_at || b.created_at) - new Date(a.published_at || a.created_at));
+    
+    let html = '<div style="margin-top: 1.5rem;">';
+    
+    if (pinnedNews.length > 0) {
+        html += '<div style="margin-bottom: 2rem;"><h3 style="font-size: 0.875rem; font-weight: 600; color: #6b7280; margin-bottom: 1rem;">📌 Actualités épinglées</h3>';
+        html += pinnedNews.map(news => createNewsCard(news, true)).join('');
+        html += '</div>';
+    }
+    
+    if (regularNews.length > 0) {
+        if (pinnedNews.length > 0) {
+            html += '<h3 style="font-size: 0.875rem; font-weight: 600; color: #6b7280; margin-bottom: 1rem;">Actualités récentes</h3>';
+        }
+        html += regularNews.map(news => createNewsCard(news, false)).join('');
+    }
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function createNewsCard(news, isPinned) {
+    const categoryEmoji = {
+        'info': 'ℹ️',
+        'announcement': '📢',
+        'warning': '⚠️',
+        'maintenance': '🔧'
+    };
+    
+    const categoryColor = {
+        'info': '#3b82f6',
+        'announcement': '#10b981',
+        'warning': '#f59e0b',
+        'maintenance': '#ef4444'
+    };
+    
+    const date = new Date(news.published_at || news.created_at);
+    const formattedDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    
+    return `
+        <div style="background: white; border: 2px solid ${isPinned ? '#a5b4fc' : '#e5e7eb'}; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; ${isPinned ? 'background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);' : ''}">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div style="flex-shrink: 0; font-size: 2.5rem;">
+                    ${categoryEmoji[news.category] || 'ℹ️'}
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
-                    <div style="font-size: 0.75rem; color: #9ca3af;">
-                        ${news.residence_name || 'Toutes les résidences'} • ${new Date(news.published_at || news.created_at).toLocaleDateString('fr-FR')}
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                                ${news.is_important ? '<span style="color: #ef4444; font-size: 1.25rem;">⭐</span>' : ''}
+                                ${news.is_pinned ? '<span style="font-size: 1rem;">📌</span>' : ''}
+                                <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: ${categoryColor[news.category] || '#3b82f6'}20; color: ${categoryColor[news.category] || '#3b82f6'};">
+                                    ${news.category || 'info'}
+                                </span>
+                            </div>
+                            <p style="color: #111827; font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap;">${news.content}</p>
+                        </div>
                     </div>
-                    <button onclick="deleteNews(${news.id})" style="padding: 0.375rem 0.75rem; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; font-size: 0.8125rem; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">
-                        🗑️ Supprimer
-                    </button>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.8125rem; color: #9ca3af;">
+                            <span>📅 ${formattedDate}</span>
+                            ${news.author_name ? `<span>✍️ ${news.author_name}</span>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="editNews(${news.id})" style="padding: 0.5rem 0.875rem; color: #667eea; border: 1px solid #667eea; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                                ✏️ Modifier
+                            </button>
+                            <button onclick="deleteNews(${news.id})" style="padding: 0.5rem 0.875rem; color: #dc2626; border: 1px solid #fca5a5; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">
+                                🗑️ Supprimer
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        `;
-    }).join('');
+        </div>
+    `;
 }
 
 async function publishNews() {
-    const residenceId = document.getElementById('residence_id').value;
-    const title = document.getElementById('news-title').value.trim();
-    const content = document.getElementById('news-content').value.trim();
-    const isImportant = document.getElementById('is_important').checked;
-    const isPinned = document.getElementById('is_pinned').checked;
-    
-    if (!residenceId) {
+    if (!selectedResidenceId) {
         MySindic.showToast('Veuillez sélectionner une résidence', 'error');
         return;
     }
     
-    if (!title || !content) {
-        MySindic.showToast('Veuillez remplir le titre et le contenu', 'error');
+    const content = document.getElementById('news-content').value.trim();
+    const isImportant = document.getElementById('is_important').checked;
+    const isPinned = document.getElementById('is_pinned').checked;
+    const category = document.getElementById('category').value;
+    
+    if (!content) {
+        MySindic.showToast('Veuillez écrire un message', 'error');
         return;
     }
     
@@ -215,10 +276,10 @@ async function publishNews() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                residence_id: parseInt(residenceId),
-                title,
-                content,
-                category: 'info',
+                residence_id: selectedResidenceId,
+                title: content.substring(0, 100),
+                content: content,
+                category: category,
                 is_important: isImportant,
                 is_pinned: isPinned,
                 is_published: true
@@ -228,11 +289,12 @@ async function publishNews() {
         const data = await response.json();
         
         if (data.success) {
-            MySindic.showToast('Actualité publiée!', 'success');
-            document.getElementById('news-title').value = '';
+            MySindic.showToast('Actualité publiée !', 'success');
             document.getElementById('news-content').value = '';
             document.getElementById('is_important').checked = false;
             document.getElementById('is_pinned').checked = false;
+            document.getElementById('category').value = 'info';
+            document.getElementById('advanced-options').style.display = 'none';
             loadNews();
         } else {
             MySindic.showToast(data.error || 'Erreur lors de la publication', 'error');
@@ -243,8 +305,12 @@ async function publishNews() {
     }
 }
 
+async function editNews(newsId) {
+    MySindic.showToast('Fonctionnalité de modification à venir', 'info');
+}
+
 async function deleteNews(newsId) {
-    if (!confirm('Supprimer cette actualité?')) return;
+    if (!confirm('Supprimer cette actualité ?')) return;
     
     try {
         const response = await fetch(`/api/admin/news/${newsId}`, {
@@ -267,7 +333,6 @@ async function deleteNews(newsId) {
 
 document.addEventListener('DOMContentLoaded', function() {
     loadResidences();
-    loadNews();
 });
 </script>
 {% endblock %}
