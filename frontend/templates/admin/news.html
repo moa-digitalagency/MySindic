@@ -15,7 +15,7 @@ www.myoneart.com
     <div class="card-header">
         <div>
             <h1 class="page-title">📰 Fil d'Actualité</h1>
-            <p class="page-subtitle">Gérez les actualités par résidence</p>
+            <p class="page-subtitle">Gérez les actualités de toutes les résidences</p>
         </div>
     </div>
 
@@ -25,18 +25,18 @@ www.myoneart.com
             🏢 Résidence
         </label>
         <select id="residence-filter" onchange="onResidenceChange()" style="width: 100%; max-width: 400px; padding: 0.625rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; background: white; outline: none; cursor: pointer;">
-            <option value="">Sélectionner une résidence...</option>
+            <option value="all">🌐 Toutes les résidences</option>
         </select>
     </div>
 
-    <!-- Zone de publication (visible uniquement si résidence sélectionnée) -->
-    <div id="publish-section" style="display: none; margin-bottom: 2rem;">
+    <!-- Zone de publication -->
+    <div id="publish-section" style="margin-bottom: 2rem;">
         <div style="background: white; border: 2px solid #667eea; border-radius: 16px; padding: 1.5rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
                 <span style="font-size: 1.25rem;">📝</span>
                 <h3 style="font-size: 1.125rem; font-weight: 700; color: #111827;">Fil d'Actualité</h3>
             </div>
-            <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">Dernières nouvelles de votre résidence</p>
+            <p id="publish-subtitle" style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">Publication dans toutes les résidences</p>
             
             <textarea id="news-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.875rem; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 0.9375rem; resize: vertical; min-height: 100px; outline: none; background: #f9fafb; margin-bottom: 0.75rem;"></textarea>
             
@@ -85,17 +85,11 @@ www.myoneart.com
         </div>
     </div>
 
-    <!-- Message si aucune résidence sélectionnée -->
-    <div id="no-residence-message" style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 12px; border: 2px dashed #e5e7eb;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">🏢</div>
-        <p style="color: #6b7280; font-size: 1rem; font-weight: 500;">Sélectionnez une résidence pour voir son fil d'actualité</p>
-    </div>
-
     <!-- Fil d'actualités -->
-    <div id="news-feed" style="display: none;">
+    <div id="news-feed">
         <div style="text-align: center; padding: 3rem;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
-            <p style="color: #9ca3af;">Aucune actualité pour le moment</p>
+            <p style="color: #9ca3af;">Chargement des actualités...</p>
         </div>
     </div>
 </div>
@@ -104,7 +98,8 @@ www.myoneart.com
 {% block admin_extra_js %}
 <script>
 let allNews = [];
-let selectedResidenceId = null;
+let allResidences = [];
+let selectedResidenceId = 'all';
 
 function toggleAdvancedOptions() {
     const options = document.getElementById('advanced-options');
@@ -117,8 +112,9 @@ async function loadResidences() {
         const data = await response.json();
         
         if (data.success) {
+            allResidences = data.residences;
             const select = document.getElementById('residence-filter');
-            select.innerHTML = '<option value="">Sélectionner une résidence...</option>';
+            select.innerHTML = '<option value="all">🌐 Toutes les résidences</option>';
             data.residences.forEach(res => {
                 select.innerHTML += `<option value="${res.id}">${res.name}</option>`;
             });
@@ -130,28 +126,30 @@ async function loadResidences() {
 
 function onResidenceChange() {
     const select = document.getElementById('residence-filter');
-    selectedResidenceId = select.value ? parseInt(select.value) : null;
+    selectedResidenceId = select.value;
     
-    if (selectedResidenceId) {
-        document.getElementById('publish-section').style.display = 'block';
-        document.getElementById('no-residence-message').style.display = 'none';
-        loadNews();
+    const subtitle = document.getElementById('publish-subtitle');
+    if (selectedResidenceId === 'all') {
+        subtitle.textContent = 'Publication dans toutes les résidences';
     } else {
-        document.getElementById('publish-section').style.display = 'none';
-        document.getElementById('news-feed').style.display = 'none';
-        document.getElementById('no-residence-message').style.display = 'block';
+        const residence = allResidences.find(r => r.id === parseInt(selectedResidenceId));
+        subtitle.textContent = residence ? `Publication dans ${residence.name}` : 'Dernières nouvelles de votre résidence';
     }
+    
+    loadNews();
 }
 
 async function loadNews() {
-    if (!selectedResidenceId) return;
-    
     try {
         const response = await fetch('/api/admin/news');
         const data = await response.json();
         
         if (data.success) {
-            allNews = data.news.filter(n => n.residence_id === selectedResidenceId);
+            if (selectedResidenceId === 'all') {
+                allNews = data.news || [];
+            } else {
+                allNews = (data.news || []).filter(n => n.residence_id === parseInt(selectedResidenceId));
+            }
             displayNews(allNews);
         }
     } catch (error) {
@@ -162,14 +160,13 @@ async function loadNews() {
 
 function displayNews(newsList) {
     const container = document.getElementById('news-feed');
-    container.style.display = 'block';
     
     if (newsList.length === 0) {
         container.innerHTML = `
             <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 12px; margin-top: 1rem;">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
                 <p style="color: #9ca3af; font-size: 0.9375rem;">Aucune actualité pour le moment</p>
-                <p style="color: #d1d5db; font-size: 0.8125rem; margin-top: 0.5rem;">Publiez la première actualité de cette résidence</p>
+                <p style="color: #d1d5db; font-size: 0.8125rem; margin-top: 0.5rem;">Publiez la première actualité</p>
             </div>
         `;
         return;
@@ -230,6 +227,11 @@ function createNewsCard(news, isPinned) {
                                 <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: ${categoryColor[news.category] || '#3b82f6'}20; color: ${categoryColor[news.category] || '#3b82f6'};">
                                     ${news.category || 'info'}
                                 </span>
+                                ${selectedResidenceId === 'all' && news.residence_name ? `
+                                    <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: #f3f4f6; color: #6b7280;">
+                                        🏢 ${news.residence_name}
+                                    </span>
+                                ` : ''}
                             </div>
                             <p style="color: #111827; font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap;">${news.content}</p>
                         </div>
@@ -256,11 +258,6 @@ function createNewsCard(news, isPinned) {
 }
 
 async function publishNews() {
-    if (!selectedResidenceId) {
-        MySindic.showToast('Veuillez sélectionner une résidence', 'error');
-        return;
-    }
-    
     const content = document.getElementById('news-content').value.trim();
     const isImportant = document.getElementById('is_important').checked;
     const isPinned = document.getElementById('is_pinned').checked;
@@ -272,32 +269,72 @@ async function publishNews() {
     }
     
     try {
-        const response = await fetch('/api/admin/news', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                residence_id: selectedResidenceId,
-                title: content.substring(0, 100),
-                content: content,
-                category: category,
-                is_important: isImportant,
-                is_pinned: isPinned,
-                is_published: true
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            MySindic.showToast('Actualité publiée !', 'success');
-            document.getElementById('news-content').value = '';
-            document.getElementById('is_important').checked = false;
-            document.getElementById('is_pinned').checked = false;
-            document.getElementById('category').value = 'info';
-            document.getElementById('advanced-options').style.display = 'none';
-            loadNews();
+        if (selectedResidenceId === 'all') {
+            // Publier dans toutes les résidences
+            if (allResidences.length === 0) {
+                MySindic.showToast('Aucune résidence disponible', 'error');
+                return;
+            }
+            
+            const publishPromises = allResidences.map(residence => 
+                fetch('/api/admin/news', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        residence_id: residence.id,
+                        title: content.substring(0, 100),
+                        content: content,
+                        category: category,
+                        is_important: isImportant,
+                        is_pinned: isPinned,
+                        is_published: true
+                    })
+                })
+            );
+            
+            const results = await Promise.all(publishPromises);
+            const allSuccess = results.every(r => r.ok);
+            
+            if (allSuccess) {
+                MySindic.showToast(`Actualité publiée dans ${allResidences.length} résidence(s) !`, 'success');
+                document.getElementById('news-content').value = '';
+                document.getElementById('is_important').checked = false;
+                document.getElementById('is_pinned').checked = false;
+                document.getElementById('category').value = 'info';
+                document.getElementById('advanced-options').style.display = 'none';
+                loadNews();
+            } else {
+                MySindic.showToast('Erreur lors de la publication dans certaines résidences', 'error');
+            }
         } else {
-            MySindic.showToast(data.error || 'Erreur lors de la publication', 'error');
+            // Publier dans une résidence spécifique
+            const response = await fetch('/api/admin/news', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    residence_id: parseInt(selectedResidenceId),
+                    title: content.substring(0, 100),
+                    content: content,
+                    category: category,
+                    is_important: isImportant,
+                    is_pinned: isPinned,
+                    is_published: true
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                MySindic.showToast('Actualité publiée !', 'success');
+                document.getElementById('news-content').value = '';
+                document.getElementById('is_important').checked = false;
+                document.getElementById('is_pinned').checked = false;
+                document.getElementById('category').value = 'info';
+                document.getElementById('advanced-options').style.display = 'none';
+                loadNews();
+            } else {
+                MySindic.showToast(data.error || 'Erreur lors de la publication', 'error');
+            }
         }
     } catch (error) {
         console.error('Error:', error);
@@ -332,7 +369,9 @@ async function deleteNews(newsId) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadResidences();
+    loadResidences().then(() => {
+        loadNews();
+    });
 });
 </script>
 {% endblock %}
