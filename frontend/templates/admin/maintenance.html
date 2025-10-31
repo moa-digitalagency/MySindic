@@ -83,6 +83,40 @@ www.myoneart.com
                 </div>
             </div>
             
+            <!-- Section Commentaires -->
+            <div id="comments-section" class="mt-6 border-t pt-6">
+                <h3 class="font-medium text-gray-900 mb-4">💬 Commentaires & Communication</h3>
+                
+                <div id="comments-list" class="space-y-3 mb-4">
+                    <!-- Les commentaires seront chargés ici -->
+                </div>
+                
+                <form id="commentForm" class="mt-4">
+                    <input type="hidden" id="comment-request-id">
+                    <div>
+                        <label class="label-field">Ajouter un commentaire</label>
+                        <textarea id="comment-text" class="input-field" rows="3" placeholder="Écrivez votre commentaire..."></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-2">
+                        <div>
+                            <label class="label-field">Taguer un résident</label>
+                            <select id="comment-mention" class="input-field">
+                                <option value="">Aucun</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="comment-internal" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-2 text-sm text-gray-700">Commentaire interne (admins seulement)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex justify-end">
+                        <button type="submit" class="btn-primary">Publier le commentaire</button>
+                    </div>
+                </form>
+            </div>
+            
             <form id="updateForm" class="space-y-4 mt-6 border-t pt-6">
                 <input type="hidden" id="request-id">
                 
@@ -338,6 +372,7 @@ async function viewRequest(requestId) {
     
     document.getElementById('modal-title').textContent = request.title;
     document.getElementById('request-id').value = request.id;
+    document.getElementById('comment-request-id').value = request.id;
     
     const details = `
         <div class="grid grid-cols-2 gap-4">
@@ -347,19 +382,31 @@ async function viewRequest(requestId) {
             </div>
             <div>
                 <label class="text-sm font-medium text-gray-500">Demandeur</label>
-                <p class="mt-1 text-gray-900">${request.author_name || '-'}</p>
+                <p class="mt-1 text-gray-900">${request.author_name || '-'} (${request.author_role || 'N/A'})</p>
             </div>
             <div>
-                <label class="text-sm font-medium text-gray-500">Catégorie</label>
-                <p class="mt-1 text-gray-900">${request.category || '-'}</p>
+                <label class="text-sm font-medium text-gray-500">Zone</label>
+                <p class="mt-1 text-gray-900">${request.zone || '-'}</p>
             </div>
             <div>
                 <label class="text-sm font-medium text-gray-500">Localisation</label>
-                <p class="mt-1 text-gray-900">${request.location || '-'}</p>
+                <p class="mt-1 text-gray-900">${request.zone_details || '-'}</p>
             </div>
             <div class="col-span-2">
                 <label class="text-sm font-medium text-gray-500">Description</label>
                 <p class="mt-1 text-gray-900">${request.description}</p>
+            </div>
+            ${request.image_path ? `
+                <div class="col-span-2">
+                    <label class="text-sm font-medium text-gray-500">Photo jointe</label>
+                    <div class="mt-2">
+                        <img src="${request.image_path}" alt="Photo" class="rounded-lg max-h-64 border border-gray-300" />
+                    </div>
+                </div>
+            ` : ''}
+            <div>
+                <label class="text-sm font-medium text-gray-500">N° de suivi</label>
+                <p class="mt-1 text-gray-900 font-mono">${request.tracking_number}</p>
             </div>
             <div>
                 <label class="text-sm font-medium text-gray-500">Créée le</label>
@@ -394,7 +441,72 @@ async function viewRequest(requestId) {
         document.getElementById('update-scheduled').value = '';
     }
     
+    // Charger les commentaires
+    loadComments(requestId);
+    
+    // Charger la liste des résidents pour le tag
+    loadResidentsForTag(request.residence_id);
+    
     Shabaka Syndic.openModal('maintenanceModal');
+}
+
+async function loadComments(requestId) {
+    try {
+        const response = await fetch(`/api/admin/maintenance/${requestId}/comments`, { credentials: 'same-origin' });
+        const data = await response.json();
+        
+        if (data.success) {
+            displayComments(data.comments);
+        }
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
+}
+
+function displayComments(comments) {
+    const container = document.getElementById('comments-list');
+    
+    if (!comments || comments.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500 italic">Aucun commentaire pour le moment</p>';
+        return;
+    }
+    
+    container.innerHTML = comments.map(comment => `
+        <div class="bg-gray-50 rounded-lg p-3 ${comment.is_internal ? 'border-l-4 border-yellow-400' : ''}">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-medium text-sm text-gray-900">${comment.author_name || 'Inconnu'}</span>
+                        <span class="text-xs text-gray-500">(${comment.author_role || 'N/A'})</span>
+                        ${comment.is_internal ? '<span class="badge badge-warning text-xs">Interne</span>' : ''}
+                        ${comment.comment_type === 'mention' ? '<span class="badge badge-info text-xs">Mention</span>' : ''}
+                    </div>
+                    <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap">${comment.comment_text}</p>
+                    ${comment.mentioned_user_name ? `<p class="mt-1 text-xs text-indigo-600">@${comment.mentioned_user_name}</p>` : ''}
+                </div>
+                <span class="text-xs text-gray-500">${Shabaka Syndic.formatDate(comment.created_at)}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function loadResidentsForTag(residenceId) {
+    try {
+        const response = await fetch(`/api/admin/users?residence_id=${residenceId}`, { credentials: 'same-origin' });
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.getElementById('comment-mention');
+            select.innerHTML = '<option value="">Aucun</option>';
+            data.users.forEach(user => {
+                if (user.role === 'resident' || user.role === 'owner') {
+                    select.innerHTML += `<option value="${user.id}">${user.first_name} ${user.last_name} (${user.role})</option>`;
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading residents:', error);
+    }
 }
 
 document.getElementById('updateForm').addEventListener('submit', async (e) => {
@@ -459,6 +571,49 @@ document.getElementById('announcementForm').addEventListener('submit', async (e)
             Shabaka Syndic.closeModal('announcementModal');
             document.getElementById('announcementForm').reset();
             loadMaintenanceRequests();
+        } else {
+            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.getElementById('commentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const requestId = document.getElementById('comment-request-id').value;
+    const commentText = document.getElementById('comment-text').value.trim();
+    
+    if (!commentText) {
+        Shabaka Syndic.showToast('Le commentaire ne peut pas être vide', 'error');
+        return;
+    }
+    
+    const formData = {
+        comment_text: commentText,
+        mentioned_user_id: document.getElementById('comment-mention').value || null,
+        is_internal: document.getElementById('comment-internal').checked,
+        comment_type: document.getElementById('comment-mention').value ? 'mention' : 'comment'
+    };
+    
+    try {
+        const response = await fetch(`/api/admin/maintenance/${requestId}/comments`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            Shabaka Syndic.showToast('Commentaire ajouté', 'success');
+            document.getElementById('comment-text').value = '';
+            document.getElementById('comment-mention').value = '';
+            document.getElementById('comment-internal').checked = false;
+            loadComments(requestId);
         } else {
             Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
         }

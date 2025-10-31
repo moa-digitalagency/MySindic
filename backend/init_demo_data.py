@@ -27,6 +27,7 @@ def init_demo_data(app, db):
     from backend.models.charge import Charge, ChargeDistribution
     from backend.models.payment import Payment
     from backend.models.maintenance import MaintenanceRequest
+    from backend.models.maintenance_comment import MaintenanceComment
     from backend.models.maintenance_log import MaintenanceLog
     from backend.models.news import News
     from backend.models.poll import Poll, PollOption, PollVote
@@ -269,6 +270,53 @@ def init_demo_data(app, db):
         db.session.add_all([maintenance1, maintenance2, maintenance3])
         db.session.commit()
         print(f"✅ Demandes de maintenance créées\n")
+        
+        # 7.5. Créer des commentaires pour les demandes de maintenance
+        print("💬 Création des commentaires de maintenance...")
+        comment1 = MaintenanceComment(
+            maintenance_request_id=maintenance1.id,
+            author_id=admin_user.id,
+            comment_text="Demande bien reçue. Un plombier sera envoyé demain matin pour diagnostiquer la fuite.",
+            comment_type="status_update",
+            is_internal=False
+        )
+        
+        comment2 = MaintenanceComment(
+            maintenance_request_id=maintenance1.id,
+            author_id=admin_user.id,
+            comment_text="Le plombier a identifié un joint défectueux. Intervention prévue cet après-midi.",
+            comment_type="comment",
+            is_internal=False
+        )
+        
+        comment3 = MaintenanceComment(
+            maintenance_request_id=maintenance1.id,
+            author_id=residents[0].id,
+            comment_text="Merci pour votre réactivité ! Je serai disponible entre 14h et 17h.",
+            comment_type="comment",
+            is_internal=False
+        )
+        
+        comment4 = MaintenanceComment(
+            maintenance_request_id=maintenance2.id,
+            author_id=admin_user.id,
+            comment_text="@{} - Pourriez-vous nous indiquer si cela se produit avec des appareils spécifiques ?".format(residents[1].first_name + " " + residents[1].last_name),
+            comment_type="mention",
+            mentioned_user_id=residents[1].id,
+            is_internal=False
+        )
+        
+        comment5 = MaintenanceComment(
+            maintenance_request_id=maintenance1.id,
+            author_id=admin_user.id,
+            comment_text="Note interne: Vérifier si d'autres appartements ont le même problème.",
+            comment_type="comment",
+            is_internal=True
+        )
+        
+        db.session.add_all([comment1, comment2, comment3, comment4, comment5])
+        db.session.commit()
+        print(f"✅ Commentaires de maintenance créés\n")
         
         # 8. Créer des entrées dans le carnet d'entretien
         print("📓 Création d'entrées du carnet d'entretien...")

@@ -176,6 +176,26 @@ www.myoneart.com
                     <div class="loading-spinner border-indigo-600"></div>
                 </div>
             </div>
+            
+            <!-- Section Commentaires -->
+            <div id="comments-section-resident" class="mt-6 border-t pt-6 hidden">
+                <h3 class="font-medium text-gray-900 mb-4">💬 Communication</h3>
+                
+                <div id="resident-comments-list" class="space-y-3 mb-4">
+                    <!-- Les commentaires seront chargés ici -->
+                </div>
+                
+                <form id="residentCommentForm" class="mt-4">
+                    <input type="hidden" id="resident-comment-request-id">
+                    <div>
+                        <label class="label-field">Ajouter un commentaire</label>
+                        <textarea id="resident-comment-text" class="input-field" rows="3" placeholder="Écrivez votre commentaire..."></textarea>
+                    </div>
+                    <div class="mt-3 flex justify-end">
+                        <button type="submit" class="btn-primary">Publier le commentaire</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -325,6 +345,7 @@ async function viewRequestDetails(requestId) {
     if (!request) return;
     
     document.getElementById('details-title').textContent = request.title;
+    document.getElementById('resident-comment-request-id').value = requestId;
     
     const getStatusColor = (status) => {
         switch(status) {
@@ -443,7 +464,52 @@ async function viewRequestDetails(requestId) {
     `;
     
     document.getElementById('request-details').innerHTML = details;
+    
+    // Charger les commentaires
+    loadResidentComments(requestId);
+    
     Shabaka Syndic.openModal('detailsModal');
+}
+
+async function loadResidentComments(requestId) {
+    try {
+        const response = await fetch(`/api/resident/maintenance/${requestId}/comments`, { credentials: 'same-origin' });
+        const data = await response.json();
+        
+        if (data.success && data.comments && data.comments.length > 0) {
+            document.getElementById('comments-section-resident').classList.remove('hidden');
+            displayResidentComments(data.comments);
+        } else {
+            document.getElementById('comments-section-resident').classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
+}
+
+function displayResidentComments(comments) {
+    const container = document.getElementById('resident-comments-list');
+    
+    if (!comments || comments.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500 italic">Aucun commentaire pour le moment</p>';
+        return;
+    }
+    
+    container.innerHTML = comments.map(comment => `
+        <div class="bg-gray-50 rounded-lg p-3">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-medium text-sm text-gray-900">${comment.author_name || 'Inconnu'}</span>
+                        <span class="text-xs text-gray-500">(${comment.author_role || 'N/A'})</span>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap">${comment.comment_text}</p>
+                    ${comment.mentioned_user_name ? `<p class="mt-1 text-xs text-indigo-600">📌 Mention: ${comment.mentioned_user_name}</p>` : ''}
+                </div>
+                <span class="text-xs text-gray-500">${Shabaka Syndic.formatDate(comment.created_at)}</span>
+            </div>
+        </div>
+    `).join('');
 }
 
 function clearImage() {
@@ -495,6 +561,44 @@ document.getElementById('requestForm').addEventListener('submit', async (e) => {
             loadMyRequests();
         } else {
             Shabaka Syndic.showToast(data.error || 'Erreur lors de la création', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.getElementById('residentCommentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const requestId = document.getElementById('resident-comment-request-id').value;
+    const commentText = document.getElementById('resident-comment-text').value.trim();
+    
+    if (!commentText) {
+        Shabaka Syndic.showToast('Le commentaire ne peut pas être vide', 'error');
+        return;
+    }
+    
+    const formData = {
+        comment_text: commentText
+    };
+    
+    try {
+        const response = await fetch(`/api/resident/maintenance/${requestId}/comments`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            Shabaka Syndic.showToast('Commentaire ajouté', 'success');
+            document.getElementById('resident-comment-text').value = '';
+            loadResidentComments(requestId);
+        } else {
+            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
