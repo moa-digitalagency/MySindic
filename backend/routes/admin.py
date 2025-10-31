@@ -552,10 +552,19 @@ def update_maintenance(request_id):
         
         if 'assigned_to' in data:
             maintenance_request.assigned_to = data['assigned_to']
-            maintenance_request.assigned_at = datetime.utcnow()
+            if not maintenance_request.assigned_at:
+                maintenance_request.assigned_at = datetime.utcnow()
+        
+        if 'assigned_user_id' in data:
+            maintenance_request.assigned_user_id = data['assigned_user_id']
+            if not maintenance_request.assigned_at:
+                maintenance_request.assigned_at = datetime.utcnow()
         
         if 'scheduled_date' in data:
-            maintenance_request.scheduled_date = datetime.fromisoformat(data['scheduled_date'])
+            if data['scheduled_date']:
+                maintenance_request.scheduled_date = datetime.fromisoformat(data['scheduled_date'])
+            else:
+                maintenance_request.scheduled_date = None
         
         if 'admin_notes' in data:
             maintenance_request.admin_notes = data['admin_notes']
@@ -585,8 +594,12 @@ def create_maintenance_announcement():
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
         
+        # Générer un numéro de suivi unique
+        tracking_number = MaintenanceRequest.generate_tracking_number(data['residence_id'])
+        
         # Créer l'annonce
         announcement = MaintenanceRequest(
+            tracking_number=tracking_number,
             request_type='admin_announcement',
             residence_id=data['residence_id'],
             author_id=current_user.id,
@@ -597,6 +610,7 @@ def create_maintenance_announcement():
             priority=data.get('priority', 'medium'),
             scheduled_date=datetime.fromisoformat(data['scheduled_date']) if data.get('scheduled_date') else None,
             assigned_to=data.get('assigned_to'),
+            assigned_user_id=data.get('assigned_user_id'),
             status='in_progress'
         )
         
@@ -611,6 +625,214 @@ def create_maintenance_announcement():
             'message': 'Annonce créée avec succès',
             'announcement': announcement.to_dict()
         }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== COMMENTAIRES MAINTENANCE ====================
+
+@admin_bp.route('/maintenance/<int:request_id>/comments', methods=['GET'])
+@login_required
+@superadmin_required
+def get_maintenance_comments(request_id):
+    """Récupère les commentaires d'une demande de maintenance"""
+    try:
+        from backend.models.maintenance_comment import MaintenanceComment
+        
+        # Vérifier que la demande existe
+        maintenance_request = MaintenanceRequest.query.get(request_id)
+        if not maintenance_request:
+            return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        # Récupérer tous les commentaires (incluant les internes)
+        comments = MaintenanceComment.query.filter_by(
+            maintenance_request_id=request_id
+        ).order_by(MaintenanceComment.created_at).all()
+        
+        return jsonify({
+            'success': True,
+            'comments': [c.to_dict() for c in comments]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/maintenance/<int:request_id>/comments', methods=['POST'])
+@login_required
+@superadmin_required
+def add_maintenance_comment(request_id):
+    """Ajoute un commentaire à une demande de maintenance"""
+    try:
+        from backend.models.maintenance_comment import MaintenanceComment
+        
+        # Vérifier que la demande existe
+        maintenance_request = MaintenanceRequest.query.get(request_id)
+        if not maintenance_request:
+            return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        data = request.get_json()
+        
+        if 'comment_text' not in data or not data['comment_text'].strip():
+            return jsonify({'success': False, 'error': 'Le commentaire ne peut pas être vide'}), 400
+        
+        # Créer le commentaire
+        comment = MaintenanceComment(
+            maintenance_request_id=request_id,
+            author_id=current_user.id,
+            comment_text=data['comment_text'],
+            comment_type=data.get('comment_type', 'comment'),
+            mentioned_user_id=data.get('mentioned_user_id'),
+            is_internal=data.get('is_internal', False)
+        )
+        
+        db.session.add(comment)
+        db.session.commit()
+        
+        # Notifier si un utilisateur est mentionné
+        if comment.mentioned_user_id:
+            NotificationService.notify_user_mentioned(comment)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Commentaire ajouté',
+            'comment': comment.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== DOCUMENTS MAINTENANCE ====================
+
+@admin_bp.route('/maintenance/<int:request_id>/documents', methods=['GET'])
+@login_required
+@superadmin_required
+def get_maintenance_documents(request_id):
+    """Récupère les documents d'une demande de maintenance"""
+    try:
+        from backend.models.maintenance_document import MaintenanceDocument
+        
+        # Vérifier que la demande existe
+        maintenance_request = MaintenanceRequest.query.get(request_id)
+        if not maintenance_request:
+            return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        # Récupérer tous les documents
+        documents = MaintenanceDocument.query.filter_by(
+            maintenance_request_id=request_id
+        ).order_by(MaintenanceDocument.created_at.desc()).all()
+        
+        return jsonify({
+            'success': True,
+            'documents': [d.to_dict() for d in documents]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/maintenance/<int:request_id>/documents', methods=['POST'])
+@login_required
+@superadmin_required
+def upload_maintenance_document(request_id):
+    """Upload un document pour une demande de maintenance"""
+    import os
+    from werkzeug.utils import secure_filename
+    from backend.models.maintenance_document import MaintenanceDocument
+    
+    try:
+        # Vérifier que la demande existe
+        maintenance_request = MaintenanceRequest.query.get(request_id)
+        if not maintenance_request:
+            return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        # Gérer l'upload de fichier
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'Aucun fichier fourni'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'Nom de fichier invalide'}), 400
+        
+        # Récupérer les métadonnées depuis le formulaire
+        document_type = request.form.get('document_type', 'other')
+        title = request.form.get('title', file.filename)
+        description = request.form.get('description', '')
+        
+        # Créer le dossier uploads si nécessaire
+        upload_folder = os.path.join('frontend', 'static', 'uploads', 'maintenance', 'documents')
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        # Sécuriser le nom de fichier
+        filename = secure_filename(file.filename)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{timestamp}_{filename}"
+        
+        # Sauvegarder le fichier
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+        
+        # Obtenir la taille et le type MIME
+        file_size = os.path.getsize(file_path)
+        mime_type = file.content_type
+        
+        # Créer l'entrée dans la base de données
+        document = MaintenanceDocument(
+            maintenance_request_id=request_id,
+            document_type=document_type,
+            title=title,
+            description=description,
+            filename=filename,
+            file_path=f"/static/uploads/maintenance/documents/{filename}",
+            file_size=file_size,
+            mime_type=mime_type,
+            uploaded_by=current_user.id
+        )
+        
+        db.session.add(document)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Document uploadé',
+            'document': document.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/maintenance/documents/<int:document_id>', methods=['DELETE'])
+@login_required
+@superadmin_required
+def delete_maintenance_document(document_id):
+    """Supprime un document de maintenance"""
+    import os
+    from backend.models.maintenance_document import MaintenanceDocument
+    
+    try:
+        document = MaintenanceDocument.query.get(document_id)
+        if not document:
+            return jsonify({'success': False, 'error': 'Document non trouvé'}), 404
+        
+        # Supprimer le fichier physique
+        try:
+            file_path = os.path.join('frontend', document.file_path.lstrip('/'))
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"Erreur lors de la suppression du fichier: {e}")
+        
+        # Supprimer l'entrée de la base de données
+        db.session.delete(document)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Document supprimé'}), 200
         
     except Exception as e:
         db.session.rollback()

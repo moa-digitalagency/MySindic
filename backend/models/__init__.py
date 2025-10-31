@@ -32,6 +32,8 @@ def init_db(app):
     from backend.models.residence import Residence, Unit
     from backend.models.residence_admin import ResidenceAdmin
     from backend.models.maintenance import MaintenanceRequest
+    from backend.models.maintenance_comment import MaintenanceComment
+    from backend.models.maintenance_document import MaintenanceDocument
     from backend.models.document import Document
     from backend.models.charge import Charge, ChargeDistribution
     from backend.models.payment import Payment

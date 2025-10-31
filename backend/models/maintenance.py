@@ -23,6 +23,9 @@ class MaintenanceRequest(db.Model):
     # Identifiant
     id = db.Column(db.Integer, primary_key=True)
     
+    # Numéro de suivi unique
+    tracking_number = db.Column(db.String(20), unique=True, nullable=False)
+    
     # Type de demande
     request_type = db.Column(db.String(50), nullable=False, default='resident_request')  # 'resident_request' ou 'admin_announcement'
     
@@ -49,7 +52,8 @@ class MaintenanceRequest(db.Model):
     image_path = db.Column(db.String(500))
     
     # Intervenant assigné
-    assigned_to = db.Column(db.String(200))  # Nom du technicien/prestataire
+    assigned_to = db.Column(db.String(200))  # Nom du technicien/prestataire externe
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Admin de résidence assigné
     assigned_at = db.Column(db.DateTime)
     
     # Dates
@@ -65,13 +69,28 @@ class MaintenanceRequest(db.Model):
     
     # Relations
     author = db.relationship('User', foreign_keys=[author_id], backref='authored_maintenance_requests', lazy=True)
+    assigned_user = db.relationship('User', foreign_keys=[assigned_user_id], backref='assigned_maintenance_requests', lazy=True)
+    comments = db.relationship('MaintenanceComment', backref='maintenance_request', lazy=True, cascade='all, delete-orphan', order_by='MaintenanceComment.created_at')
+    documents = db.relationship('MaintenanceDocument', backref='maintenance_request', lazy=True, cascade='all, delete-orphan', order_by='MaintenanceDocument.created_at.desc()')
     
-    def to_dict(self):
+    @staticmethod
+    def generate_tracking_number(residence_id):
+        """Génère un numéro de suivi unique pour une demande"""
+        import random
+        import string
+        year = datetime.utcnow().year
+        # Format: MNT-YYYY-RESIDXXXX (ex: MNT-2025-RES001234)
+        count = MaintenanceRequest.query.filter_by(residence_id=residence_id).count() + 1
+        random_suffix = ''.join(random.choices(string.digits, k=4))
+        return f"MNT-{year}-R{residence_id:03d}{random_suffix}"
+    
+    def to_dict(self, include_relations=False):
         """Convertit la demande en dictionnaire"""
         from backend.models.residence import Residence
         
         result = {
             'id': self.id,
+            'tracking_number': self.tracking_number,
             'request_type': self.request_type,
             'residence_id': self.residence_id,
             'author_id': self.author_id,
@@ -83,6 +102,7 @@ class MaintenanceRequest(db.Model):
             'status': self.status,
             'image_path': self.image_path,
             'assigned_to': self.assigned_to,
+            'assigned_user_id': self.assigned_user_id,
             'assigned_at': self.assigned_at.isoformat() if self.assigned_at else None,
             'scheduled_date': self.scheduled_date.isoformat() if self.scheduled_date else None,
             'resolved_at': self.resolved_at.isoformat() if self.resolved_at else None,
@@ -104,6 +124,21 @@ class MaintenanceRequest(db.Model):
         # Ajouter le nom de la résidence
         residence = Residence.query.get(self.residence_id)
         result['residence_name'] = residence.name if residence else None
+        
+        # Ajouter les informations de l'utilisateur assigné
+        if self.assigned_user:
+            result['assigned_user_name'] = f"{self.assigned_user.first_name} {self.assigned_user.last_name}"
+            result['assigned_user_email'] = self.assigned_user.email
+        else:
+            result['assigned_user_name'] = None
+            result['assigned_user_email'] = None
+        
+        # Inclure les relations si demandé
+        if include_relations:
+            result['comments'] = [c.to_dict() for c in self.comments]
+            result['documents'] = [d.to_dict() for d in self.documents]
+            result['comments_count'] = len(self.comments)
+            result['documents_count'] = len(self.documents)
         
         return result
     

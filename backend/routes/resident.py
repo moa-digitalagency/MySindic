@@ -164,8 +164,12 @@ def create_maintenance_request():
             image_file.save(file_path)
             image_path = f"/static/uploads/maintenance/{filename}"
         
+        # Générer un numéro de suivi unique
+        tracking_number = MaintenanceRequest.generate_tracking_number(current_user.residence_id)
+        
         # SÉCURITÉ: Utiliser residence_id et author_id de current_user (pas de la requête)
         maintenance_request = MaintenanceRequest(
+            tracking_number=tracking_number,
             request_type='resident_request',
             residence_id=current_user.residence_id,
             author_id=current_user.id,
@@ -224,7 +228,116 @@ def get_maintenance_detail(request_id):
         if maintenance_request.author_id != current_user.id:
             return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
-        return jsonify({'success': True, 'maintenance_request': maintenance_request.to_dict()}), 200
+        return jsonify({'success': True, 'maintenance_request': maintenance_request.to_dict(include_relations=True)}), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== COMMENTAIRES MAINTENANCE (RÉSIDENT) ====================
+
+@resident_bp.route('/maintenance/<int:request_id>/comments', methods=['GET'])
+@login_required
+def get_resident_maintenance_comments(request_id):
+    """Récupère les commentaires d'une demande de maintenance (non-internes uniquement)"""
+    try:
+        from backend.models.maintenance_comment import MaintenanceComment
+        
+        # Vérifier que la demande existe et appartient à l'utilisateur
+        maintenance_request = MaintenanceRequest.query.get(request_id)
+        if not maintenance_request:
+            return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        if maintenance_request.author_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        
+        # Récupérer les commentaires non-internes
+        comments = MaintenanceComment.query.filter_by(
+            maintenance_request_id=request_id,
+            is_internal=False
+        ).order_by(MaintenanceComment.created_at).all()
+        
+        return jsonify({
+            'success': True,
+            'comments': [c.to_dict() for c in comments]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@resident_bp.route('/maintenance/<int:request_id>/comments', methods=['POST'])
+@login_required
+def add_resident_maintenance_comment(request_id):
+    """Ajoute un commentaire à une demande de maintenance"""
+    try:
+        from backend.models.maintenance_comment import MaintenanceComment
+        
+        # Vérifier que la demande existe et appartient à l'utilisateur
+        maintenance_request = MaintenanceRequest.query.get(request_id)
+        if not maintenance_request:
+            return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        if maintenance_request.author_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        
+        data = request.get_json()
+        
+        if 'comment_text' not in data or not data['comment_text'].strip():
+            return jsonify({'success': False, 'error': 'Le commentaire ne peut pas être vide'}), 400
+        
+        # Créer le commentaire (toujours non-interne pour les résidents)
+        comment = MaintenanceComment(
+            maintenance_request_id=request_id,
+            author_id=current_user.id,
+            comment_text=data['comment_text'],
+            comment_type='comment',
+            is_internal=False
+        )
+        
+        db.session.add(comment)
+        db.session.commit()
+        
+        # Notifier les admins
+        NotificationService.notify_new_maintenance_comment(comment)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Commentaire ajouté',
+            'comment': comment.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ==================== DOCUMENTS MAINTENANCE (RÉSIDENT) ====================
+
+@resident_bp.route('/maintenance/<int:request_id>/documents', methods=['GET'])
+@login_required
+def get_resident_maintenance_documents(request_id):
+    """Récupère les documents d'une demande de maintenance"""
+    try:
+        from backend.models.maintenance_document import MaintenanceDocument
+        
+        # Vérifier que la demande existe et appartient à l'utilisateur
+        maintenance_request = MaintenanceRequest.query.get(request_id)
+        if not maintenance_request:
+            return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        if maintenance_request.author_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        
+        # Récupérer tous les documents
+        documents = MaintenanceDocument.query.filter_by(
+            maintenance_request_id=request_id
+        ).order_by(MaintenanceDocument.created_at.desc()).all()
+        
+        return jsonify({
+            'success': True,
+            'documents': [d.to_dict() for d in documents]
+        }), 200
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

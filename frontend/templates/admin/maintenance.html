@@ -17,28 +17,39 @@ www.myoneart.com
             <h1 class="text-2xl font-semibold text-gray-900">Gestion de la Maintenance</h1>
             <p class="mt-2 text-sm text-gray-700">Toutes les demandes de maintenance des résidences</p>
         </div>
+        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <button onclick="MySindic.openModal('announcementModal')" class="btn-primary">
+                + Nouvelle Annonce
+            </button>
+        </div>
     </div>
 
     <div class="mt-8">
         <div class="card">
-            <div class="mb-4 flex space-x-4">
-                <div class="flex-1">
+            <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="label-field">Filtrer par résidence</label>
+                    <select id="filter-residence" class="input-field" onchange="filterRequests()">
+                        <option value="">Toutes les résidences</option>
+                    </select>
+                </div>
+                <div>
                     <label class="label-field">Filtrer par statut</label>
                     <select id="filter-status" class="input-field" onchange="filterRequests()">
                         <option value="">Tous</option>
                         <option value="pending">En attente</option>
                         <option value="in_progress">En cours</option>
-                        <option value="completed">Terminé</option>
-                        <option value="cancelled">Annulé</option>
+                        <option value="resolved">Résolu</option>
+                        <option value="rejected">Rejeté</option>
                     </select>
                 </div>
-                <div class="flex-1">
+                <div>
                     <label class="label-field">Filtrer par priorité</label>
                     <select id="filter-priority" class="input-field" onchange="filterRequests()">
                         <option value="">Toutes</option>
                         <option value="urgent">Urgent</option>
                         <option value="high">Haute</option>
-                        <option value="normal">Normale</option>
+                        <option value="medium">Normale</option>
                         <option value="low">Basse</option>
                     </select>
                 </div>
@@ -120,6 +131,78 @@ www.myoneart.com
         </div>
     </div>
 </div>
+
+<!-- Modal Nouvelle Annonce -->
+<div id="announcementModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Nouvelle Annonce de Maintenance</h2>
+                <button onclick="MySindic.closeModal('announcementModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="announcementForm" class="space-y-4">
+                <div>
+                    <label class="label-field">Résidence *</label>
+                    <select id="announcement-residence" class="input-field" required>
+                        <option value="">Sélectionner une résidence</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="label-field">Titre *</label>
+                    <input type="text" id="announcement-title" class="input-field" required>
+                </div>
+                
+                <div>
+                    <label class="label-field">Description *</label>
+                    <textarea id="announcement-description" class="input-field" rows="4" required></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Zone *</label>
+                        <select id="announcement-zone" class="input-field" required>
+                            <option value="general">Général</option>
+                            <option value="escalier">Escalier</option>
+                            <option value="ascenseur">Ascenseur</option>
+                            <option value="parking">Parking</option>
+                            <option value="jardin">Jardin</option>
+                            <option value="toiture">Toiture</option>
+                            <option value="facade">Façade</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-field">Priorité</label>
+                        <select id="announcement-priority" class="input-field">
+                            <option value="medium">Normale</option>
+                            <option value="high">Haute</option>
+                            <option value="urgent">Urgente</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label-field">Date d'intervention prévue</label>
+                    <input type="datetime-local" id="announcement-scheduled" class="input-field">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="MySindic.closeModal('announcementModal')" class="btn-secondary">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        Créer l'annonce
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block admin_extra_js %}
@@ -133,6 +216,7 @@ async function loadMaintenanceRequests() {
         
         if (data.success) {
             allRequests = data.maintenance_requests;
+            loadResidenceFilter();
             filterRequests();
         } else {
             MySindic.showToast('Erreur lors du chargement', 'error');
@@ -143,11 +227,33 @@ async function loadMaintenanceRequests() {
     }
 }
 
+async function loadResidenceFilter() {
+    try {
+        const response = await fetch('/api/admin/residences');
+        const data = await response.json();
+        if (data.success) {
+            const residenceSelect = document.getElementById('filter-residence');
+            const announcementSelect = document.getElementById('announcement-residence');
+            data.residences.forEach(r => {
+                residenceSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+                announcementSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error loading residences:', error);
+    }
+}
+
 function filterRequests() {
+    const residenceFilter = document.getElementById('filter-residence').value;
     const statusFilter = document.getElementById('filter-status').value;
     const priorityFilter = document.getElementById('filter-priority').value;
     
     let filtered = allRequests;
+    
+    if (residenceFilter) {
+        filtered = filtered.filter(r => r.residence_id == residenceFilter);
+    }
     
     if (statusFilter) {
         filtered = filtered.filter(r => r.status === statusFilter);
@@ -204,12 +310,12 @@ function displayRequests(requestsList) {
                     <tr>
                         <td>
                             <div class="font-medium text-gray-900">${r.title}</div>
-                            ${r.category ? `<div class="text-sm text-gray-500">${r.category}</div>` : ''}
+                            <div class="text-xs text-gray-500">N° ${r.tracking_number}</div>
                         </td>
                         <td>${r.residence_name || '-'}</td>
                         <td>
-                            <div class="text-sm">${r.requester_name || '-'}</div>
-                            ${r.location ? `<div class="text-xs text-gray-500">${r.location}</div>` : ''}
+                            <div class="text-sm">${r.author_name || '-'}</div>
+                            ${r.zone_details ? `<div class="text-xs text-gray-500">${r.zone_details}</div>` : ''}
                         </td>
                         <td><span class="badge ${getPriorityColor(r.priority)}">${r.priority}</span></td>
                         <td><span class="badge ${getStatusColor(r.status)}">${r.status}</span></td>
@@ -315,6 +421,41 @@ document.getElementById('updateForm').addEventListener('submit', async (e) => {
         if (data.success) {
             MySindic.showToast('Demande mise à jour', 'success');
             MySindic.closeModal('maintenanceModal');
+            loadMaintenanceRequests();
+        } else {
+            MySindic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        MySindic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+document.getElementById('announcementForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        residence_id: parseInt(document.getElementById('announcement-residence').value),
+        title: document.getElementById('announcement-title').value,
+        description: document.getElementById('announcement-description').value,
+        zone: document.getElementById('announcement-zone').value,
+        priority: document.getElementById('announcement-priority').value,
+        scheduled_date: document.getElementById('announcement-scheduled').value || null
+    };
+    
+    try {
+        const response = await fetch('/api/admin/maintenance/announcement', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            MySindic.showToast('Annonce créée avec succès', 'success');
+            MySindic.closeModal('announcementModal');
+            document.getElementById('announcementForm').reset();
             loadMaintenanceRequests();
         } else {
             MySindic.showToast(data.error || 'Erreur', 'error');
