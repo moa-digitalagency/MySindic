@@ -26,6 +26,33 @@
 
 **Result:** Maintenance pages now load data correctly instead of showing infinite spinner
 
+### Maintenance Comment System Implemented ✅ (Oct 31, 2025)
+**New Features:**
+1. **Comment System with User Mentions:** Complete commenting system for maintenance requests with @mentions to tag users
+2. **Internal/Public Comments:** Admins can create internal-only comments or public comments visible to residents
+3. **Demo Data with Comments:** Database now includes sample maintenance comments showcasing the full feature set
+
+**Implementation Details:**
+- **Backend API (Already Existed):**
+  - `GET/POST /api/admin/maintenance/<id>/comments` - Admin comment management with all visibility levels
+  - `GET/POST /api/resident/maintenance/<id>/comments` - Resident access to public comments only
+  - Proper filtering: residents only see non-internal comments
+  
+- **Frontend Updates:**
+  - `frontend/templates/admin/maintenance.html` - Complete comment interface with tagging, visibility controls, and display of author info
+  - `frontend/templates/resident/maintenance.html` - Public comment display and submission form
+  - Real-time comment loading when viewing maintenance request details
+  
+- **Demo Data (`backend/init_demo_data.py`):**
+  - Created diverse maintenance comments: public messages, internal admin notes, and comments with user mentions
+  - Examples demonstrate collaboration between admins and residents
+
+**User Experience:**
+- Admins see all comments (public + internal) with author names, roles, and mention tags
+- Residents only see public comments, ensuring privacy of internal admin discussions
+- Comment forms support simple @mention syntax for user tagging
+- Mentions are displayed with visual indicators (📌) for easy identification
+
 ### Access Credentials
 ```
 Super Admin: admin@mysindic.ma / Admin123!
