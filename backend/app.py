@@ -298,10 +298,13 @@ def create_app():
     @app.errorhandler(404)
     def not_found(error):
         """Gestion des erreurs 404"""
-        return jsonify({
-            'error': 'Page non trouvée',
-            'status': 404
-        }), 404
+        from flask import request
+        if request.path.startswith('/api/'):
+            return jsonify({
+                'error': 'Page non trouvée',
+                'status': 404
+            }), 404
+        return redirect(url_for('index'))
     
     @app.errorhandler(500)
     def internal_error(error):
