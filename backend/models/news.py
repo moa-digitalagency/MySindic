@@ -53,7 +53,9 @@ class News(db.Model):
     
     def to_dict(self):
         """Convertit l'actualité en dictionnaire"""
-        return {
+        from backend.models.residence import Residence
+        
+        result = {
             'id': self.id,
             'residence_id': self.residence_id,
             'title': self.title,
@@ -67,6 +69,20 @@ class News(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+        
+        # Ajouter les informations de l'auteur
+        if self.author:
+            result['author_name'] = f"{self.author.first_name} {self.author.last_name}"
+            result['author_role'] = self.author.role
+        else:
+            result['author_name'] = None
+            result['author_role'] = None
+        
+        # Ajouter le nom de la résidence
+        residence = Residence.query.get(self.residence_id)
+        result['residence_name'] = residence.name if residence else None
+        
+        return result
     
     def __repr__(self):
         return f'<News {self.title}>'
