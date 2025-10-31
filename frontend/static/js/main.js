@@ -37,6 +37,7 @@ function confirmAction(message, callback) {
 async function apiRequest(url, options = {}) {
     try {
         const response = await fetch(url, {
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers

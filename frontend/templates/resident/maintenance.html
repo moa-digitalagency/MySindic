@@ -187,7 +187,7 @@ let myRequests = [];
 
 async function loadMyRequests() {
     try {
-        const response = await fetch('/api/resident/maintenance');
+        const response = await fetch('/api/resident/maintenance', { credentials: 'same-origin' });
         const data = await response.json();
         
         if (data.success) {
@@ -481,6 +481,7 @@ document.getElementById('requestForm').addEventListener('submit', async (e) => {
     try {
         const response = await fetch('/api/resident/maintenance', {
             method: 'POST',
+            credentials: 'same-origin',
             body: formData
         });
         

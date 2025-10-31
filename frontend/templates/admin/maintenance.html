@@ -211,7 +211,7 @@ let allRequests = [];
 
 async function loadMaintenanceRequests() {
     try {
-        const response = await fetch('/api/admin/maintenance');
+        const response = await fetch('/api/admin/maintenance', { credentials: 'same-origin' });
         const data = await response.json();
         
         if (data.success) {
@@ -229,7 +229,7 @@ async function loadMaintenanceRequests() {
 
 async function loadResidenceFilter() {
     try {
-        const response = await fetch('/api/admin/residences');
+        const response = await fetch('/api/admin/residences', { credentials: 'same-origin' });
         const data = await response.json();
         if (data.success) {
             const residenceSelect = document.getElementById('filter-residence');
@@ -412,6 +412,7 @@ document.getElementById('updateForm').addEventListener('submit', async (e) => {
     try {
         const response = await fetch(`/api/admin/maintenance/${requestId}`, {
             method: 'PUT',
+            credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
@@ -446,6 +447,7 @@ document.getElementById('announcementForm').addEventListener('submit', async (e)
     try {
         const response = await fetch('/api/admin/maintenance/announcement', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });

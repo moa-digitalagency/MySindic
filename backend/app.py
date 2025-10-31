@@ -69,6 +69,14 @@ def create_app():
         from backend.models.user import User
         return User.query.get(int(user_id))
     
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        """Gestionnaire pour les requêtes non authentifiées"""
+        from flask import request
+        if request.path.startswith('/api/'):
+            return jsonify({'success': False, 'error': 'Authentification requise'}), 401
+        return redirect(url_for('login_page'))
+    
     @app.context_processor
     def inject_custom_head():
         """Injecte le code <head> personnalisé dans tous les templates"""

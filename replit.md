@@ -13,6 +13,19 @@
 - All backend APIs tested and functional
 - Frontend templates verified and operational
 
+### Maintenance Functionality Fixed ✅ (Oct 31, 2025)
+**Problems Fixed:**
+1. **Flask-Login API Redirects:** Added `@login_manager.unauthorized_handler` to return JSON 401 for API routes instead of redirecting to login page
+2. **Missing Session Credentials:** Added `credentials: 'same-origin'` to all fetch() requests so session cookies are sent with AJAX calls
+
+**Files Modified:**
+- `backend/app.py` - Added unauthorized handler
+- `frontend/static/js/main.js` - Updated apiRequest() with credentials
+- `frontend/templates/admin/maintenance.html` - Added credentials to all fetch calls
+- `frontend/templates/resident/maintenance.html` - Added credentials to all fetch calls
+
+**Result:** Maintenance pages now load data correctly instead of showing infinite spinner
+
 ### Access Credentials
 ```
 Super Admin: admin@mysindic.ma / Admin123!
