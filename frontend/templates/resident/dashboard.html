@@ -12,159 +12,8 @@ www.myoneart.com
 
 {% block resident_extra_css %}
 <style>
-    body {
-        background: #f5f7fa;
-        margin: 0;
-        padding: 0;
-    }
-    
-    .modern-header {
-        background: white;
-        padding: 0.75rem 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-    
-    .header-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1.5rem;
-    }
-    
-    .logo {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #2563eb;
-    }
-    
-    .search-bar {
-        flex: 1;
-        max-width: 350px;
-        position: relative;
-    }
-    
-    .search-input {
-        width: 100%;
-        padding: 0.5rem 0.75rem 0.5rem 2rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        font-size: 0.8rem;
-        outline: none;
-        transition: all 0.3s;
-        background: #f9fafb;
-    }
-    
-    .search-input:focus {
-        background: white;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-    
-    .search-icon {
-        position: absolute;
-        left: 0.625rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #9ca3af;
-        font-size: 0.875rem;
-    }
-    
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .icon-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f9fafb;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        font-size: 1rem;
-    }
-    
-    .icon-btn:hover {
-        background: #e5e7eb;
-    }
-    
-    .icon-btn.active {
-        background: #dbeafe;
-        color: #2563eb;
-    }
-    
-    .badge {
-        position: absolute;
-        top: -3px;
-        right: -3px;
-        background: #ef4444;
-        color: white;
-        font-size: 0.625rem;
-        padding: 0.075rem 0.25rem;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-    
-    .user-profile-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.375rem;
-        border-radius: 10px;
-        border: none;
-        background: #f9fafb;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .user-profile-btn:hover {
-        background: #e5e7eb;
-    }
-    
-    .user-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        background: rgba(37, 99, 235, 0.1);
-        border: 2px solid #2563eb;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #2563eb;
-        font-weight: 700;
-        font-size: 0.75rem;
-    }
-    
-    .user-name {
-        font-weight: 600;
-        color: #111827;
-        font-size: 0.8rem;
-    }
-    
-    .dashboard-layout {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 1.25rem;
-        display: grid;
-        grid-template-columns: 260px 1fr 280px;
-        gap: 1.25rem;
-    }
-    
-    .left-sidebar {
-        position: sticky;
-        top: 85px;
-        height: fit-content;
+    .resident-layout {
+        grid-template-columns: 260px 1fr 280px !important;
     }
     
     .profile-card {
@@ -172,75 +21,7 @@ www.myoneart.com
         border: 2px solid #e5e7eb;
         border-radius: 12px;
         padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .profile-header-img {
-        height: 70px;
-        background: rgba(37, 99, 235, 0.1);
-        border: 2px solid #2563eb;
-        border-radius: 10px;
-        margin: -1rem -1rem 0;
-        position: relative;
-    }
-    
-    .profile-avatar-large {
-        width: 50px;
-        height: 50px;
-        border-radius: 10px;
-        background: white;
-        border: 3px solid white;
-        position: absolute;
-        bottom: -25px;
-        left: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    .profile-info {
-        margin-top: 35px;
-    }
-    
-    .profile-name {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 0.125rem;
-    }
-    
-    .profile-role {
-        font-size: 0.75rem;
-        color: #6b7280;
-        margin-bottom: 0.75rem;
-    }
-    
-    .stats-row {
-        display: flex;
-        gap: 1rem;
-        padding: 0.75rem 0;
-        border-top: 1px solid #f3f4f6;
-    }
-    
-    .stat-item {
-        flex: 1;
-        text-align: center;
-    }
-    
-    .stat-value {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #111827;
-        display: block;
-    }
-    
-    .stat-label {
-        font-size: 0.65rem;
-        color: #6b7280;
-        display: block;
-        margin-top: 0.125rem;
+        margin-top: 1rem;
     }
     
     .section-title {
@@ -271,10 +52,6 @@ www.myoneart.com
         font-size: 0.7rem;
         font-weight: 600;
         color: #111827;
-    }
-    
-    .main-content {
-        min-height: 500px;
     }
     
     .content-card {
@@ -402,43 +179,6 @@ www.myoneart.com
         height: fit-content;
     }
     
-    .nav-tabs-card {
-        background: white;
-        border-radius: 12px;
-        padding: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1rem;
-    }
-    
-    .nav-tab {
-        display: flex;
-        align-items: center;
-        gap: 0.625rem;
-        padding: 0.625rem 0.75rem;
-        border-radius: 8px;
-        text-decoration: none;
-        color: #6b7280;
-        font-size: 0.8rem;
-        font-weight: 500;
-        transition: all 0.2s;
-        margin-bottom: 0.25rem;
-    }
-    
-    .nav-tab:hover {
-        background: #f9fafb;
-        color: #111827;
-    }
-    
-    .nav-tab.active {
-        background: #dbeafe;
-        color: #2563eb;
-        font-weight: 600;
-    }
-    
-    .nav-tab-icon {
-        font-size: 1.125rem;
-    }
-    
     .calendar-card {
         background: white;
         border-radius: 12px;
@@ -552,571 +292,370 @@ www.myoneart.com
         color: #1e40af;
     }
     
-    /* Menu Hamburger pour mobile */
-    .mobile-menu-toggle {
-        display: none;
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        background: #f9fafb;
-        border: 2px solid #e5e7eb;
-        cursor: pointer;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        transition: all 0.3s;
-    }
-    
-    .mobile-menu-toggle:hover {
-        background: #e5e7eb;
-    }
-    
-    .mobile-menu-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-    }
-    
-    .mobile-menu-drawer {
-        position: fixed;
-        top: 0;
-        left: -280px;
-        width: 280px;
-        height: 100%;
-        background: white;
-        z-index: 1000;
-        transition: left 0.3s ease;
-        overflow-y: auto;
-        padding: 1rem;
+    .tab-content {
         display: none;
     }
     
-    .mobile-menu-drawer.open {
-        left: 0;
-    }
-    
-    @media (max-width: 768px) {
-        .mobile-menu-drawer {
-            display: block;
-        }
-    }
-    
-    .mobile-menu-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #e5e7eb;
-    }
-    
-    .mobile-menu-close {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        background: #f9fafb;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
+    .tab-content.active {
+        display: block;
     }
     
     @media (max-width: 1024px) {
-        .dashboard-layout {
-            grid-template-columns: 1fr;
+        .resident-layout {
+            grid-template-columns: 1fr !important;
         }
         
-        .left-sidebar,
         .right-sidebar {
             position: static;
-        }
-        
-        .search-bar {
-            display: none;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .mobile-menu-toggle {
-            display: flex;
-        }
-        
-        .left-sidebar {
-            display: none;
-        }
-        
-        .dashboard-layout {
-            padding: 0.75rem;
-            grid-template-columns: 1fr;
-        }
-        
-        .header-container {
-            padding: 0.5rem;
-        }
-        
-        .header-actions {
-            gap: 0.375rem;
-        }
-        
-        .user-name {
-            display: none;
-        }
-        
-        .right-sidebar {
-            order: 2;
-        }
-        
-        .main-content {
-            order: 1;
         }
     }
 </style>
 {% endblock %}
 
 {% block resident_content %}
-<div class="modern-header">
-    <div class="header-container">
-        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-        <div class="logo">🏢 Shabaka Syndic</div>
-        
-        <div class="search-bar">
-            <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" placeholder="Rechercher...">
+<!-- Residence Info Card in Left Sidebar -->
+<div class="profile-card" style="position: absolute; left: 1.25rem; top: 190px; width: 228px;">
+    <div class="section-title">🏢 Ma Résidence</div>
+    <div id="residence-info">
+        <div class="info-item">
+            <span class="info-label">Résidence</span>
+            <span class="info-value" id="residence-name">-</span>
         </div>
-        
-        <div class="header-actions">
-            <button class="icon-btn active" title="Accueil">🏠</button>
-            <button class="icon-btn" title="Messages">💬</button>
-            <button class="icon-btn" title="Notifications">
-                🔔
-                <span class="badge">3</span>
-            </button>
-            <button class="user-profile-btn" onclick="switchTab(event, 'profile')">
-                <div class="user-avatar" id="header-avatar">👤</div>
-                <span class="user-name" id="header-name">Chargement...</span>
-            </button>
+        <div class="info-item" id="building-row" style="display: none;">
+            <span class="info-label">Immeuble</span>
+            <span class="info-value" id="unit-building">-</span>
         </div>
-    </div>
-</div>
-
-<!-- Menu Mobile Overlay et Drawer -->
-<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
-<div class="mobile-menu-drawer" id="mobileMenuDrawer">
-    <div class="mobile-menu-header">
-        <div class="logo">🏢 Shabaka Syndic</div>
-        <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
-    </div>
-    
-    <div class="nav-tabs-card" style="margin-bottom: 1rem;">
-        <a href="#actualite" class="nav-tab active" data-tab="actualite" onclick="switchTab(event, 'actualite'); toggleMobileMenu();">
-            <span class="nav-tab-icon">📰</span>
-            <span>Actualité</span>
-        </a>
-        <a href="#maintenance" class="nav-tab" data-tab="maintenance" onclick="switchTab(event, 'maintenance'); toggleMobileMenu();">
-            <span class="nav-tab-icon">🔧</span>
-            <span>Maintenance</span>
-        </a>
-        <a href="#assemblies" class="nav-tab" data-tab="assemblies" onclick="switchTab(event, 'assemblies'); toggleMobileMenu();">
-            <span class="nav-tab-icon">🗳️</span>
-            <span>Assemblées Générales</span>
-        </a>
-        <a href="#finances" class="nav-tab" data-tab="finances" onclick="switchTab(event, 'finances'); toggleMobileMenu();">
-            <span class="nav-tab-icon">💰</span>
-            <span>Finances</span>
-        </a>
-        <a href="#documents" class="nav-tab" data-tab="documents" onclick="switchTab(event, 'documents'); toggleMobileMenu();">
-            <span class="nav-tab-icon">📄</span>
-            <span>Documents</span>
-        </a>
-        <a href="#profile" class="nav-tab" data-tab="profile" onclick="switchTab(event, 'profile'); toggleMobileMenu();">
-            <span class="nav-tab-icon">👤</span>
-            <span>Mon Profil</span>
-        </a>
-        <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
-            <a href="#" class="nav-tab" onclick="event.preventDefault(); Shabaka Syndic.logout();" style="color: #dc2626;">
-                <span class="nav-tab-icon">🚪</span>
-                <span>Déconnexion</span>
-            </a>
+        <div class="info-item" id="floor-row" style="display: none;">
+            <span class="info-label">Étage</span>
+            <span class="info-value" id="unit-floor">-</span>
         </div>
-    </div>
-    
-    <div class="profile-card">
-        <div class="section-title">🏢 Ma Résidence</div>
-        <div id="mobile-residence-info">
-            <div class="info-item">
-                <span class="info-label">Résidence</span>
-                <span class="info-value" id="mobile-residence-name">-</span>
-            </div>
-            <div class="info-item" id="mobile-building-row" style="display: none;">
-                <span class="info-label">Immeuble</span>
-                <span class="info-value" id="mobile-unit-building">-</span>
-            </div>
-            <div class="info-item" id="mobile-floor-row" style="display: none;">
-                <span class="info-label">Étage</span>
-                <span class="info-value" id="mobile-unit-floor">-</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Unité</span>
-                <span class="info-value" id="mobile-unit-number">-</span>
-            </div>
-            <div class="info-item" id="mobile-unit-type-row" style="display: none;">
-                <span class="info-label">Type</span>
-                <span class="info-value" id="mobile-unit-type">-</span>
-            </div>
+        <div class="info-item">
+            <span class="info-label">Unité</span>
+            <span class="info-value" id="unit-number">-</span>
+        </div>
+        <div class="info-item" id="unit-type-row" style="display: none;">
+            <span class="info-label">Type</span>
+            <span class="info-value" id="unit-type">-</span>
         </div>
     </div>
 </div>
 
-<div class="dashboard-layout">
-    <aside class="left-sidebar">
-        <div class="nav-tabs-card">
-            <a href="#actualite" class="nav-tab active" data-tab="actualite" onclick="switchTab(event, 'actualite')">
-                <span class="nav-tab-icon">📰</span>
-                <span>Actualité</span>
-            </a>
-            <a href="#maintenance" class="nav-tab" data-tab="maintenance" onclick="switchTab(event, 'maintenance')">
-                <span class="nav-tab-icon">🔧</span>
-                <span>Maintenance</span>
-            </a>
-            <a href="#assemblies" class="nav-tab" data-tab="assemblies" onclick="switchTab(event, 'assemblies')">
-                <span class="nav-tab-icon">🗳️</span>
-                <span>Assemblées Générales</span>
-            </a>
-            <a href="#finances" class="nav-tab" data-tab="finances" onclick="switchTab(event, 'finances')">
-                <span class="nav-tab-icon">💰</span>
-                <span>Finances</span>
-            </a>
-            <a href="#documents" class="nav-tab" data-tab="documents" onclick="switchTab(event, 'documents')">
-                <span class="nav-tab-icon">📄</span>
-                <span>Documents</span>
-            </a>
-            <a href="#profile" class="nav-tab" data-tab="profile" onclick="switchTab(event, 'profile')">
-                <span class="nav-tab-icon">👤</span>
-                <span>Mon Profil</span>
-            </a>
-            <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
-                <a href="#" class="nav-tab" onclick="event.preventDefault(); Shabaka Syndic.logout();" style="color: #dc2626;">
-                    <span class="nav-tab-icon">🚪</span>
-                    <span>Déconnexion</span>
-                </a>
+<!-- Main Dashboard Content -->
+<div id="tab-actualite" class="tab-content active">
+    <div class="content-card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">📰 Fil d'Actualité</h2>
+                <p class="card-subtitle">Dernières nouvelles de votre résidence</p>
             </div>
         </div>
         
-        <div class="profile-card">
-            <div class="section-title">🏢 Ma Résidence</div>
-            <div id="residence-info">
-                <div class="info-item">
-                    <span class="info-label">Résidence</span>
-                    <span class="info-value" id="residence-name">-</span>
-                </div>
-                <div class="info-item" id="building-row" style="display: none;">
-                    <span class="info-label">Immeuble</span>
-                    <span class="info-value" id="unit-building">-</span>
-                </div>
-                <div class="info-item" id="floor-row" style="display: none;">
-                    <span class="info-label">Étage</span>
-                    <span class="info-value" id="unit-floor">-</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Unité</span>
-                    <span class="info-value" id="unit-number">-</span>
-                </div>
-                <div class="info-item" id="unit-type-row" style="display: none;">
-                    <span class="info-label">Type</span>
-                    <span class="info-value" id="unit-type">-</span>
-                </div>
-            </div>
-        </div>
-    </aside>
-    
-    <main class="main-content" id="main-content">
-        <div id="tab-actualite" class="tab-content active">
-        <div class="content-card">
-            <div class="card-header">
-                <div>
-                    <h2 class="card-title">📰 Fil d'Actualité</h2>
-                    <p class="card-subtitle">Dernières nouvelles de votre résidence</p>
+        <div class="publish-box" style="padding: 1rem; background: #f9fafb; border-radius: 12px; margin-bottom: 1rem;">
+            <textarea id="new-post-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; min-height: 100px; outline: none; background: white;"></textarea>
+            
+            <div id="media-preview" style="margin-top: 0.75rem; display: none;">
+                <div style="position: relative; display: inline-block;">
+                    <img id="preview-image" style="max-width: 200px; max-height: 200px; border-radius: 8px; display: none;">
+                    <button onclick="removeMedia()" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none;" id="remove-media-btn">✕</button>
                 </div>
             </div>
             
-            <div class="publish-box" style="padding: 1rem; background: #f9fafb; border-radius: 12px; margin-bottom: 1rem;">
-                <textarea id="new-post-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; min-height: 100px; outline: none; background: white;"></textarea>
-                
-                <div id="media-preview" style="margin-top: 0.75rem; display: none;">
-                    <div style="position: relative; display: inline-block;">
-                        <img id="preview-image" style="max-width: 200px; max-height: 200px; border-radius: 8px; display: none;">
-                        <button onclick="removeMedia()" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none;" id="remove-media-btn">✕</button>
-                    </div>
-                </div>
-                
-                <div id="formatting-toolbar" style="display: none; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem; gap: 0.25rem; flex-wrap: wrap;">
-                    <button onclick="applyFormat('bold')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">B</button>
-                    <button onclick="applyFormat('italic')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-style: italic; cursor: pointer; font-size: 0.75rem;">I</button>
-                    <button onclick="applyFormat('underline')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; text-decoration: underline; cursor: pointer; font-size: 0.75rem;">U</button>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
-                    <div style="display: flex; gap: 0.5rem;">
-                        <label for="image-upload" style="cursor: pointer; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
-                            🖼️ <span>Photo</span>
-                        </label>
-                        <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-                        
-                        <label for="video-upload" style="cursor: pointer; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
-                            🎥 <span>Vidéo</span>
-                        </label>
-                        <input type="file" id="video-upload" accept="video/*" style="display: none;" onchange="handleVideoUpload(event)">
-                        
-                        <button onclick="insertEmoji()" style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
-                            😊 Emoji
-                        </button>
-                        
-                        <button onclick="toggleFormatting()" style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
-                            ✨ Format
-                        </button>
-                    </div>
+            <div id="formatting-toolbar" style="display: none; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem; gap: 0.25rem; flex-wrap: wrap;">
+                <button onclick="applyFormat('bold')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">B</button>
+                <button onclick="applyFormat('italic')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-style: italic; cursor: pointer; font-size: 0.75rem;">I</button>
+                <button onclick="applyFormat('underline')" style="padding: 0.25rem 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; text-decoration: underline; cursor: pointer; font-size: 0.75rem;">U</button>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                <div style="display: flex; gap: 0.5rem;">
+                    <label for="image-upload" style="cursor: pointer; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        🖼️ <span>Photo</span>
+                    </label>
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
                     
-                    <button onclick="publishPost()" style="padding: 0.5rem 1.5rem; background: rgba(37, 99, 235, 0.08); border: 2px solid #2563eb; color: #2563eb; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='rgba(37, 99, 235, 0.15)'" onmouseout="this.style.background='rgba(37, 99, 235, 0.08)'">
-                        Publier
+                    <label for="video-upload" style="cursor: pointer; padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        🎥 <span>Vidéo</span>
+                    </label>
+                    <input type="file" id="video-upload" accept="video/*" style="display: none;" onchange="handleVideoUpload(event)">
+                    
+                    <button onclick="insertEmoji()" style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        😊 Emoji
+                    </button>
+                    
+                    <button onclick="toggleFormatting()" style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+                        ✨ Format
                     </button>
                 </div>
-            </div>
-            
-            <div id="news-feed">
-                <div class="empty-state">
-                    <div class="empty-icon">📭</div>
-                    <p class="empty-text">Aucune actualité pour le moment</p>
-                </div>
-            </div>
-        </div>
-        </div>
-        
-        <div id="tab-maintenance" class="tab-content" style="display: none;">
-            <div class="content-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">🔧 Demandes de Maintenance</h2>
-                        <p class="card-subtitle">Vos demandes et celles de la résidence</p>
-                    </div>
-                </div>
-                <div id="maintenance-feed">
-                    <div class="empty-state">
-                        <div class="empty-icon">✨</div>
-                        <p class="empty-text">Aucune demande de maintenance</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="tab-assemblies" class="tab-content" style="display: none;">
-            <div class="content-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">🗳️ Assemblées Générales</h2>
-                        <p class="card-subtitle">Participez aux décisions de votre résidence</p>
-                    </div>
-                </div>
-                <div class="empty-state">
-                    <div class="empty-icon">📋</div>
-                    <p class="empty-text">Aucune assemblée prévue</p>
-                </div>
-            </div>
-        </div>
-        
-        <div id="tab-finances" class="tab-content" style="display: none;">
-            <div class="content-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">💰 Mes Finances</h2>
-                        <p class="card-subtitle">Charges et paiements</p>
-                    </div>
-                </div>
-                <div class="empty-state">
-                    <div class="empty-icon">💳</div>
-                    <p class="empty-text">Aucune charge en attente</p>
-                </div>
-            </div>
-        </div>
-        
-        <div id="tab-documents" class="tab-content" style="display: none;">
-            <div class="content-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">📄 Documents</h2>
-                        <p class="card-subtitle">Accédez aux documents de votre résidence</p>
-                    </div>
-                </div>
-                <div class="empty-state">
-                    <div class="empty-icon">📁</div>
-                    <p class="empty-text">Aucun document disponible</p>
-                </div>
-            </div>
-        </div>
-        
-        <div id="tab-profile" class="tab-content" style="display: none;">
-            <div class="content-card" style="margin-bottom: 1rem;">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">📊 Statistiques de Mon Compte</h2>
-                        <p class="card-subtitle">Aperçu de votre activité</p>
-                    </div>
-                </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; padding: 1rem 0;">
-                    <div style="background: rgba(59, 130, 246, 0.08); border: 2px solid #3b82f6; padding: 1rem; border-radius: 10px;">
-                        <div style="font-size: 0.7rem; color: #1e40af; margin-bottom: 0.25rem; font-weight: 600;">Demandes Maintenance</div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #1e3a8a;" id="stat-user-maintenance">0</div>
-                    </div>
-                    <div style="background: rgba(16, 185, 129, 0.08); border: 2px solid #10b981; padding: 1rem; border-radius: 10px;">
-                        <div style="font-size: 0.7rem; color: #065f46; margin-bottom: 0.25rem; font-weight: 600;">Paiements Effectués</div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #064e3b;" id="stat-user-payments">0</div>
-                    </div>
-                    <div style="background: rgba(245, 158, 11, 0.08); border: 2px solid #f59e0b; padding: 1rem; border-radius: 10px;">
-                        <div style="font-size: 0.7rem; color: #92400e; margin-bottom: 0.25rem; font-weight: 600;">Jours d'Activité</div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #78350f;" id="stat-user-days">-</div>
-                    </div>
-                    <div style="background: rgba(99, 102, 241, 0.08); border: 2px solid #6366f1; padding: 1rem; border-radius: 10px;">
-                        <div style="font-size: 0.7rem; color: #3730a3; margin-bottom: 0.25rem; font-weight: 600;">Rôle</div>
-                        <div style="font-size: 1.125rem; font-weight: 700; color: #312e81; text-transform: capitalize;" id="stat-user-role">-</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="content-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="card-title">👤 Mon Profil</h2>
-                        <p class="card-subtitle">Gérez vos informations personnelles</p>
-                    </div>
-                </div>
-                
-                <div style="padding: 1rem 0;">
-                    <div style="margin-bottom: 1.5rem;">
-                        <h3 style="font-size: 0.9rem; font-weight: 700; color: #111827; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <span>👤</span> Informations Personnelles
-                        </h3>
-                        <div style="display: grid; gap: 1rem;">
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Prénom</label>
-                                <input type="text" id="profile-first-name" placeholder="Ahmed" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
-                            </div>
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Nom</label>
-                                <input type="text" id="profile-last-name" placeholder="Alami" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
-                            </div>
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Email</label>
-                                <input type="email" id="profile-user-email" placeholder="ahmed.alami@example.com" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
-                            </div>
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Téléphone</label>
-                                <input type="tel" id="profile-phone" placeholder="+212 6 00 00 00 00" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
-                        <h3 style="font-size: 0.9rem; font-weight: 700; color: #111827; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <span>🏢</span> Informations de Résidence
-                        </h3>
-                        <div style="display: grid; gap: 1rem;">
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Résidence</label>
-                                <input type="text" id="profile-residence" value="Résidence Les Jardins" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
-                            </div>
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Numéro d'appartement</label>
-                                <input type="text" id="profile-unit" value="A101" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                <div>
-                                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Bâtiment</label>
-                                    <input type="text" id="profile-building" value="A" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
-                                </div>
-                                <div>
-                                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Étage</label>
-                                    <input type="text" id="profile-floor" value="1er" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
-                                </div>
-                            </div>
-                            <div>
-                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Type de bien</label>
-                                <input type="text" id="profile-type" value="Appartement" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
-                        <button onclick="cancelProfileEdit()" style="padding: 0.625rem 1.25rem; background: white; color: #6b7280; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                            Annuler
-                        </button>
-                        <button onclick="saveProfile()" style="padding: 0.625rem 1.25rem; background: rgba(37, 99, 235, 0.08); border: 2px solid #2563eb; color: #2563eb; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                            Enregistrer
-                        </button>
-                    </div>
-                </div>
+                <button onclick="publishPost()" style="padding: 0.5rem 1.5rem; background: rgba(37, 99, 235, 0.08); border: 2px solid #2563eb; color: #2563eb; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='rgba(37, 99, 235, 0.15)'" onmouseout="this.style.background='rgba(37, 99, 235, 0.08)'">
+                    Publier
+                </button>
             </div>
         </div>
         
-    </main>
-    
-    <aside class="right-sidebar">
-        <div class="calendar-card">
-            <div class="calendar-header">
-                <span class="calendar-month" id="calendar-month">Octobre 2025</span>
-                <div class="calendar-nav">
-                    <button class="calendar-nav-btn">‹</button>
-                    <button class="calendar-nav-btn">›</button>
-                </div>
-            </div>
-            <div class="calendar-grid">
-                <div class="calendar-day-label">Lun</div>
-                <div class="calendar-day-label">Mar</div>
-                <div class="calendar-day-label">Mer</div>
-                <div class="calendar-day-label">Jeu</div>
-                <div class="calendar-day-label">Ven</div>
-                <div class="calendar-day-label">Sam</div>
-                <div class="calendar-day-label">Dim</div>
-            </div>
-            <div class="calendar-grid" id="calendar-days"></div>
-        </div>
-        
-        <div class="poll-card">
-            <div class="section-title">🗳️ Sondage Actif</div>
-            <div id="polls-container">
-                <p class="poll-question">Êtes-vous favorable à l'installation de panneaux solaires ?</p>
-                <div class="poll-option">👍 Oui</div>
-                <div class="poll-option">👎 Non</div>
-                <div class="poll-option">ℹ️ Besoin de plus d'infos</div>
+        <div id="news-feed">
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p class="empty-text">Aucune actualité pour le moment</p>
             </div>
         </div>
-    </aside>
+    </div>
 </div>
+
+<div id="tab-maintenance" class="tab-content">
+    <div class="content-card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">🔧 Maintenance</h2>
+                <p class="card-subtitle">Demandes de maintenance et interventions</p>
+            </div>
+        </div>
+        
+        <div id="maintenance-feed">
+            <div class="empty-state">
+                <div class="empty-icon">✨</div>
+                <p class="empty-text">Aucune demande de maintenance</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tab-assemblies" class="tab-content">
+    <div class="content-card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">🗳️ Assemblées Générales</h2>
+                <p class="card-subtitle">Consultez les assemblées et votez</p>
+            </div>
+        </div>
+        
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <p class="empty-text">Aucune assemblée programmée</p>
+        </div>
+    </div>
+</div>
+
+<div id="tab-finances" class="tab-content">
+    <div class="content-card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">💰 Mes Finances</h2>
+                <p class="card-subtitle">Charges et paiements</p>
+            </div>
+        </div>
+        
+        <div class="empty-state">
+            <div class="empty-icon">💳</div>
+            <p class="empty-text">Aucune charge enregistrée</p>
+        </div>
+    </div>
+</div>
+
+<div id="tab-documents" class="tab-content">
+    <div class="content-card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">📄 Documents</h2>
+                <p class="card-subtitle">Accédez à vos documents importants</p>
+            </div>
+        </div>
+        
+        <div class="empty-state">
+            <div class="empty-icon">📁</div>
+            <p class="empty-text">Aucun document disponible</p>
+        </div>
+    </div>
+</div>
+
+<div id="tab-profile" class="tab-content">
+    <div class="content-card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">📊 Mes Statistiques</h2>
+                <p class="card-subtitle">Aperçu de votre activité</p>
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: rgba(37, 99, 235, 0.08); border: 2px solid #2563eb; padding: 1rem; border-radius: 10px;">
+                <div style="font-size: 0.7rem; color: #1e40af; margin-bottom: 0.25rem; font-weight: 600;">Demandes de Maintenance</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #1e3a8a;" id="stat-user-maintenance">0</div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.08); border: 2px solid #10b981; padding: 1rem; border-radius: 10px;">
+                <div style="font-size: 0.7rem; color: #065f46; margin-bottom: 0.25rem; font-weight: 600;">Paiements Effectués</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #064e3b;" id="stat-user-payments">0</div>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.08); border: 2px solid #f59e0b; padding: 1rem; border-radius: 10px;">
+                <div style="font-size: 0.7rem; color: #92400e; margin-bottom: 0.25rem; font-weight: 600;">Jours d'Activité</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #78350f;" id="stat-user-days">-</div>
+            </div>
+            <div style="background: rgba(99, 102, 241, 0.08); border: 2px solid #6366f1; padding: 1rem; border-radius: 10px;">
+                <div style="font-size: 0.7rem; color: #3730a3; margin-bottom: 0.25rem; font-weight: 600;">Rôle</div>
+                <div style="font-size: 1.125rem; font-weight: 700; color: #312e81; text-transform: capitalize;" id="stat-user-role">-</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-card">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">👤 Mon Profil</h2>
+                <p class="card-subtitle">Gérez vos informations personnelles</p>
+            </div>
+        </div>
+        
+        <div style="padding: 1rem 0;">
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="font-size: 0.9rem; font-weight: 700; color: #111827; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>👤</span> Informations Personnelles
+                </h3>
+                <div style="display: grid; gap: 1rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Prénom</label>
+                        <input type="text" id="profile-first-name" placeholder="Ahmed" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Nom</label>
+                        <input type="text" id="profile-last-name" placeholder="Alami" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Email</label>
+                        <input type="email" id="profile-user-email" placeholder="ahmed.alami@example.com" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Téléphone</label>
+                        <input type="tel" id="profile-phone" placeholder="+212 6 00 00 00 00" style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem;">
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
+                <h3 style="font-size: 0.9rem; font-weight: 700; color: #111827; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🏢</span> Informations de Résidence
+                </h3>
+                <div style="display: grid; gap: 1rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Résidence</label>
+                        <input type="text" id="profile-residence" value="Résidence Les Jardins" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Numéro d'appartement</label>
+                        <input type="text" id="profile-unit" value="A101" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Bâtiment</label>
+                            <input type="text" id="profile-building" value="A" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Étage</label>
+                            <input type="text" id="profile-floor" value="1er" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.25rem;">Type de bien</label>
+                        <input type="text" id="profile-type" value="Appartement" readonly style="width: 100%; padding: 0.625rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
+                <button onclick="cancelProfileEdit()" style="padding: 0.625rem 1.25rem; background: white; color: #6b7280; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    Annuler
+                </button>
+                <button onclick="saveProfile()" style="padding: 0.625rem 1.25rem; background: rgba(37, 99, 235, 0.08); border: 2px solid #2563eb; color: #2563eb; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Right Sidebar with Calendar and Polls -->
+<aside class="right-sidebar">
+    <div class="calendar-card">
+        <div class="calendar-header">
+            <span class="calendar-month" id="calendar-month">Octobre 2025</span>
+            <div class="calendar-nav">
+                <button class="calendar-nav-btn">‹</button>
+                <button class="calendar-nav-btn">›</button>
+            </div>
+        </div>
+        <div class="calendar-grid">
+            <div class="calendar-day-label">Lun</div>
+            <div class="calendar-day-label">Mar</div>
+            <div class="calendar-day-label">Mer</div>
+            <div class="calendar-day-label">Jeu</div>
+            <div class="calendar-day-label">Ven</div>
+            <div class="calendar-day-label">Sam</div>
+            <div class="calendar-day-label">Dim</div>
+        </div>
+        <div class="calendar-grid" id="calendar-days"></div>
+    </div>
+    
+    <div class="poll-card">
+        <div class="section-title">🗳️ Sondage Actif</div>
+        <div id="polls-container">
+            <p class="poll-question">Êtes-vous favorable à l'installation de panneaux solaires ?</p>
+            <div class="poll-option">👍 Oui</div>
+            <div class="poll-option">👎 Non</div>
+            <div class="poll-option">ℹ️ Besoin de plus d'infos</div>
+        </div>
+    </div>
+</aside>
 {% endblock %}
 
 {% block resident_extra_js %}
 <script>
 let uploadedImage = null;
 
+document.addEventListener('DOMContentLoaded', () => {
+    const tabMap = {
+        '/resident/dashboard': 'actualite',
+        '/resident/news': 'actualite',
+        '/resident/maintenance': 'maintenance',
+        '/resident/assemblies': 'assemblies',
+        '/resident/finances': 'finances',
+        '/resident/documents': 'documents'
+    };
+    
+    const navTabs = document.querySelectorAll('.left-sidebar .nav-tab');
+    navTabs.forEach(tab => {
+        const href = tab.getAttribute('href');
+        const tabName = tabMap[href];
+        if (tabName) {
+            tab.setAttribute('data-tab', tabName);
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(e, tabName);
+            });
+        }
+    });
+    
+    loadResidentDashboard();
+});
+
 function switchTab(event, tabName) {
     event.preventDefault();
     
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = 'none';
+        tab.classList.remove('active');
     });
     
     document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.classList.remove('active');
     });
     
-    document.getElementById('tab-' + tabName).style.display = 'block';
-    event.currentTarget.classList.add('active');
+    const targetTab = document.getElementById('tab-' + tabName);
+    if (targetTab) {
+        targetTab.style.display = 'block';
+        targetTab.classList.add('active');
+    }
+    
+    const navLinks = document.querySelectorAll('.nav-tab[data-tab="' + tabName + '"]');
+    navLinks.forEach(link => link.classList.add('active'));
 }
 
 function handleImageUpload(event) {
@@ -1124,7 +663,7 @@ function handleImageUpload(event) {
     if (!file) return;
     
     if (!file.type.startsWith('image/')) {
-        Shabaka Syndic.showToast('Veuillez sélectionner une image', 'error');
+        alert('Veuillez sélectionner une image');
         return;
     }
     
@@ -1164,12 +703,12 @@ function handleVideoUpload(event) {
     if (!file) return;
     
     if (!file.type.startsWith('video/')) {
-        Shabaka Syndic.showToast('Veuillez sélectionner une vidéo', 'error');
+        alert('Veuillez sélectionner une vidéo');
         return;
     }
     
     if (file.size > 50 * 1024 * 1024) {
-        Shabaka Syndic.showToast('La vidéo ne doit pas dépasser 50 MB', 'error');
+        alert('La vidéo ne doit pas dépasser 50 MB');
         return;
     }
     
@@ -1209,7 +748,7 @@ function applyFormat(format) {
     const selectedText = textarea.value.substring(start, end);
     
     if (!selectedText) {
-        Shabaka Syndic.showToast('Sélectionnez du texte pour le formater', 'info');
+        alert('Sélectionnez du texte pour le formater');
         return;
     }
     
@@ -1242,11 +781,11 @@ function saveProfile() {
     const phone = document.getElementById('profile-phone').value;
     
     if (!firstName || !lastName || !email || !phone) {
-        Shabaka Syndic.showToast('Veuillez remplir tous les champs', 'error');
+        alert('Veuillez remplir tous les champs');
         return;
     }
     
-    Shabaka Syndic.showToast('Profil enregistré avec succès', 'success');
+    alert('Profil enregistré avec succès');
 }
 
 function cancelProfileEdit() {
@@ -1273,7 +812,7 @@ async function publishPost() {
     const content = document.getElementById('new-post-content').value.trim();
     
     if (!content) {
-        Shabaka Syndic.showToast('Veuillez saisir du contenu', 'error');
+        alert('Veuillez saisir du contenu');
         return;
     }
     
@@ -1292,27 +831,14 @@ async function publishPost() {
         
         if (data.success) {
             document.getElementById('new-post-content').value = '';
-            Shabaka Syndic.showToast('Publication envoyée avec succès', 'success');
+            alert('Publication envoyée avec succès');
             loadResidentDashboard();
         } else {
-            Shabaka Syndic.showToast(data.message || 'Erreur lors de la publication', 'error');
+            alert(data.message || 'Erreur lors de la publication');
         }
     } catch (error) {
         console.error('Error publishing post:', error);
-        Shabaka Syndic.showToast('Erreur lors de la publication', 'error');
-    }
-}
-
-function toggleMobileMenu() {
-    const overlay = document.getElementById('mobileMenuOverlay');
-    const drawer = document.getElementById('mobileMenuDrawer');
-    
-    if (drawer.classList.contains('open')) {
-        drawer.classList.remove('open');
-        overlay.style.display = 'none';
-    } else {
-        drawer.classList.add('open');
-        overlay.style.display = 'block';
+        alert('Erreur lors de la publication');
     }
 }
 
@@ -1321,20 +847,19 @@ function updateProfile(data) {
     const residence = data.residence || {};
     const unit = data.unit || {};
     
-    const fullName = user.full_name || user.first_name || 'Utilisateur';
-    const headerName = document.getElementById('header-name');
-    if (headerName) {
-        headerName.textContent = fullName;
-    }
-    document.getElementById('profile-email').textContent = user.email || '';
+    const firstName = user.first_name || '';
+    const lastName = user.last_name || '';
     
-    const initials = fullName.substring(0, 2).toUpperCase();
-    const headerAvatar = document.getElementById('header-avatar');
-    if (headerAvatar) {
-        headerAvatar.textContent = initials;
-    }
+    const profileFirstName = document.getElementById('profile-first-name');
+    const profileLastName = document.getElementById('profile-last-name');
+    const profileEmail = document.getElementById('profile-user-email');
+    const profilePhone = document.getElementById('profile-phone');
     
-    // Desktop sidebar
+    if (profileFirstName) profileFirstName.value = firstName;
+    if (profileLastName) profileLastName.value = lastName;
+    if (profileEmail) profileEmail.value = user.email || '';
+    if (profilePhone) profilePhone.value = user.phone || '';
+    
     if (residence.name) {
         document.getElementById('residence-name').textContent = residence.name;
     }
@@ -1344,45 +869,35 @@ function updateProfile(data) {
     }
     
     if (unit.building) {
-        document.getElementById('building-row').style.display = 'block';
+        document.getElementById('building-row').style.display = 'flex';
         document.getElementById('unit-building').textContent = unit.building;
     }
     
     if (unit.floor !== null && unit.floor !== undefined) {
-        document.getElementById('floor-row').style.display = 'block';
+        document.getElementById('floor-row').style.display = 'flex';
         const floorText = unit.floor === 0 ? 'RDC' : `${unit.floor}`;
         document.getElementById('unit-floor').textContent = floorText;
     }
     
     if (unit.unit_type) {
-        document.getElementById('unit-type-row').style.display = 'block';
+        document.getElementById('unit-type-row').style.display = 'flex';
         document.getElementById('unit-type').textContent = unit.unit_type;
     }
     
-    // Mobile menu (dupliquer les données)
-    if (residence.name) {
-        document.getElementById('mobile-residence-name').textContent = residence.name;
-    }
+    const profileResidence = document.getElementById('profile-residence');
+    const profileUnit = document.getElementById('profile-unit');
+    const profileBuilding = document.getElementById('profile-building');
+    const profileFloor = document.getElementById('profile-floor');
+    const profileType = document.getElementById('profile-type');
     
-    if (unit.unit_number) {
-        document.getElementById('mobile-unit-number').textContent = unit.unit_number;
-    }
-    
-    if (unit.building) {
-        document.getElementById('mobile-building-row').style.display = 'block';
-        document.getElementById('mobile-unit-building').textContent = unit.building;
-    }
-    
-    if (unit.floor !== null && unit.floor !== undefined) {
-        document.getElementById('mobile-floor-row').style.display = 'block';
+    if (profileResidence && residence.name) profileResidence.value = residence.name;
+    if (profileUnit && unit.unit_number) profileUnit.value = unit.unit_number;
+    if (profileBuilding && unit.building) profileBuilding.value = unit.building;
+    if (profileFloor && unit.floor !== null && unit.floor !== undefined) {
         const floorText = unit.floor === 0 ? 'RDC' : `${unit.floor}`;
-        document.getElementById('mobile-unit-floor').textContent = floorText;
+        profileFloor.value = floorText;
     }
-    
-    if (unit.unit_type) {
-        document.getElementById('mobile-unit-type-row').style.display = 'block';
-        document.getElementById('mobile-unit-type').textContent = unit.unit_type;
-    }
+    if (profileType && unit.unit_type) profileType.value = unit.unit_type;
 }
 
 function loadNewsFeed(news) {
@@ -1404,7 +919,7 @@ function loadNewsFeed(news) {
                 <div class="post-avatar">📢</div>
                 <div class="post-info">
                     <div class="post-author">${item.title}</div>
-                    <div class="post-date">${Shabaka Syndic.formatDate(item.created_at)}</div>
+                    <div class="post-date">${formatDate(item.created_at)}</div>
                 </div>
             </div>
             <div class="post-content">${item.content}</div>
@@ -1450,7 +965,7 @@ function loadMaintenanceFeed(myRequests, allRequests) {
                 <div class="post-avatar">🔧</div>
                 <div class="post-info">
                     <div class="post-author">${req.title}</div>
-                    <div class="post-date">${Shabaka Syndic.formatDate(req.created_at)}</div>
+                    <div class="post-date">${formatDate(req.created_at)}</div>
                 </div>
             </div>
             <div class="post-content">${req.description || 'Aucune description'}</div>
@@ -1461,6 +976,20 @@ function loadMaintenanceFeed(myRequests, allRequests) {
     `).join('');
     
     container.innerHTML = maintenanceHTML;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
 }
 
 function initCalendar() {
@@ -1492,9 +1021,5 @@ function initCalendar() {
     
     calendarDays.innerHTML = daysHTML;
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadResidentDashboard();
-});
 </script>
 {% endblock %}

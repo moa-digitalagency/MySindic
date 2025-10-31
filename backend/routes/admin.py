@@ -48,6 +48,18 @@ def superadmin_required(f):
     return decorated_function
 
 
+def admin_or_superadmin_required(f):
+    """Décorateur pour vérifier que l'utilisateur est un admin ou un superadmin"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': 'Authentification requise'}), 401
+        if not (current_user.is_admin() or current_user.is_superadmin()):
+            return jsonify({'success': False, 'error': 'Accès réservé aux administrateurs'}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 # ==================== DASHBOARD ====================
 
 @admin_bp.route('/dashboard', methods=['GET'])
@@ -519,7 +531,7 @@ def delete_news(news_id):
 
 @admin_bp.route('/maintenance', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_all_maintenance():
     """Récupère toutes les demandes de maintenance"""
     try:
@@ -531,7 +543,7 @@ def get_all_maintenance():
 
 @admin_bp.route('/maintenance/<int:request_id>', methods=['PUT'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def update_maintenance(request_id):
     """Met à jour une demande de maintenance"""
     try:
@@ -582,7 +594,7 @@ def update_maintenance(request_id):
 
 @admin_bp.route('/maintenance/announcement', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_maintenance_announcement():
     """Crée une annonce de maintenance planifiée"""
     try:
@@ -635,7 +647,7 @@ def create_maintenance_announcement():
 
 @admin_bp.route('/maintenance/<int:request_id>/comments', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_maintenance_comments(request_id):
     """Récupère les commentaires d'une demande de maintenance"""
     try:
@@ -662,7 +674,7 @@ def get_maintenance_comments(request_id):
 
 @admin_bp.route('/maintenance/<int:request_id>/comments', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def add_maintenance_comment(request_id):
     """Ajoute un commentaire à une demande de maintenance"""
     try:
