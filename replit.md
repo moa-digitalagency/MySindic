@@ -4,6 +4,24 @@
 
 **Shabaka Syndic** is a Progressive Web App (PWA) designed for condominium management in the Moroccan market. It provides a comprehensive solution for syndics (superadmins) and residents, aiming to modernize property management, offer a mobile-first and responsive experience, automate administrative tasks like fund calls and charge distribution, and facilitate communication between all stakeholders.
 
+## Recent Changes (October 31, 2025)
+
+### Import to Replit Environment Completed ✅
+- PostgreSQL database created and initialized
+- Demo data loaded successfully (4 users, 1 residence, 5 units, 3 maintenance requests)
+- Workflow configured and running on port 5000
+- All backend APIs tested and functional
+- Frontend templates verified and operational
+
+### Access Credentials
+```
+Super Admin: admin@mysindic.ma / Admin123!
+Admin Syndic: admin.syndic@mysindic.ma / Admin123!
+Résident 1: resident@mysindic.ma / Resident123!
+Résident 2: karim@mysindic.ma / Resident123!
+Propriétaire: owner@mysindic.ma / Owner123!
+```
+
 ## User Preferences
 
 - **Workflow:** Iterative development is preferred.
