@@ -6,11 +6,11 @@ Par : Aisance KALONJI
 Mail : moa@myoneart.com
 www.myoneart.com
 -->
-{% extends "base.html" %}
+{% extends "resident/resident_base.html" %}
 
 {% block title %}Actualités - Shabaka Syndic{% endblock %}
 
-{% block content %}
+{% block resident_content %}
 <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
@@ -71,7 +71,7 @@ www.myoneart.com
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block resident_extra_js %}
 <script>
 let allNews = [];
 let currentCategory = '';

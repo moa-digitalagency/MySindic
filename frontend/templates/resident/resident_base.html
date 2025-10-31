@@ -1,0 +1,322 @@
+<!--
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
+-->
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #f5f7fa;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .modern-header {
+        background: white;
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .header-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+    
+    .logo {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #2563eb;
+    }
+    
+    .search-bar {
+        flex: 1;
+        max-width: 350px;
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem 0.5rem 2rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        outline: none;
+        transition: all 0.3s;
+        background: #f9fafb;
+    }
+    
+    .search-input:focus {
+        background: white;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 0.625rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+    
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f9fafb;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        font-size: 1rem;
+    }
+    
+    .icon-btn:hover {
+        background: #e5e7eb;
+    }
+    
+    .icon-btn.active {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .badge {
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        background: #ef4444;
+        color: white;
+        font-size: 0.625rem;
+        padding: 0.075rem 0.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    
+    .user-profile-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem;
+        border-radius: 10px;
+        border: none;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .user-profile-btn:hover {
+        background: #e5e7eb;
+    }
+    
+    .user-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: rgba(16, 185, 129, 0.1);
+        border: 2px solid #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #10b981;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #111827;
+        font-size: 0.8rem;
+    }
+    
+    .resident-layout {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.25rem;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 1.25rem;
+    }
+    
+    .left-sidebar {
+        position: sticky;
+        top: 85px;
+        height: fit-content;
+    }
+    
+    .nav-tabs-card {
+        background: rgba(255, 255, 255, 0.6);
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .nav-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding: 0.625rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #6b7280;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-tab:hover {
+        background: #f9fafb;
+        color: #111827;
+    }
+    
+    .nav-tab.active {
+        background: #d1fae5;
+        color: #059669;
+        font-weight: 600;
+    }
+    
+    .nav-tab-icon {
+        font-size: 1.125rem;
+    }
+    
+    .main-content {
+        min-height: 500px;
+    }
+    
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        background: rgba(16, 185, 129, 0.05);
+        border: 2px solid #10b981;
+        color: #10b981;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        width: 100%;
+    }
+    
+    .quick-action-btn:hover {
+        background: rgba(16, 185, 129, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    
+    .quick-action-icon {
+        font-size: 1.25rem;
+    }
+    
+    @media (max-width: 768px) {
+        .resident-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .left-sidebar {
+            position: static;
+        }
+        
+        .search-bar {
+            display: none;
+        }
+    }
+</style>
+{% block resident_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="modern-header">
+    <div class="header-container">
+        <div class="logo">🏠 Shabaka Syndic</div>
+        
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="Rechercher...">
+        </div>
+        
+        <div class="header-actions">
+            <button class="icon-btn" title="Notifications">
+                🔔
+                <span class="badge">3</span>
+            </button>
+            
+            <button class="user-profile-btn" onclick="window.location.href='/api/auth/logout'">
+                <div class="user-avatar">{{ current_user.first_name[0] if current_user.first_name else 'U' }}</div>
+                <span class="user-name">{{ current_user.first_name or 'Utilisateur' }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="resident-layout">
+    <aside class="left-sidebar">
+        <div class="nav-tabs-card">
+            <a href="/resident/dashboard" class="nav-tab {% if request.path == '/resident/dashboard' %}active{% endif %}">
+                <span class="nav-tab-icon">📊</span>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="/resident/news" class="nav-tab {% if request.path == '/resident/news' %}active{% endif %}">
+                <span class="nav-tab-icon">📰</span>
+                <span>Actualités</span>
+            </a>
+            <a href="/resident/maintenance" class="nav-tab {% if request.path == '/resident/maintenance' %}active{% endif %}">
+                <span class="nav-tab-icon">🔧</span>
+                <span>Maintenance</span>
+            </a>
+            <a href="/resident/finances" class="nav-tab {% if request.path == '/resident/finances' %}active{% endif %}">
+                <span class="nav-tab-icon">💰</span>
+                <span>Mes Finances</span>
+            </a>
+            <a href="/resident/assemblies" class="nav-tab {% if request.path == '/resident/assemblies' %}active{% endif %}">
+                <span class="nav-tab-icon">👥</span>
+                <span>Assemblées</span>
+            </a>
+            <a href="/resident/documents" class="nav-tab {% if request.path == '/resident/documents' %}active{% endif %}">
+                <span class="nav-tab-icon">📄</span>
+                <span>Documents</span>
+            </a>
+        </div>
+        
+        <a href="/resident/maintenance#new" class="quick-action-btn">
+            <span class="quick-action-icon">➕</span>
+            <span>Nouvelle demande</span>
+        </a>
+    </aside>
+    
+    <main class="main-content">
+        {% block resident_content %}
+        {% endblock %}
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% block resident_extra_js %}{% endblock %}
+{% endblock %}

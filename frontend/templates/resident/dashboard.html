@@ -6,11 +6,11 @@ Par : Aisance KALONJI
 Mail : moa@myoneart.com
 www.myoneart.com
 -->
-{% extends "base.html" %}
+{% extends "resident/resident_base.html" %}
 
 {% block title %}Mon Tableau de Bord - Shabaka Syndic{% endblock %}
 
-{% block extra_css %}
+{% block resident_extra_css %}
 <style>
     body {
         background: #f5f7fa;
@@ -673,7 +673,7 @@ www.myoneart.com
 </style>
 {% endblock %}
 
-{% block content %}
+{% block resident_content %}
 <div class="modern-header">
     <div class="header-container">
         <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
@@ -1093,7 +1093,7 @@ www.myoneart.com
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block resident_extra_js %}
 <script>
 let uploadedImage = null;
 
