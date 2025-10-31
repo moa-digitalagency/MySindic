@@ -64,7 +64,7 @@ class MaintenanceRequest(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relations
-    author = db.relationship('User', backref='maintenance_requests', lazy=True)
+    author = db.relationship('User', foreign_keys=[author_id], backref='authored_maintenance_requests', lazy=True)
     
     def to_dict(self):
         """Convertit la demande en dictionnaire"""

@@ -51,7 +51,6 @@ class User(UserMixin, db.Model):
     # Relations
     residence = db.relationship('Residence', backref='residents', lazy=True)
     unit = db.relationship('Unit', backref='resident', lazy=True)
-    maintenance_requests = db.relationship('MaintenanceRequest', backref='requester', lazy=True)
     poll_votes = db.relationship('PollVote', backref='voter', lazy=True)
     
     def set_password(self, password):
