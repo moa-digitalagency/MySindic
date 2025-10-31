@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "admin/admin_base.html" %}
 
-{% block title %}Dashboard SuperAdmin - MySindic{% endblock %}
+{% block title %}Dashboard SuperAdmin - Shabaka Syndic{% endblock %}
 
 {% block admin_extra_css %}
 <style>
@@ -188,7 +188,7 @@ async function loadDashboardStats() {
             animateValue('stat-charges', 0, stats.total_charges || 0, 1000);
             animateValue('stat-maintenance', 0, stats.pending_maintenance || 0, 1000);
             
-            document.getElementById('stat-unpaid').textContent = MySindic.formatCurrency(stats.total_unpaid || 0);
+            document.getElementById('stat-unpaid').textContent = Shabaka Syndic.formatCurrency(stats.total_unpaid || 0);
             
             // Update notification badge
             const notificationCount = stats.pending_maintenance || 0;
@@ -202,7 +202,7 @@ async function loadDashboardStats() {
         }
     } catch (error) {
         console.error('Error loading dashboard:', error);
-        MySindic.showToast('Erreur lors du chargement des statistiques', 'error');
+        Shabaka Syndic.showToast('Erreur lors du chargement des statistiques', 'error');
     }
 }
 
@@ -319,7 +319,7 @@ async function loadRecentActivity() {
                     iconBg: '#FEF3C7',
                     title: req.title,
                     desc: req.category || 'Autre',
-                    time: MySindic.formatDate(req.created_at),
+                    time: Shabaka Syndic.formatDate(req.created_at),
                     status: req.status
                 });
             });
@@ -333,8 +333,8 @@ async function loadRecentActivity() {
                     icon: '💳',
                     iconBg: '#D1FAE5',
                     title: `Paiement reçu`,
-                    desc: MySindic.formatCurrency(payment.amount),
-                    time: MySindic.formatDate(payment.created_at),
+                    desc: Shabaka Syndic.formatCurrency(payment.amount),
+                    time: Shabaka Syndic.formatDate(payment.created_at),
                     status: payment.status
                 });
             });
@@ -374,7 +374,7 @@ async function loadRecentActivity() {
 }
 
 function refreshDashboard() {
-    MySindic.showToast('Actualisation des données...', 'info');
+    Shabaka Syndic.showToast('Actualisation des données...', 'info');
     loadDashboardStats();
 }
 

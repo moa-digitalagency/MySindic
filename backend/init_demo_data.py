@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -34,7 +34,7 @@ def init_demo_data(app, db):
     from backend.models.general_assembly import GeneralAssembly, Resolution, Vote, Attendance
     
     with app.app_context():
-        print("🚀 Initialisation de la base de données MySindic avec données complètes...\n")
+        print("🚀 Initialisation de la base de données Shabaka Syndic avec données complètes...\n")
         
         # Créer toutes les tables
         print("📋 Création des tables...")
@@ -73,7 +73,7 @@ def init_demo_data(app, db):
             postal_code="20000",
             total_units=20,
             description="Résidence moderne avec espaces verts et piscine",
-            syndic_name="MySindic",
+            syndic_name="Shabaka Syndic",
             syndic_email="contact@mysindic.ma",
             syndic_phone="+212522000000"
         )
@@ -310,7 +310,7 @@ def init_demo_data(app, db):
         print("📰 Création des actualités...")
         news1 = News(
             residence_id=residence.id,
-            title="Bienvenue sur MySindic!",
+            title="Bienvenue sur Shabaka Syndic!",
             content="Nous sommes ravis de vous présenter votre nouvelle plateforme de gestion de copropriété. Vous pouvez maintenant consulter vos charges, faire des demandes de maintenance et bien plus encore.",
             author_id=admin.id,
             is_published=True

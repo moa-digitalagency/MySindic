@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "admin/admin_base.html" %}
 
-{% block title %}Gestion des Documents - MySindic{% endblock %}
+{% block title %}Gestion des Documents - Shabaka Syndic{% endblock %}
 
 {% block admin_content %}
 <div class="px-4 sm:px-6 lg:px-8">
@@ -18,7 +18,7 @@ www.myoneart.com
             <p class="mt-2 text-sm text-gray-700">Centralisation des documents de vos résidences</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button onclick="MySindic.openModal('addDocumentModal')" class="btn-primary w-full sm:w-auto">
+            <button onclick="Shabaka Syndic.openModal('addDocumentModal')" class="btn-primary w-full sm:w-auto">
                 <span class="hidden sm:inline">Ajouter un document</span>
                 <span class="sm:hidden">+ Ajouter</span>
             </button>
@@ -100,7 +100,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Ajouter un Document</h3>
-                <button onclick="MySindic.closeModal('addDocumentModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="Shabaka Syndic.closeModal('addDocumentModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -171,7 +171,7 @@ www.myoneart.com
             </div>
 
             <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button type="button" onclick="MySindic.closeModal('addDocumentModal')" class="btn-secondary">
+                <button type="button" onclick="Shabaka Syndic.closeModal('addDocumentModal')" class="btn-secondary">
                     Annuler
                 </button>
                 <button type="submit" class="btn-primary">
@@ -187,7 +187,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900" id="view-doc-title">Détails du document</h3>
-                <button onclick="MySindic.closeModal('viewDocumentModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="Shabaka Syndic.closeModal('viewDocumentModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -225,7 +225,7 @@ async function loadDocuments() {
         }
     } catch (error) {
         console.error('Error loading documents:', error);
-        MySindic.showToast('Erreur lors du chargement', 'error');
+        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -280,7 +280,7 @@ function renderDocuments(documents) {
                     <span class="badge badge-info">${getTypeLabel(doc.document_type)}</span>
                 </td>
                 <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden lg:table-cell">
-                    ${doc.document_date ? MySindic.formatDate(doc.document_date) : '-'}
+                    ${doc.document_date ? Shabaka Syndic.formatDate(doc.document_date) : '-'}
                 </td>
                 <td class="px-3 py-4 sm:px-6">
                     ${doc.is_public ? '<span class="badge badge-success text-xs">Public</span>' : '<span class="badge badge-warning text-xs">Privé</span>'}
@@ -343,7 +343,7 @@ function viewDocument(docId) {
                 </div>
                 <div>
                     <p class="text-xs sm:text-sm text-gray-500">Date du document</p>
-                    <p class="font-medium">${doc.document_date ? MySindic.formatDate(doc.document_date) : '-'}</p>
+                    <p class="font-medium">${doc.document_date ? Shabaka Syndic.formatDate(doc.document_date) : '-'}</p>
                 </div>
                 <div>
                     <p class="text-xs sm:text-sm text-gray-500">Visibilité</p>
@@ -372,7 +372,7 @@ function viewDocument(docId) {
         </div>
     `;
     
-    MySindic.openModal('viewDocumentModal');
+    Shabaka Syndic.openModal('viewDocumentModal');
 }
 
 function formatFileSize(bytes) {
@@ -386,7 +386,7 @@ async function downloadDocument(docId) {
     const doc = allDocuments.find(d => d.id === docId);
     if (!doc) return;
     
-    MySindic.showToast('Téléchargement en cours...', 'info');
+    Shabaka Syndic.showToast('Téléchargement en cours...', 'info');
     window.open(`/api/admin/documents/${docId}/download`, '_blank');
 }
 
@@ -409,22 +409,22 @@ document.getElementById('addDocumentForm').addEventListener('submit', async (e) 
         
         const result = await response.json();
         if (result.success) {
-            MySindic.showToast('Document ajouté avec succès', 'success');
-            MySindic.closeModal('addDocumentModal');
+            Shabaka Syndic.showToast('Document ajouté avec succès', 'success');
+            Shabaka Syndic.closeModal('addDocumentModal');
             e.target.reset();
             document.getElementById('file-name').textContent = '';
             loadDocuments();
         } else {
-            MySindic.showToast(result.message || 'Erreur', 'error');
+            Shabaka Syndic.showToast(result.message || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur lors de l\'ajout', 'error');
+        Shabaka Syndic.showToast('Erreur lors de l\'ajout', 'error');
     }
 });
 
 ['filter-residence', 'filter-type', 'filter-search'].forEach(id => {
-    document.getElementById(id).addEventListener('input', MySindic.debounce(() => {
+    document.getElementById(id).addEventListener('input', Shabaka Syndic.debounce(() => {
         let filtered = allDocuments;
         
         const residenceId = document.getElementById('filter-residence').value;

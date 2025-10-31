@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "admin/admin_base.html" %}
 
-{% block title %}Gestion des Utilisateurs - MySindic{% endblock %}
+{% block title %}Gestion des Utilisateurs - Shabaka Syndic{% endblock %}
 
 {% block admin_content %}
 <div class="px-4 sm:px-6 lg:px-8">
@@ -58,7 +58,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold" id="modal-title">Nouvel Utilisateur</h2>
-                <button onclick="MySindic.closeModal('userModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="Shabaka Syndic.closeModal('userModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -139,7 +139,7 @@ www.myoneart.com
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="MySindic.closeModal('userModal')" class="btn-secondary">
+                    <button type="button" onclick="Shabaka Syndic.closeModal('userModal')" class="btn-secondary">
                         Annuler
                     </button>
                     <button type="submit" class="btn-primary">
@@ -230,7 +230,7 @@ async function changeUserRole(userId, currentRole) {
     
     const validRoles = ['superadmin', 'admin', 'owner', 'resident'];
     if (!validRoles.includes(newRole)) {
-        MySindic.showToast('Rôle invalide', 'error');
+        Shabaka Syndic.showToast('Rôle invalide', 'error');
         return;
     }
     
@@ -244,14 +244,14 @@ async function changeUserRole(userId, currentRole) {
         const data = await response.json();
         
         if (data.success) {
-            MySindic.showToast(data.message, 'success');
+            Shabaka Syndic.showToast(data.message, 'success');
             loadUsers();
         } else {
-            MySindic.showToast(data.error, 'error');
+            Shabaka Syndic.showToast(data.error, 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur lors du changement de rôle', 'error');
+        Shabaka Syndic.showToast('Erreur lors du changement de rôle', 'error');
     }
 }
 
@@ -319,7 +319,7 @@ function openCreateUserModal() {
     document.getElementById('password-section').style.display = 'block';
     document.getElementById('user-password').required = true;
     document.getElementById('residence-fields').classList.add('hidden');
-    MySindic.openModal('userModal');
+    Shabaka Syndic.openModal('userModal');
 }
 
 function editUser(userId) {
@@ -344,7 +344,7 @@ function editUser(userId) {
         document.getElementById('user-unit').value = user.unit_number || '';
     }
     
-    MySindic.openModal('userModal');
+    Shabaka Syndic.openModal('userModal');
 }
 
 function toggleResidenceFields() {
@@ -398,15 +398,15 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            MySindic.showToast(userId ? 'Utilisateur mis à jour' : 'Utilisateur créé', 'success');
-            MySindic.closeModal('userModal');
+            Shabaka Syndic.showToast(userId ? 'Utilisateur mis à jour' : 'Utilisateur créé', 'success');
+            Shabaka Syndic.closeModal('userModal');
             loadUsers();
         } else {
-            MySindic.showToast(data.error || 'Erreur', 'error');
+            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur de connexion', 'error');
+        Shabaka Syndic.showToast('Erreur de connexion', 'error');
     }
 });
 

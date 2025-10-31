@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "base.html" %}
 
-{% block title %}Mon Tableau de Bord - MySindic{% endblock %}
+{% block title %}Mon Tableau de Bord - Shabaka Syndic{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -677,7 +677,7 @@ www.myoneart.com
 <div class="modern-header">
     <div class="header-container">
         <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-        <div class="logo">🏢 MySindic</div>
+        <div class="logo">🏢 Shabaka Syndic</div>
         
         <div class="search-bar">
             <span class="search-icon">🔍</span>
@@ -703,7 +703,7 @@ www.myoneart.com
 <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
 <div class="mobile-menu-drawer" id="mobileMenuDrawer">
     <div class="mobile-menu-header">
-        <div class="logo">🏢 MySindic</div>
+        <div class="logo">🏢 Shabaka Syndic</div>
         <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
     </div>
     
@@ -733,7 +733,7 @@ www.myoneart.com
             <span>Mon Profil</span>
         </a>
         <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
-            <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
+            <a href="#" class="nav-tab" onclick="event.preventDefault(); Shabaka Syndic.logout();" style="color: #dc2626;">
                 <span class="nav-tab-icon">🚪</span>
                 <span>Déconnexion</span>
             </a>
@@ -795,7 +795,7 @@ www.myoneart.com
                 <span>Mon Profil</span>
             </a>
             <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
-                <a href="#" class="nav-tab" onclick="event.preventDefault(); MySindic.logout();" style="color: #dc2626;">
+                <a href="#" class="nav-tab" onclick="event.preventDefault(); Shabaka Syndic.logout();" style="color: #dc2626;">
                     <span class="nav-tab-icon">🚪</span>
                     <span>Déconnexion</span>
                 </a>
@@ -1117,7 +1117,7 @@ function handleImageUpload(event) {
     if (!file) return;
     
     if (!file.type.startsWith('image/')) {
-        MySindic.showToast('Veuillez sélectionner une image', 'error');
+        Shabaka Syndic.showToast('Veuillez sélectionner une image', 'error');
         return;
     }
     
@@ -1157,12 +1157,12 @@ function handleVideoUpload(event) {
     if (!file) return;
     
     if (!file.type.startsWith('video/')) {
-        MySindic.showToast('Veuillez sélectionner une vidéo', 'error');
+        Shabaka Syndic.showToast('Veuillez sélectionner une vidéo', 'error');
         return;
     }
     
     if (file.size > 50 * 1024 * 1024) {
-        MySindic.showToast('La vidéo ne doit pas dépasser 50 MB', 'error');
+        Shabaka Syndic.showToast('La vidéo ne doit pas dépasser 50 MB', 'error');
         return;
     }
     
@@ -1202,7 +1202,7 @@ function applyFormat(format) {
     const selectedText = textarea.value.substring(start, end);
     
     if (!selectedText) {
-        MySindic.showToast('Sélectionnez du texte pour le formater', 'info');
+        Shabaka Syndic.showToast('Sélectionnez du texte pour le formater', 'info');
         return;
     }
     
@@ -1235,11 +1235,11 @@ function saveProfile() {
     const phone = document.getElementById('profile-phone').value;
     
     if (!firstName || !lastName || !email || !phone) {
-        MySindic.showToast('Veuillez remplir tous les champs', 'error');
+        Shabaka Syndic.showToast('Veuillez remplir tous les champs', 'error');
         return;
     }
     
-    MySindic.showToast('Profil enregistré avec succès', 'success');
+    Shabaka Syndic.showToast('Profil enregistré avec succès', 'success');
 }
 
 function cancelProfileEdit() {
@@ -1266,7 +1266,7 @@ async function publishPost() {
     const content = document.getElementById('new-post-content').value.trim();
     
     if (!content) {
-        MySindic.showToast('Veuillez saisir du contenu', 'error');
+        Shabaka Syndic.showToast('Veuillez saisir du contenu', 'error');
         return;
     }
     
@@ -1285,14 +1285,14 @@ async function publishPost() {
         
         if (data.success) {
             document.getElementById('new-post-content').value = '';
-            MySindic.showToast('Publication envoyée avec succès', 'success');
+            Shabaka Syndic.showToast('Publication envoyée avec succès', 'success');
             loadResidentDashboard();
         } else {
-            MySindic.showToast(data.message || 'Erreur lors de la publication', 'error');
+            Shabaka Syndic.showToast(data.message || 'Erreur lors de la publication', 'error');
         }
     } catch (error) {
         console.error('Error publishing post:', error);
-        MySindic.showToast('Erreur lors de la publication', 'error');
+        Shabaka Syndic.showToast('Erreur lors de la publication', 'error');
     }
 }
 
@@ -1397,7 +1397,7 @@ function loadNewsFeed(news) {
                 <div class="post-avatar">📢</div>
                 <div class="post-info">
                     <div class="post-author">${item.title}</div>
-                    <div class="post-date">${MySindic.formatDate(item.created_at)}</div>
+                    <div class="post-date">${Shabaka Syndic.formatDate(item.created_at)}</div>
                 </div>
             </div>
             <div class="post-content">${item.content}</div>
@@ -1443,7 +1443,7 @@ function loadMaintenanceFeed(myRequests, allRequests) {
                 <div class="post-avatar">🔧</div>
                 <div class="post-info">
                     <div class="post-author">${req.title}</div>
-                    <div class="post-date">${MySindic.formatDate(req.created_at)}</div>
+                    <div class="post-date">${Shabaka Syndic.formatDate(req.created_at)}</div>
                 </div>
             </div>
             <div class="post-content">${req.description || 'Aucune description'}</div>

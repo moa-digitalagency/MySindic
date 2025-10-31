@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -273,7 +273,7 @@ def create_app():
         
         return jsonify({
             'status': 'healthy',
-            'application': 'MySindic',
+            'application': 'Shabaka Syndic',
             'version': '0.1.0',
             'database': db_status
         })
@@ -282,7 +282,7 @@ def create_app():
     def api_info():
         """Informations sur l'API"""
         return jsonify({
-            'name': 'MySindic API',
+            'name': 'Shabaka Syndic API',
             'version': '0.1.0',
             'description': 'API de gestion de copropriété',
             'endpoints': {
@@ -377,7 +377,7 @@ if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     
     # Bind sur 0.0.0.0 pour être accessible depuis l'extérieur
-    print(f"🚀 Démarrage de MySindic sur le port {port}...")
+    print(f"🚀 Démarrage de Shabaka Syndic sur le port {port}...")
     app.run(
         host='0.0.0.0',
         port=port,

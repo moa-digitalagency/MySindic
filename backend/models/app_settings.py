@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Modèle pour les paramètres de l'application
+Shabaka Syndic - Modèle pour les paramètres de l'application
 
 Stocke les paramètres personnalisés de l'application
 incluant le code <head> personnalisé

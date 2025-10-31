@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "admin/admin_base.html" %}
 
-{% block title %}Rôles & Permissions - MySindic{% endblock %}
+{% block title %}Rôles & Permissions - Shabaka Syndic{% endblock %}
 
 {% block admin_extra_css %}
 <style>
@@ -703,13 +703,13 @@ async function savePermissions() {
         });
         
         if (response.ok) {
-            MySindic.showToast('✅ Permissions enregistrées avec succès', 'success');
+            Shabaka Syndic.showToast('✅ Permissions enregistrées avec succès', 'success');
         } else {
-            MySindic.showToast('❌ Erreur lors de l\'enregistrement', 'error');
+            Shabaka Syndic.showToast('❌ Erreur lors de l\'enregistrement', 'error');
         }
     } catch (error) {
         console.error('Erreur:', error);
-        MySindic.showToast('❌ Erreur de connexion', 'error');
+        Shabaka Syndic.showToast('❌ Erreur de connexion', 'error');
     }
 }
 

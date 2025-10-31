@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -47,7 +47,7 @@ class Config:
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@mysindic.ma')
     
     # Configuration de l'application
-    APP_NAME = 'MySindic'
+    APP_NAME = 'Shabaka Syndic'
     APP_VERSION = '0.1.0'
     
     # Pagination

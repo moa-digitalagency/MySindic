@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "admin/admin_base.html" %}
 
-{% block title %}Actualités - MySindic{% endblock %}
+{% block title %}Actualités - Shabaka Syndic{% endblock %}
 
 {% block admin_content %}
 <div class="content-card">
@@ -42,13 +42,13 @@ www.myoneart.com
             
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                    <button onclick="MySindic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                    <button onclick="Shabaka Syndic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
                         <span>🖼️</span> Photo
                     </button>
-                    <button onclick="MySindic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                    <button onclick="Shabaka Syndic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
                         <span>🎥</span> Vidéo
                     </button>
-                    <button onclick="MySindic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                    <button onclick="Shabaka Syndic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
                         <span>😊</span> Emoji
                     </button>
                     <button onclick="toggleAdvancedOptions()" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
@@ -154,7 +154,7 @@ async function loadNews() {
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur de connexion', 'error');
+        Shabaka Syndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -307,7 +307,7 @@ async function publishNews() {
     const category = document.getElementById('category').value;
     
     if (!content) {
-        MySindic.showToast('Veuillez écrire un message', 'error');
+        Shabaka Syndic.showToast('Veuillez écrire un message', 'error');
         return;
     }
     
@@ -315,7 +315,7 @@ async function publishNews() {
         if (selectedResidenceId === 'all') {
             // Publier dans toutes les résidences
             if (allResidences.length === 0) {
-                MySindic.showToast('Aucune résidence disponible', 'error');
+                Shabaka Syndic.showToast('Aucune résidence disponible', 'error');
                 return;
             }
             
@@ -339,7 +339,7 @@ async function publishNews() {
             const allSuccess = results.every(r => r.ok);
             
             if (allSuccess) {
-                MySindic.showToast(`Actualité publiée dans ${allResidences.length} résidence(s) !`, 'success');
+                Shabaka Syndic.showToast(`Actualité publiée dans ${allResidences.length} résidence(s) !`, 'success');
                 document.getElementById('news-content').value = '';
                 document.getElementById('is_important').checked = false;
                 document.getElementById('is_pinned').checked = false;
@@ -347,7 +347,7 @@ async function publishNews() {
                 document.getElementById('advanced-options').style.display = 'none';
                 loadNews();
             } else {
-                MySindic.showToast('Erreur lors de la publication dans certaines résidences', 'error');
+                Shabaka Syndic.showToast('Erreur lors de la publication dans certaines résidences', 'error');
             }
         } else {
             // Publier dans une résidence spécifique
@@ -368,7 +368,7 @@ async function publishNews() {
             const data = await response.json();
             
             if (data.success) {
-                MySindic.showToast('Actualité publiée !', 'success');
+                Shabaka Syndic.showToast('Actualité publiée !', 'success');
                 document.getElementById('news-content').value = '';
                 document.getElementById('is_important').checked = false;
                 document.getElementById('is_pinned').checked = false;
@@ -376,17 +376,17 @@ async function publishNews() {
                 document.getElementById('advanced-options').style.display = 'none';
                 loadNews();
             } else {
-                MySindic.showToast(data.error || 'Erreur lors de la publication', 'error');
+                Shabaka Syndic.showToast(data.error || 'Erreur lors de la publication', 'error');
             }
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur de connexion', 'error');
+        Shabaka Syndic.showToast('Erreur de connexion', 'error');
     }
 }
 
 async function editNews(newsId) {
-    MySindic.showToast('Fonctionnalité de modification à venir', 'info');
+    Shabaka Syndic.showToast('Fonctionnalité de modification à venir', 'info');
 }
 
 async function deleteNews(newsId) {
@@ -400,14 +400,14 @@ async function deleteNews(newsId) {
         const data = await response.json();
         
         if (data.success) {
-            MySindic.showToast('Actualité supprimée', 'success');
+            Shabaka Syndic.showToast('Actualité supprimée', 'success');
             loadNews();
         } else {
-            MySindic.showToast(data.error || 'Erreur lors de la suppression', 'error');
+            Shabaka Syndic.showToast(data.error || 'Erreur lors de la suppression', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur de connexion', 'error');
+        Shabaka Syndic.showToast('Erreur de connexion', 'error');
     }
 }
 

@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "base.html" %}
 
-{% block title %}Mes Finances - MySindic{% endblock %}
+{% block title %}Mes Finances - Shabaka Syndic{% endblock %}
 
 {% block content %}
 <div class="px-4 sm:px-6 lg:px-8">
@@ -18,7 +18,7 @@ www.myoneart.com
             <p class="mt-2 text-sm text-gray-700">Charges et paiements de mon lot</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button onclick="MySindic.openModal('paymentModal')" class="btn-primary">
+            <button onclick="Shabaka Syndic.openModal('paymentModal')" class="btn-primary">
                 Déclarer un Paiement
             </button>
         </div>
@@ -80,7 +80,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Déclarer un Paiement</h2>
-                <button onclick="MySindic.closeModal('paymentModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="Shabaka Syndic.closeModal('paymentModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -133,7 +133,7 @@ www.myoneart.com
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="MySindic.closeModal('paymentModal')" class="btn-secondary">
+                    <button type="button" onclick="Shabaka Syndic.closeModal('paymentModal')" class="btn-secondary">
                         Annuler
                     </button>
                     <button type="submit" class="btn-primary">
@@ -179,17 +179,17 @@ async function loadFinancialData() {
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur lors du chargement', 'error');
+        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
 function updateStats() {
     const balanceEl = document.getElementById('stat-balance');
-    balanceEl.textContent = MySindic.formatCurrency(Math.abs(balance));
+    balanceEl.textContent = Shabaka Syndic.formatCurrency(Math.abs(balance));
     balanceEl.classList.add(balance < 0 ? 'text-red-600' : 'text-green-600');
     
     const unpaid = myCharges.filter(c => c.distribution && !c.distribution.is_paid).reduce((sum, c) => sum + parseFloat(c.distribution.amount), 0);
-    document.getElementById('stat-unpaid').textContent = MySindic.formatCurrency(unpaid);
+    document.getElementById('stat-unpaid').textContent = Shabaka Syndic.formatCurrency(unpaid);
     
     const pending = myPayments.filter(p => p.status === 'pending').length;
     document.getElementById('stat-pending').textContent = pending;
@@ -228,8 +228,8 @@ function displayCharges() {
                             </td>
                             <td><span class="badge badge-info">${charge.charge_type}</span></td>
                             <td>${charge.period_month ? charge.period_month + '/' : ''}${charge.period_year}</td>
-                            <td class="font-semibold">${dist ? MySindic.formatCurrency(dist.amount) : '-'}</td>
-                            <td class="text-sm">${charge.due_date ? MySindic.formatDate(charge.due_date) : '-'}</td>
+                            <td class="font-semibold">${dist ? Shabaka Syndic.formatCurrency(dist.amount) : '-'}</td>
+                            <td class="text-sm">${charge.due_date ? Shabaka Syndic.formatDate(charge.due_date) : '-'}</td>
                             <td>
                                 ${isPaid ? 
                                     '<span class="badge badge-success">Payée</span>' :
@@ -266,8 +266,8 @@ async function loadPayments() {
             <tbody>
                 ${myPayments.map(p => `
                     <tr>
-                        <td>${MySindic.formatDate(p.payment_date)}</td>
-                        <td class="font-semibold text-green-600">${MySindic.formatCurrency(p.amount)}</td>
+                        <td>${Shabaka Syndic.formatDate(p.payment_date)}</td>
+                        <td class="font-semibold text-green-600">${Shabaka Syndic.formatCurrency(p.amount)}</td>
                         <td><span class="badge badge-info">${p.payment_method}</span></td>
                         <td class="text-sm">${p.reference || '-'}</td>
                         <td>
@@ -320,8 +320,8 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            MySindic.showToast('Paiement déclaré avec succès', 'success');
-            MySindic.closeModal('paymentModal');
+            Shabaka Syndic.showToast('Paiement déclaré avec succès', 'success');
+            Shabaka Syndic.closeModal('paymentModal');
             document.getElementById('paymentForm').reset();
             
             const paymentsRes = await fetch('/api/resident/payments');
@@ -334,11 +334,11 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
                 }
             }
         } else {
-            MySindic.showToast(data.error || 'Erreur', 'error');
+            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        MySindic.showToast('Erreur de connexion', 'error');
+        Shabaka Syndic.showToast('Erreur de connexion', 'error');
     }
 });
 

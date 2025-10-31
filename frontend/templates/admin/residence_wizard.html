@@ -1,5 +1,5 @@
 <!--
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -8,7 +8,7 @@ www.myoneart.com
 -->
 {% extends "base.html" %}
 
-{% block title %}Créer une Résidence - MySindic{% endblock %}
+{% block title %}Créer une Résidence - Shabaka Syndic{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -685,7 +685,7 @@ www.myoneart.com
                 
                 <div class="form-group">
                     <label class="form-label">Nom du syndic</label>
-                    <input type="text" id="syndic_name" class="form-input" placeholder="Ex: MySindic">
+                    <input type="text" id="syndic_name" class="form-input" placeholder="Ex: Shabaka Syndic">
                 </div>
                 
                 <div class="form-group">
@@ -914,20 +914,20 @@ function validateStep(step) {
             const city = document.getElementById('residence_city').value;
             
             if (!name || !address || !city) {
-                MySindic.showToast('Veuillez remplir tous les champs obligatoires', 'error');
+                Shabaka Syndic.showToast('Veuillez remplir tous les champs obligatoires', 'error');
                 return false;
             }
             return true;
             
         case 2:
             if (!wizardData.divisionType) {
-                MySindic.showToast('Veuillez sélectionner un type de découpe', 'error');
+                Shabaka Syndic.showToast('Veuillez sélectionner un type de découpe', 'error');
                 return false;
             }
             
             const divCount = parseInt(document.getElementById('division_count').value);
             if (!divCount || divCount < 1) {
-                MySindic.showToast('Veuillez spécifier le nombre de divisions', 'error');
+                Shabaka Syndic.showToast('Veuillez spécifier le nombre de divisions', 'error');
                 return false;
             }
             
@@ -939,7 +939,7 @@ function validateStep(step) {
             
             // Vérifier que les divisions ont bien été créées
             if (!wizardData.divisions || wizardData.divisions.length === 0) {
-                MySindic.showToast('Erreur lors de la création des divisions', 'error');
+                Shabaka Syndic.showToast('Erreur lors de la création des divisions', 'error');
                 return false;
             }
             
@@ -948,7 +948,7 @@ function validateStep(step) {
             
         case 3:
             if (wizardData.units.length === 0) {
-                MySindic.showToast('Veuillez configurer au moins une unité', 'error');
+                Shabaka Syndic.showToast('Veuillez configurer au moins une unité', 'error');
                 return false;
             }
             return true;
@@ -983,8 +983,8 @@ function saveStepData(step) {
             console.log('saveStepData(2) - Divisions finales:', wizardData.divisions);
             
             // Afficher une notification de succès visuelle
-            if (wizardData.divisions.length > 0 && typeof MySindic !== 'undefined') {
-                MySindic.showToast(`${wizardData.divisions.length} division(s) configurée(s) avec succès`, 'success');
+            if (wizardData.divisions.length > 0 && typeof Shabaka Syndic !== 'undefined') {
+                Shabaka Syndic.showToast(`${wizardData.divisions.length} division(s) configurée(s) avec succès`, 'success');
             }
             break;
     }
@@ -1449,19 +1449,19 @@ async function submitResidence() {
         const data = await response.json();
         
         if (data.success) {
-            MySindic.showToast('Résidence créée avec succès !', 'success');
+            Shabaka Syndic.showToast('Résidence créée avec succès !', 'success');
             setTimeout(() => {
                 window.location.href = '/admin/residences';
             }, 1500);
         } else {
-            MySindic.showToast(data.message || 'Erreur lors de la création', 'error');
+            Shabaka Syndic.showToast(data.message || 'Erreur lors de la création', 'error');
             nextBtn.disabled = false;
             nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4"></i> Créer la résidence';
             feather.replace();
         }
     } catch (error) {
         console.error('Error creating residence:', error);
-        MySindic.showToast('Erreur lors de la création de la résidence', 'error');
+        Shabaka Syndic.showToast('Erreur lors de la création de la résidence', 'error');
         nextBtn.disabled = false;
         nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4"></i> Créer la résidence';
         feather.replace();
