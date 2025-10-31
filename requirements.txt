@@ -1,5 +1,5 @@
-# MySindic - Dépendances Python
-# Date: 24 octobre 2025
+# Shabaka Syndic - Dépendances Python
+# Date: 31 octobre 2025
 
 # Framework Web
 Flask==3.0.0
@@ -26,61 +26,3 @@ gunicorn==21.2.0
 
 # Validation de données
 email-validator==2.1.0
-email_validator
-flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-email_validator
-flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-cryptography==41.0.7
-email-validator==2.1.0
-flask==3.0.0
-flask-cors==4.0.0
-flask-login==0.6.3
-flask-mail==0.9.1
-flask-migrate==4.0.5
-flask-sqlalchemy==3.1.1
-gunicorn==21.2.0
-psycopg2-binary==2.9.9
-pyjwt==2.8.0
-python-dotenv==1.0.0
-sqlalchemy==2.0.23
-werkzeug==3.0.1
-email_validator
-flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-email_validator
-flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-email_validator
-flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-cryptography
-email-validator
-flask
-flask-cors
-flask-login
-flask-mail
-flask-migrate
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-pyjwt
-python-dotenv
-sqlalchemy
-werkzeug
-email_validator
-flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary

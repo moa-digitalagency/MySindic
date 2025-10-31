@@ -1,8 +1,8 @@
-# 🔐 MySindic - Identifiants de Démonstration
+# 🔐 Shabaka Syndic - Identifiants de Démonstration
 
 **Dernière mise à jour :** 25 octobre 2025
 
-Ce document contient tous les identifiants de démonstration pour tester l'application MySindic.
+Ce document contient tous les identifiants de démonstration pour tester l'application Shabaka Syndic.
 
 ⚠️ **Auto-initialisation activée** - La base de données s'initialise automatiquement au premier démarrage!
 

@@ -1,8 +1,8 @@
-# MySindic - Documentation Technique
+# Shabaka Syndic - Documentation Technique
 
 ## Architecture Globale
 
-MySindic est une application web monolithique basée sur Flask avec une architecture en couches :
+Shabaka Syndic est une application web monolithique basée sur Flask avec une architecture en couches :
 
 ```
 ┌─────────────────────────────────────────┐
@@ -640,7 +640,7 @@ server {
     }
     
     location /static {
-        alias /var/www/mysindic/frontend/static;
+        alias /var/www/shabaka-syndic/frontend/static;
         expires 30d;
     }
 }
@@ -650,15 +650,15 @@ server {
 
 ```ini
 [Unit]
-Description=MySindic Gunicorn
+Description=Shabaka Syndic Gunicorn
 After=network.target
 
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/mysindic
-Environment="PATH=/var/www/mysindic/venv/bin"
-ExecStart=/var/www/mysindic/venv/bin/gunicorn --config gunicorn.conf.py main:app
+WorkingDirectory=/var/www/shabaka-syndic
+Environment="PATH=/var/www/shabaka-syndic/venv/bin"
+ExecStart=/var/www/shabaka-syndic/venv/bin/gunicorn --config gunicorn.conf.py main:app
 
 [Install]
 WantedBy=multi-user.target
@@ -740,4 +740,4 @@ except Exception as e:
 
 ---
 
-© 2025 MySindic - Documentation Technique
+© 2025 Shabaka Syndic - Documentation Technique

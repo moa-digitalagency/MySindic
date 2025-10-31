@@ -1,4 +1,4 @@
-# MySindic - Document de Suivi du Projet
+# Shabaka Syndic - Document de Suivi du Projet
 
 **Date de création :** 24 octobre 2025  
 **Dernière mise à jour :** 26 octobre 2025 - Améliorations UI/UX (Hero slider, Menu hamburger mobile, Code personnalisé) ✅
@@ -7,7 +7,7 @@
 
 ## 📋 Vue d'ensemble
 
-MySindic est une application web PWA de gestion de copropriété au Maroc, avec un design moderne et mobile-friendly.
+Shabaka Syndic est une application web PWA de gestion de copropriété au Maroc, avec un design moderne et mobile-friendly.
 
 ### Stack Technique
 - **Backend :** Python (Flask)
@@ -87,7 +87,7 @@ MySindic est une application web PWA de gestion de copropriété au Maroc, avec 
 ### Structure du Projet
 
 ```
-MySindic/
+Shabaka Syndic/
 ├── backend/                   # Backend Python Flask
 │   ├── app.py                # Application Flask principale
 │   ├── config.py             # Configuration
@@ -377,7 +377,7 @@ Un script automatisé `deploy_vps.sh` est fourni pour le déploiement sur VPS :
 - 🟢 **Base de données** : PostgreSQL connectée avec 16 modèles de données
 - 🟢 **Frontend** : Toutes les pages HTML stylées et fonctionnelles
 - 🟢 **CSS** : Styles en vanilla CSS compatibles avec Tailwind CDN
-- 🟢 **JavaScript** : Utilitaires MySindic complets
+- 🟢 **JavaScript** : Utilitaires Shabaka Syndic complets
 - 🟢 **Workflow** : Gunicorn en cours d'exécution
 - 🟢 **Sécurité** : Authentification et autorisation implémentées
 
@@ -412,7 +412,7 @@ Un script automatisé `deploy_vps.sh` est fourni pour le déploiement sur VPS :
 3. ✅ **Correction de la déconnexion**
    - Problème : Erreur "Method Not Allowed" - liens HTML utilisaient GET au lieu de POST
    - Solution : Ajout d'une fonction JavaScript logout() qui fait un POST à /api/auth/logout
-   - Conversion des liens <a> en boutons <button> avec onclick="MySindic.logout()"
+   - Conversion des liens <a> en boutons <button> avec onclick="Shabaka Syndic.logout()"
 
 4. ✅ **Correction du dashboard résident**
    - Problème : Erreur de chargement des statistiques

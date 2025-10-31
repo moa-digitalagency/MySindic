@@ -1,10 +1,10 @@
-# MySindic - Gestion Moderne de Copropriété
+# Shabaka Syndic - Gestion Moderne de Copropriété
 
-![MySindic Banner](frontend/static/images/modern_apartment_bui_04cc653f.jpg)
+![Shabaka Syndic Banner](frontend/static/images/modern_apartment_bui_04cc653f.jpg)
 
 **Solution complète et digitale pour les syndics et résidents au Maroc**
 
-MySindic est une application web progressive (PWA) moderne conçue pour simplifier et digitaliser la gestion des copropriétés au Maroc. Elle offre une interface intuitive et responsive pour les administrateurs de syndic et les résidents.
+Shabaka Syndic est une application web progressive (PWA) moderne conçue pour simplifier et digitaliser la gestion des copropriétés au Maroc. Elle offre une interface intuitive et responsive pour les administrateurs de syndic et les résidents.
 
 ## 📋 Table des Matières
 
@@ -486,8 +486,8 @@ Pour toute question ou problème :
 
 ## 📄 Licence
 
-© 2025 MySindic - Shabaka Syndic par Aisance KALONJI
+© 2025 Shabaka Syndic - Shabaka Syndic par Aisance KALONJI
 
 ---
 
-**MySindic** - Gestion Moderne de Copropriété pour le Maroc 🇲🇦
+**Shabaka Syndic** - Gestion Moderne de Copropriété pour le Maroc 🇲🇦

@@ -195,7 +195,7 @@ async function logout() {
     }
 }
 
-window.MySindic = {
+window.ShabakaSyndic = {
     showToast,
     confirmAction,
     apiRequest,

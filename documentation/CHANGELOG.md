@@ -1,4 +1,4 @@
-# Changelog - MySindic
+# Changelog - Shabaka Syndic
 
 ## 2025-10-26
 

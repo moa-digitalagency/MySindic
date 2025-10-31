@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MySindic - Solution complète et digitale pour les syndics et résidents au Maroc.
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
 
 Shabaka Syndic
 Par : Aisance KALONJI
@@ -14,7 +14,7 @@ import sys
 
 if __name__ == "__main__":
     try:
-        print("🚀 Initialisation manuelle de la base de données MySindic...\n")
+        print("🚀 Initialisation manuelle de la base de données Shabaka Syndic...\n")
         
         from backend.app import app
         from backend.models import db
