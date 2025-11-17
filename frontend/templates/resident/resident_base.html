@@ -155,11 +155,17 @@ www.myoneart.com
         margin: 0 auto;
         padding: 1.25rem;
         display: grid;
-        grid-template-columns: 260px 1fr;
+        grid-template-columns: 260px 1fr 280px;
         gap: 1.25rem;
     }
     
     .left-sidebar {
+        position: sticky;
+        top: 85px;
+        height: fit-content;
+    }
+    
+    .right-sidebar {
         position: sticky;
         top: 85px;
         height: fit-content;
@@ -316,6 +322,10 @@ www.myoneart.com
         {% block resident_content %}
         {% endblock %}
     </main>
+    
+    <aside class="right-sidebar">
+        {% block right_sidebar_extra %}{% endblock %}
+    </aside>
 </div>
 {% endblock %}
 

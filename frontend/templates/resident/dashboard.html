@@ -12,10 +12,6 @@ www.myoneart.com
 
 {% block resident_extra_css %}
 <style>
-    .resident-layout {
-        grid-template-columns: 260px 1fr 280px !important;
-    }
-    
     .profile-card {
         background: rgba(255, 255, 255, 0.6);
         border: 2px solid #e5e7eb;
@@ -572,39 +568,38 @@ www.myoneart.com
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Right Sidebar with Calendar and Polls -->
-<aside class="right-sidebar">
-    <div class="calendar-card">
-        <div class="calendar-header">
-            <span class="calendar-month" id="calendar-month">Octobre 2025</span>
-            <div class="calendar-nav">
-                <button class="calendar-nav-btn">‹</button>
-                <button class="calendar-nav-btn">›</button>
-            </div>
-        </div>
-        <div class="calendar-grid">
-            <div class="calendar-day-label">Lun</div>
-            <div class="calendar-day-label">Mar</div>
-            <div class="calendar-day-label">Mer</div>
-            <div class="calendar-day-label">Jeu</div>
-            <div class="calendar-day-label">Ven</div>
-            <div class="calendar-day-label">Sam</div>
-            <div class="calendar-day-label">Dim</div>
-        </div>
-        <div class="calendar-grid" id="calendar-days"></div>
-    </div>
-    
-    <div class="poll-card">
-        <div class="section-title">🗳️ Sondage Actif</div>
-        <div id="polls-container">
-            <p class="poll-question">Êtes-vous favorable à l'installation de panneaux solaires ?</p>
-            <div class="poll-option">👍 Oui</div>
-            <div class="poll-option">👎 Non</div>
-            <div class="poll-option">ℹ️ Besoin de plus d'infos</div>
+{% block right_sidebar_extra %}
+<div class="calendar-card">
+    <div class="calendar-header">
+        <span class="calendar-month" id="calendar-month">Octobre 2025</span>
+        <div class="calendar-nav">
+            <button class="calendar-nav-btn">‹</button>
+            <button class="calendar-nav-btn">›</button>
         </div>
     </div>
-</aside>
+    <div class="calendar-grid">
+        <div class="calendar-day-label">Lun</div>
+        <div class="calendar-day-label">Mar</div>
+        <div class="calendar-day-label">Mer</div>
+        <div class="calendar-day-label">Jeu</div>
+        <div class="calendar-day-label">Ven</div>
+        <div class="calendar-day-label">Sam</div>
+        <div class="calendar-day-label">Dim</div>
+    </div>
+    <div class="calendar-grid" id="calendar-days"></div>
+</div>
+
+<div class="poll-card">
+    <div class="section-title">🗳️ Sondage Actif</div>
+    <div id="polls-container">
+        <p class="poll-question">Êtes-vous favorable à l'installation de panneaux solaires ?</p>
+        <div class="poll-option">👍 Oui</div>
+        <div class="poll-option">👎 Non</div>
+        <div class="poll-option">ℹ️ Besoin de plus d'infos</div>
+    </div>
+</div>
 {% endblock %}
 
 {% block resident_extra_js %}
