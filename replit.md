@@ -4,7 +4,30 @@
 
 **Shabaka Syndic** is a Progressive Web App (PWA) designed for condominium management in the Moroccan market. It provides a comprehensive solution for syndics (superadmins) and residents, aiming to modernize property management, offer a mobile-first and responsive experience, automate administrative tasks like fund calls and charge distribution, and facilitate communication between all stakeholders.
 
-## Recent Changes (October 31, 2025)
+## Recent Changes
+
+### Navigation and News Feed Improvements ✅ (November 17, 2025)
+**Problems Fixed:**
+1. **Broken Navigation from Dashboard:** Removed legacy JavaScript code that intercepted link clicks, preventing navigation from working on the dashboard page
+2. **Confusing Separate News Page:** Removed the separate "Actualités" page that created user confusion
+
+**Changes Made:**
+- **Frontend:**
+  - `frontend/templates/resident/dashboard.html` - Removed tab-switching JavaScript (lines 469-514) that blocked navigation
+  - `frontend/templates/resident/resident_base.html` - Removed "Actualités" link from sidebar navigation menu
+  - Replaced "Voir actualités" quick action button with "Assemblées" button
+  
+- **Backend:**
+  - `backend/routes/resident.py` - Modified `/api/resident/dashboard` to load ALL news items instead of just 5
+  - Added `is_pinned` sorting to prioritize important announcements
+
+**User Experience:**
+- Navigation works correctly from all pages including the dashboard
+- All news items are displayed directly in the dashboard feed
+- Simplified navigation menu without redundant "Actualités" entry
+- News items sorted with pinned items appearing first
+
+## Previous Changes (October 31, 2025)
 
 ### Import to Replit Environment Completed ✅
 - PostgreSQL database created and initialized
