@@ -6,6 +6,23 @@
 
 ## Recent Changes
 
+### Correction Fonctionnalité "Nouvelle Demande" de Maintenance ✅ (November 17, 2025)
+**Problème corrigé:**
+Le bouton "Nouvelle Demande" dans `/resident/maintenance` ne fonctionnait pas - le modal ne s'ouvrait pas lorsqu'on cliquait dessus.
+
+**Cause:**
+Le code HTML utilisait `Shabaka Syndic.openModal()` (avec espace) alors que l'objet JavaScript global est défini comme `ShabakaSyndic` (sans espace).
+
+**Corrections apportées:**
+- Remplacé toutes les occurrences de `Shabaka Syndic.` par `ShabakaSyndic.` dans 16 fichiers HTML
+- Créé le dossier `frontend/static/uploads/maintenance/` pour stocker les images uploadées
+- Vérifié que le formulaire envoie correctement une requête POST à `/api/resident/maintenance`
+
+**Résultat:**
+- Le bouton "Nouvelle Demande" ouvre maintenant le modal correctement
+- Le formulaire de création de demande de maintenance fonctionne de bout en bout
+- Les résidents peuvent maintenant créer des demandes avec titre, description, zone, priorité et photo optionnelle
+
 ### Navigation and News Feed Improvements ✅ (November 17, 2025)
 **Problems Fixed:**
 1. **Broken Navigation from Dashboard:** Removed legacy JavaScript code that intercepted link clicks, preventing navigation from working on the dashboard page
