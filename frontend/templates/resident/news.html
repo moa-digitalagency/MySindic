@@ -54,7 +54,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold" id="modal-title">Détails de l'actualité</h2>
-                <button onclick="Shabaka Syndic.closeModal('newsModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('newsModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -85,11 +85,11 @@ async function loadNews() {
             allNews = data.news;
             filterByCategory(currentCategory);
         } else {
-            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -229,7 +229,7 @@ function createNewsCard(news, getCategoryIcon, getCategoryColor, isPinned) {
                     
                     <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
                         <div class="flex items-center gap-3 flex-wrap">
-                            <span>📅 ${Shabaka Syndic.formatDate(news.published_at || news.created_at)}</span>
+                            <span>📅 ${ShabakaSyndic.formatDate(news.published_at || news.created_at)}</span>
                             ${news.author_name ? `
                                 <div class="flex items-center gap-2">
                                     <span>✍️ ${news.author_name}</span>
@@ -300,7 +300,7 @@ async function viewNewsDetails(newsId) {
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="font-medium">Publié le</label>
-                                <p>${Shabaka Syndic.formatDate(news.published_at || news.created_at)}</p>
+                                <p>${ShabakaSyndic.formatDate(news.published_at || news.created_at)}</p>
                             </div>
                             ${news.author_name ? `
                                 <div>
@@ -317,13 +317,13 @@ async function viewNewsDetails(newsId) {
             `;
             
             document.getElementById('news-details').innerHTML = details;
-            Shabaka Syndic.openModal('newsModal');
+            ShabakaSyndic.openModal('newsModal');
         } else {
-            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
