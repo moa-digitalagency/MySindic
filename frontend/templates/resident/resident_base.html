@@ -288,6 +288,10 @@ www.myoneart.com
                 <span class="nav-tab-icon">📊</span>
                 <span>Tableau de bord</span>
             </a>
+            <a href="/resident/news" class="nav-tab {% if request.path == '/resident/news' %}active{% endif %}">
+                <span class="nav-tab-icon">📰</span>
+                <span>Fil d'Actualités</span>
+            </a>
             <a href="/resident/maintenance" class="nav-tab {% if request.path == '/resident/maintenance' %}active{% endif %}">
                 <span class="nav-tab-icon">🔧</span>
                 <span>Maintenance</span>
@@ -303,10 +307,6 @@ www.myoneart.com
             <a href="/resident/documents" class="nav-tab {% if request.path == '/resident/documents' %}active{% endif %}">
                 <span class="nav-tab-icon">📄</span>
                 <span>Documents</span>
-            </a>
-            <a href="/resident/news" class="nav-tab {% if request.path == '/resident/news' %}active{% endif %}">
-                <span class="nav-tab-icon">📰</span>
-                <span>Fil d'Actualités</span>
             </a>
         </div>
         
