@@ -6,6 +6,36 @@
 
 ## Recent Changes
 
+### Améliorations UI/UX - Sidebars Permanentes et Profil Utilisateur ✅ (November 17, 2025)
+**Nouvelles fonctionnalités:**
+1. **Profil utilisateur enrichi dans le header:**
+   - Affiche maintenant le nom complet (prénom + nom) de l'utilisateur
+   - Affiche le rôle avec emoji (👤 Résident, 🏠 Propriétaire, 🏛️ Admin Syndic, 👑 Super Admin)
+   - Affiche la résidence pour les résidents et propriétaires
+   - Gestion robuste des valeurs nulles (utilise l'email si nom absent)
+
+2. **Section "Ma Résidence" permanente (sidebar gauche):**
+   - Affiche le nom de la résidence de l'utilisateur
+   - Affiche l'adresse si disponible
+   - Affiche le logement (unité) de l'utilisateur
+
+3. **Calendrier dynamique (sidebar droite):**
+   - Affiche la date du jour calculée dynamiquement en JavaScript
+   - Section "Prochains événements" (actuellement vide avec message d'état)
+
+4. **Section Sondages (sidebar droite):**
+   - Message clair "Aucun sondage actif" au lieu de fausses données
+   - Prêt pour l'intégration future avec le backend
+
+5. **Uniformisation des pages news:**
+   - Style cohérent entre /resident/news et /admin/news
+   - Même format de cartes avec bordures arrondies et gradients pour items épinglés
+   - Même affichage des badges de rôle et format de date
+
+**Fichiers modifiés:**
+- `frontend/templates/resident/resident_base.html` - Structure des sidebars et profil
+- `frontend/templates/resident/news.html` - Style des cartes d'actualités
+
 ### Correction Fonctionnalité "Nouvelle Demande" de Maintenance ✅ (November 17, 2025)
 **Problème corrigé:**
 Le bouton "Nouvelle Demande" dans `/resident/maintenance` ne fonctionnait pas - le modal ne s'ouvrait pas lorsqu'on cliquait dessus.
