@@ -312,9 +312,8 @@ www.myoneart.com
 </style>
 {% endblock %}
 
-{% block resident_content %}
-<!-- Residence Info Card in Left Sidebar -->
-<div class="profile-card" style="position: absolute; left: 1.25rem; top: 190px; width: 228px;">
+{% block left_sidebar_extra %}
+<div class="profile-card">
     <div class="section-title">🏢 Ma Résidence</div>
     <div id="residence-info">
         <div class="info-item">
@@ -339,7 +338,9 @@ www.myoneart.com
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block resident_content %}
 <!-- Main Dashboard Content -->
 <div id="tab-actualite" class="tab-content active">
     <div class="content-card">
