@@ -418,10 +418,10 @@ www.myoneart.com
                 </div>
             </a>
             
-            <a href="/resident/news" style="text-decoration: none; padding: 0.875rem; background: rgba(139, 92, 246, 0.08); border: 2px solid #8b5cf6; border-radius: 10px; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.2)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
-                <span style="font-size: 1.25rem;">📰</span>
+            <a href="/resident/assemblies" style="text-decoration: none; padding: 0.875rem; background: rgba(139, 92, 246, 0.08); border: 2px solid #8b5cf6; border-radius: 10px; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.2)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                <span style="font-size: 1.25rem;">👥</span>
                 <div>
-                    <div style="font-size: 0.8rem; font-weight: 600; color: #8b5cf6;">Voir actualités</div>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #8b5cf6;">Assemblées</div>
                 </div>
             </a>
         </div>
@@ -466,52 +466,8 @@ www.myoneart.com
 let uploadedImage = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const tabMap = {
-        '/resident/dashboard': 'actualite',
-        '/resident/news': 'actualite',
-        '/resident/maintenance': 'maintenance',
-        '/resident/assemblies': 'assemblies',
-        '/resident/finances': 'finances',
-        '/resident/documents': 'documents'
-    };
-    
-    const navTabs = document.querySelectorAll('.left-sidebar .nav-tab');
-    navTabs.forEach(tab => {
-        const href = tab.getAttribute('href');
-        const tabName = tabMap[href];
-        if (tabName) {
-            tab.setAttribute('data-tab', tabName);
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchTab(e, tabName);
-            });
-        }
-    });
-    
     loadResidentDashboard();
 });
-
-function switchTab(event, tabName) {
-    event.preventDefault();
-    
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
-        tab.classList.remove('active');
-    });
-    
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    const targetTab = document.getElementById('tab-' + tabName);
-    if (targetTab) {
-        targetTab.style.display = 'block';
-        targetTab.classList.add('active');
-    }
-    
-    const navLinks = document.querySelectorAll('.nav-tab[data-tab="' + tabName + '"]');
-    navLinks.forEach(link => link.classList.add('active'));
-}
 
 function handleImageUpload(event) {
     const file = event.target.files[0];

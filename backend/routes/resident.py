@@ -42,13 +42,13 @@ def dashboard():
             author_id=current_user.id
         ).order_by(MaintenanceRequest.created_at.desc()).limit(5).all()
         
-        # Actualités de la résidence (filtrées par residence_id)
+        # Actualités de la résidence (filtrées par residence_id) - TOUTES les actualités
         news = []
         if current_user.residence_id:
             news = News.query.filter_by(
                 residence_id=current_user.residence_id,
                 is_published=True
-            ).order_by(News.published_at.desc()).limit(5).all()
+            ).order_by(News.is_pinned.desc(), News.published_at.desc()).all()
         
         # Solde du compte (vérifié unit_id ownership)
         balance = None
