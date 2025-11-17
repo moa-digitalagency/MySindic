@@ -330,37 +330,43 @@ function displayNews(newsList) {
 }
 
 function createNewsCard(news, getCategoryIcon, getCategoryColor, isPinned) {
+    const categoryColors = {
+        'info': '#3b82f6',
+        'announcement': '#10b981',
+        'warning': '#f59e0b',
+        'maintenance': '#ef4444'
+    };
+    
+    const date = new Date(news.published_at || news.created_at);
+    const formattedDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    
     return `
-        <div class="card ${isPinned ? 'border-2 border-indigo-300 bg-indigo-50' : ''} cursor-pointer hover:shadow-xl transition-shadow" onclick="viewNewsDetails(${news.id})">
-            <div class="flex items-start">
-                <div class="flex-shrink-0 text-3xl mr-4">
+        <div style="background: white; border: 2px solid ${isPinned ? '#a5b4fc' : '#e5e7eb'}; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; ${isPinned ? 'background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);' : ''} cursor: pointer; transition: all 0.3s;" onclick="viewNewsDetails(${news.id})" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex-shrink: 0; font-size: 2.5rem;">
                     ${getCategoryIcon(news.category)}
                 </div>
-                <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-2">
-                                ${news.is_important ? '<span class="text-red-500 font-bold">★</span>' : ''}
-                                <h3 class="text-lg font-semibold text-gray-900">${news.title}</h3>
-                            </div>
-                            <p class="mt-2 text-gray-600 line-clamp-3">${news.content}</p>
-                        </div>
-                        <span class="badge ${getCategoryColor(news.category)} ml-4">
-                            ${news.category}
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                        ${news.is_important ? '<span style="color: #ef4444; font-size: 1.25rem;">⭐</span>' : ''}
+                        ${news.is_pinned ? '<span style="font-size: 1rem;">📌</span>' : ''}
+                        <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: ${categoryColors[news.category] || '#3b82f6'}20; color: ${categoryColors[news.category] || '#3b82f6'};">
+                            ${news.category || 'info'}
                         </span>
                     </div>
+                    <p style="color: #111827; font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; margin-bottom: 0.75rem;">${news.content}</p>
                     
-                    <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-                        <div class="flex items-center gap-3 flex-wrap">
-                            <span>📅 ${ShabakaSyndic.formatDate(news.published_at || news.created_at)}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8125rem; color: #9ca3af; flex-wrap: wrap;">
+                            <span>📅 ${formattedDate}</span>
                             ${news.author_name ? `
-                                <div class="flex items-center gap-2">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span>✍️ ${news.author_name}</span>
                                     ${news.author_role ? getRoleBadge(news.author_role) : ''}
                                 </div>
                             ` : ''}
                         </div>
-                        <button style="padding: 0.375rem 0.75rem; border: 2px solid #667eea; background: rgba(102, 126, 234, 0.05); color: #667eea; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.background='rgba(102, 126, 234, 0.05)'">
+                        <button style="padding: 0.5rem 0.875rem; color: #667eea; border: 1px solid #667eea; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'" onclick="event.stopPropagation(); viewNewsDetails(${news.id})">
                             Lire plus →
                         </button>
                     </div>
