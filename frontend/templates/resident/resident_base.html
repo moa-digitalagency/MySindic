@@ -267,7 +267,7 @@ www.myoneart.com
                 <span class="badge">3</span>
             </button>
             
-            <button class="user-profile-btn" onclick="window.location.href='/api/auth/logout'">
+            <button class="user-profile-btn" onclick="ShabakaSyndic.logout()">
                 <div class="user-avatar">{{ current_user.first_name[0] if current_user.first_name else 'U' }}</div>
                 <span class="user-name">{{ current_user.first_name or 'Utilisateur' }}</span>
             </button>
