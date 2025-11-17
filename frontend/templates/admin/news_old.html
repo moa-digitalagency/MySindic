@@ -243,11 +243,11 @@ async function loadNews() {
             allNews = data.news || [];
             filterByCategory(currentCategory);
         } else {
-            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -327,7 +327,7 @@ function displayNews(newsList) {
                     
                     <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
                         <div class="flex items-center space-x-4">
-                            <span>📅 ${Shabaka Syndic.formatDate(news.published_at || news.created_at)}</span>
+                            <span>📅 ${ShabakaSyndic.formatDate(news.published_at || news.created_at)}</span>
                             ${news.author_name ? `<span>✍️ ${news.author_name}</span>` : ''}
                             <span class="inline-flex items-center px-2 py-1 rounded text-xs ${news.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">
                                 ${news.is_published ? '✓ Publié' : '🔒 Brouillon'}
@@ -379,7 +379,7 @@ async function editNews(id) {
         document.getElementById('newsModal').classList.remove('hidden');
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -398,14 +398,14 @@ async function deleteNews(id) {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Actualité supprimée', 'success');
+            ShabakaSyndic.showToast('Actualité supprimée', 'success');
             loadNews();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur lors de la suppression', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur lors de la suppression', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -437,15 +437,15 @@ document.getElementById('newsForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast(editingNewsId ? 'Actualité mise à jour' : 'Actualité créée', 'success');
+            ShabakaSyndic.showToast(editingNewsId ? 'Actualité mise à jour' : 'Actualité créée', 'success');
             closeModal();
             loadNews();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 });
 

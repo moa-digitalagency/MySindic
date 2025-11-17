@@ -18,7 +18,7 @@ www.myoneart.com
             <p class="mt-2 text-sm text-gray-700">Toutes les demandes de maintenance des résidences</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button onclick="Shabaka Syndic.openModal('announcementModal')" class="btn-primary">
+            <button onclick="ShabakaSyndic.openModal('announcementModal')" class="btn-primary">
                 + Nouvelle Annonce
             </button>
         </div>
@@ -70,7 +70,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold" id="modal-title">Détails de la demande</h2>
-                <button onclick="Shabaka Syndic.closeModal('maintenanceModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('maintenanceModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -154,7 +154,7 @@ www.myoneart.com
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="Shabaka Syndic.closeModal('maintenanceModal')" class="btn-secondary">
+                    <button type="button" onclick="ShabakaSyndic.closeModal('maintenanceModal')" class="btn-secondary">
                         Fermer
                     </button>
                     <button type="submit" class="btn-primary">
@@ -172,7 +172,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Nouvelle Annonce de Maintenance</h2>
-                <button onclick="Shabaka Syndic.closeModal('announcementModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('announcementModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -226,7 +226,7 @@ www.myoneart.com
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="Shabaka Syndic.closeModal('announcementModal')" class="btn-secondary">
+                    <button type="button" onclick="ShabakaSyndic.closeModal('announcementModal')" class="btn-secondary">
                         Annuler
                     </button>
                     <button type="submit" class="btn-primary">
@@ -250,7 +250,7 @@ async function loadMaintenanceRequests() {
         if (!response.ok) {
             const container = document.getElementById('maintenance-list');
             container.innerHTML = `<p class="text-center text-red-600 py-8">Erreur: ${response.status === 401 ? 'Authentification requise' : 'Impossible de charger les données'}</p>`;
-            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
             return;
         }
         
@@ -263,13 +263,13 @@ async function loadMaintenanceRequests() {
         } else {
             const container = document.getElementById('maintenance-list');
             container.innerHTML = `<p class="text-center text-red-600 py-8">Erreur: ${data.error || 'Une erreur est survenue'}</p>`;
-            Shabaka Syndic.showToast(data.error || 'Erreur lors du chargement', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
         const container = document.getElementById('maintenance-list');
         container.innerHTML = '<p class="text-center text-red-600 py-8">Erreur de connexion au serveur</p>';
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -365,7 +365,7 @@ function displayRequests(requestsList) {
                         </td>
                         <td><span class="badge ${getPriorityColor(r.priority)}">${r.priority}</span></td>
                         <td><span class="badge ${getStatusColor(r.status)}">${r.status}</span></td>
-                        <td class="text-sm">${Shabaka Syndic.formatDate(r.created_at)}</td>
+                        <td class="text-sm">${ShabakaSyndic.formatDate(r.created_at)}</td>
                         <td>
                             <button onclick="viewRequest(${r.id})" style="padding: 0.375rem 0.75rem; border: 2px solid #667eea; background: rgba(102, 126, 234, 0.05); color: #667eea; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.background='rgba(102, 126, 234, 0.05)'">
                                 Gérer
@@ -422,7 +422,7 @@ async function viewRequest(requestId) {
             </div>
             <div>
                 <label class="text-sm font-medium text-gray-500">Créée le</label>
-                <p class="mt-1 text-gray-900">${Shabaka Syndic.formatDate(request.created_at)}</p>
+                <p class="mt-1 text-gray-900">${ShabakaSyndic.formatDate(request.created_at)}</p>
             </div>
             ${request.assigned_to ? `
                 <div>
@@ -433,7 +433,7 @@ async function viewRequest(requestId) {
             ${request.scheduled_date ? `
                 <div>
                     <label class="text-sm font-medium text-gray-500">Intervention prévue</label>
-                    <p class="mt-1 text-gray-900">${Shabaka Syndic.formatDate(request.scheduled_date)}</p>
+                    <p class="mt-1 text-gray-900">${ShabakaSyndic.formatDate(request.scheduled_date)}</p>
                 </div>
             ` : ''}
         </div>
@@ -459,7 +459,7 @@ async function viewRequest(requestId) {
     // Charger la liste des résidents pour le tag
     loadResidentsForTag(request.residence_id);
     
-    Shabaka Syndic.openModal('maintenanceModal');
+    ShabakaSyndic.openModal('maintenanceModal');
 }
 
 async function loadComments(requestId) {
@@ -496,7 +496,7 @@ function displayComments(comments) {
                     <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap">${comment.comment_text}</p>
                     ${comment.mentioned_user_name ? `<p class="mt-1 text-xs text-indigo-600">@${comment.mentioned_user_name}</p>` : ''}
                 </div>
-                <span class="text-xs text-gray-500">${Shabaka Syndic.formatDate(comment.created_at)}</span>
+                <span class="text-xs text-gray-500">${ShabakaSyndic.formatDate(comment.created_at)}</span>
             </div>
         </div>
     `).join('');
@@ -544,15 +544,15 @@ document.getElementById('updateForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Demande mise à jour', 'success');
-            Shabaka Syndic.closeModal('maintenanceModal');
+            ShabakaSyndic.showToast('Demande mise à jour', 'success');
+            ShabakaSyndic.closeModal('maintenanceModal');
             loadMaintenanceRequests();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 });
 
@@ -579,16 +579,16 @@ document.getElementById('announcementForm').addEventListener('submit', async (e)
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Annonce créée avec succès', 'success');
-            Shabaka Syndic.closeModal('announcementModal');
+            ShabakaSyndic.showToast('Annonce créée avec succès', 'success');
+            ShabakaSyndic.closeModal('announcementModal');
             document.getElementById('announcementForm').reset();
             loadMaintenanceRequests();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 });
 
@@ -599,7 +599,7 @@ document.getElementById('commentForm').addEventListener('submit', async (e) => {
     const commentText = document.getElementById('comment-text').value.trim();
     
     if (!commentText) {
-        Shabaka Syndic.showToast('Le commentaire ne peut pas être vide', 'error');
+        ShabakaSyndic.showToast('Le commentaire ne peut pas être vide', 'error');
         return;
     }
     
@@ -621,17 +621,17 @@ document.getElementById('commentForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Commentaire ajouté', 'success');
+            ShabakaSyndic.showToast('Commentaire ajouté', 'success');
             document.getElementById('comment-text').value = '';
             document.getElementById('comment-mention').value = '';
             document.getElementById('comment-internal').checked = false;
             loadComments(requestId);
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 });
 

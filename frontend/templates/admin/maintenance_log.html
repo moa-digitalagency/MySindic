@@ -18,7 +18,7 @@ www.myoneart.com
             <p class="mt-2 text-sm text-gray-700">Historique complet des interventions sur vos résidences</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button onclick="Shabaka Syndic.openModal('addLogModal')" class="btn-primary w-full sm:w-auto">
+            <button onclick="ShabakaSyndic.openModal('addLogModal')" class="btn-primary w-full sm:w-auto">
                 <span class="hidden sm:inline">Nouvelle intervention</span>
                 <span class="sm:hidden">+ Ajouter</span>
             </button>
@@ -110,7 +110,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 sm:py-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Nouvelle Intervention</h3>
-                <button onclick="Shabaka Syndic.closeModal('addLogModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('addLogModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -207,7 +207,7 @@ www.myoneart.com
             </div>
 
             <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button type="button" onclick="Shabaka Syndic.closeModal('addLogModal')" class="btn-secondary">
+                <button type="button" onclick="ShabakaSyndic.closeModal('addLogModal')" class="btn-secondary">
                     Annuler
                 </button>
                 <button type="submit" class="btn-primary">
@@ -223,7 +223,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900" id="view-log-title">Détails de l'intervention</h3>
-                <button onclick="Shabaka Syndic.closeModal('viewLogModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('viewLogModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -261,7 +261,7 @@ async function loadMaintenanceLogs() {
         }
     } catch (error) {
         console.error('Error loading logs:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -277,7 +277,7 @@ function updateStats() {
     
     document.getElementById('stat-total').textContent = allLogs.length;
     document.getElementById('stat-month').textContent = thisMonth.length;
-    document.getElementById('stat-cost').textContent = Shabaka Syndic.formatCurrency(totalCost);
+    document.getElementById('stat-cost').textContent = ShabakaSyndic.formatCurrency(totalCost);
     document.getElementById('stat-upcoming').textContent = upcoming.length;
 }
 
@@ -304,7 +304,7 @@ function renderLogs(logs) {
         const residence = residences.find(r => r.id === log.residence_id);
         return `
             <tr class="hover:bg-gray-50">
-                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm">${Shabaka Syndic.formatDate(log.intervention_date)}</td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm">${ShabakaSyndic.formatDate(log.intervention_date)}</td>
                 <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden sm:table-cell">${residence ? residence.name : '-'}</td>
                 <td class="px-3 py-4 sm:px-6">
                     <div class="text-xs sm:text-sm font-medium text-gray-900">${log.title}</div>
@@ -318,7 +318,7 @@ function renderLogs(logs) {
                 </td>
                 <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden lg:table-cell">${log.contractor_name}</td>
                 <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-900">
-                    ${log.cost ? Shabaka Syndic.formatCurrency(log.cost) : '-'}
+                    ${log.cost ? ShabakaSyndic.formatCurrency(log.cost) : '-'}
                 </td>
                 <td class="px-3 py-4 sm:px-6">
                     <button onclick="viewLog(${log.id})" style="padding: 0.375rem 0.75rem; border: 2px solid #667eea; background: rgba(102, 126, 234, 0.05); color: #667eea; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.background='rgba(102, 126, 234, 0.05)'">
@@ -370,7 +370,7 @@ async function viewLog(logId) {
                 </div>
                 <div>
                     <p class="text-xs sm:text-sm text-gray-500">Date d'intervention</p>
-                    <p class="font-medium">${Shabaka Syndic.formatDate(log.intervention_date)}</p>
+                    <p class="font-medium">${ShabakaSyndic.formatDate(log.intervention_date)}</p>
                 </div>
                 <div>
                     <p class="text-xs sm:text-sm text-gray-500">Type</p>
@@ -399,7 +399,7 @@ async function viewLog(logId) {
                 ${log.cost ? `
                 <div>
                     <p class="text-xs sm:text-sm text-gray-500">Coût</p>
-                    <p class="font-medium text-lg">${Shabaka Syndic.formatCurrency(log.cost)}</p>
+                    <p class="font-medium text-lg">${ShabakaSyndic.formatCurrency(log.cost)}</p>
                 </div>
                 ` : ''}
                 ${log.invoice_number ? `
@@ -411,13 +411,13 @@ async function viewLog(logId) {
                 ${log.next_intervention_date ? `
                 <div>
                     <p class="text-xs sm:text-sm text-gray-500">Prochaine intervention</p>
-                    <p class="font-medium">${Shabaka Syndic.formatDate(log.next_intervention_date)}</p>
+                    <p class="font-medium">${ShabakaSyndic.formatDate(log.next_intervention_date)}</p>
                 </div>
                 ` : ''}
                 ${log.warranty_end_date ? `
                 <div>
                     <p class="text-xs sm:text-sm text-gray-500">Fin de garantie</p>
-                    <p class="font-medium">${Shabaka Syndic.formatDate(log.warranty_end_date)}</p>
+                    <p class="font-medium">${ShabakaSyndic.formatDate(log.warranty_end_date)}</p>
                 </div>
                 ` : ''}
             </div>
@@ -434,7 +434,7 @@ async function viewLog(logId) {
         </div>
     `;
     
-    Shabaka Syndic.openModal('viewLogModal');
+    ShabakaSyndic.openModal('viewLogModal');
 }
 
 document.getElementById('addLogForm').addEventListener('submit', async (e) => {
@@ -451,16 +451,16 @@ document.getElementById('addLogForm').addEventListener('submit', async (e) => {
         
         const result = await response.json();
         if (result.success) {
-            Shabaka Syndic.showToast('Intervention enregistrée avec succès', 'success');
-            Shabaka Syndic.closeModal('addLogModal');
+            ShabakaSyndic.showToast('Intervention enregistrée avec succès', 'success');
+            ShabakaSyndic.closeModal('addLogModal');
             e.target.reset();
             loadMaintenanceLogs();
         } else {
-            Shabaka Syndic.showToast(result.message || 'Erreur', 'error');
+            ShabakaSyndic.showToast(result.message || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors de l\'enregistrement', 'error');
+        ShabakaSyndic.showToast('Erreur lors de l\'enregistrement', 'error');
     }
 });
 

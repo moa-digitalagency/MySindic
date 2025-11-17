@@ -206,11 +206,11 @@ async function loadResidences() {
             residences = data.residences;
             displayResidences(residences);
         } else {
-            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -276,21 +276,21 @@ function viewResidence(residenceId) {
     const residence = residences.find(r => r.id === residenceId);
     if (!residence) return;
     
-    Shabaka Syndic.showToast(`Consultation de ${residence.name}`, 'info');
+    ShabakaSyndic.showToast(`Consultation de ${residence.name}`, 'info');
 }
 
 function editResidence(residenceId) {
     const residence = residences.find(r => r.id === residenceId);
     if (!residence) return;
     
-    Shabaka Syndic.showToast(`Modification de ${residence.name}`, 'info');
+    ShabakaSyndic.showToast(`Modification de ${residence.name}`, 'info');
 }
 
 function manageUnits(residenceId) {
     const residence = residences.find(r => r.id === residenceId);
     if (!residence) return;
     
-    Shabaka Syndic.showToast(`Gestion des unités de ${residence.name}`, 'info');
+    ShabakaSyndic.showToast(`Gestion des unités de ${residence.name}`, 'info');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

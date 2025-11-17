@@ -18,7 +18,7 @@ www.myoneart.com
             <p class="mt-2 text-sm text-gray-700">Créez et suivez vos demandes d'intervention</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button onclick="Shabaka Syndic.openModal('createRequestModal')" class="btn-primary">
+            <button onclick="ShabakaSyndic.openModal('createRequestModal')" class="btn-primary">
                 Nouvelle Demande
             </button>
         </div>
@@ -61,7 +61,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Nouvelle Demande de Maintenance</h2>
-                <button onclick="Shabaka Syndic.closeModal('createRequestModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('createRequestModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -146,7 +146,7 @@ www.myoneart.com
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="Shabaka Syndic.closeModal('createRequestModal')" class="btn-secondary">
+                    <button type="button" onclick="ShabakaSyndic.closeModal('createRequestModal')" class="btn-secondary">
                         Annuler
                     </button>
                     <button type="submit" class="btn-primary">
@@ -164,7 +164,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold" id="details-title">Détails de la demande</h2>
-                <button onclick="Shabaka Syndic.closeModal('detailsModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('detailsModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -215,11 +215,11 @@ async function loadMyRequests() {
             updateStats();
             displayRequests();
         } else {
-            Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -245,7 +245,7 @@ function displayRequests() {
                 <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune demande</h3>
                 <p class="mt-1 text-sm text-gray-500">Commencez par créer une nouvelle demande de maintenance.</p>
                 <div class="mt-6">
-                    <button onclick="Shabaka Syndic.openModal('createRequestModal')" class="btn-primary">
+                    <button onclick="ShabakaSyndic.openModal('createRequestModal')" class="btn-primary">
                         Nouvelle Demande
                     </button>
                 </div>
@@ -320,7 +320,7 @@ function displayRequests() {
                 
                 <div class="ml-4 flex flex-col items-end space-y-2">
                     <span class="badge ${getStatusColor(request.status)}">${getStatusLabel(request.status)}</span>
-                    <span class="text-xs text-gray-500">${Shabaka Syndic.formatDate(request.created_at)}</span>
+                    <span class="text-xs text-gray-500">${ShabakaSyndic.formatDate(request.created_at)}</span>
                 </div>
             </div>
             
@@ -331,7 +331,7 @@ function displayRequests() {
                     </p>
                     ${request.scheduled_date ? `
                         <p class="text-sm text-gray-600 mt-1">
-                            <span class="font-medium">Intervention prévue:</span> ${Shabaka Syndic.formatDate(request.scheduled_date)}
+                            <span class="font-medium">Intervention prévue:</span> ${ShabakaSyndic.formatDate(request.scheduled_date)}
                         </p>
                     ` : ''}
                 </div>
@@ -432,7 +432,7 @@ async function viewRequestDetails(requestId) {
                 ` : ''}
                 <div>
                     <label class="text-sm font-medium text-gray-500">Créée le</label>
-                    <p class="mt-1 text-gray-900">${Shabaka Syndic.formatDate(request.created_at)}</p>
+                    <p class="mt-1 text-gray-900">${ShabakaSyndic.formatDate(request.created_at)}</p>
                 </div>
             </div>
             
@@ -448,7 +448,7 @@ async function viewRequestDetails(requestId) {
                     ${request.scheduled_date ? `
                         <div>
                             <label class="text-sm font-medium text-gray-500">Intervention prévue</label>
-                            <p class="mt-1 text-gray-900">${Shabaka Syndic.formatDate(request.scheduled_date)}</p>
+                            <p class="mt-1 text-gray-900">${ShabakaSyndic.formatDate(request.scheduled_date)}</p>
                         </div>
                     ` : ''}
                 </div>
@@ -468,7 +468,7 @@ async function viewRequestDetails(requestId) {
     // Charger les commentaires
     loadResidentComments(requestId);
     
-    Shabaka Syndic.openModal('detailsModal');
+    ShabakaSyndic.openModal('detailsModal');
 }
 
 async function loadResidentComments(requestId) {
@@ -506,7 +506,7 @@ function displayResidentComments(comments) {
                     <p class="mt-1 text-sm text-gray-700 whitespace-pre-wrap">${comment.comment_text}</p>
                     ${comment.mentioned_user_name ? `<p class="mt-1 text-xs text-indigo-600">📌 Mention: ${comment.mentioned_user_name}</p>` : ''}
                 </div>
-                <span class="text-xs text-gray-500">${Shabaka Syndic.formatDate(comment.created_at)}</span>
+                <span class="text-xs text-gray-500">${ShabakaSyndic.formatDate(comment.created_at)}</span>
             </div>
         </div>
     `).join('');
@@ -554,17 +554,17 @@ document.getElementById('requestForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Demande créée avec succès', 'success');
-            Shabaka Syndic.closeModal('createRequestModal');
+            ShabakaSyndic.showToast('Demande créée avec succès', 'success');
+            ShabakaSyndic.closeModal('createRequestModal');
             document.getElementById('requestForm').reset();
             clearImage();
             loadMyRequests();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur lors de la création', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur lors de la création', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 });
 
@@ -575,7 +575,7 @@ document.getElementById('residentCommentForm').addEventListener('submit', async 
     const commentText = document.getElementById('resident-comment-text').value.trim();
     
     if (!commentText) {
-        Shabaka Syndic.showToast('Le commentaire ne peut pas être vide', 'error');
+        ShabakaSyndic.showToast('Le commentaire ne peut pas être vide', 'error');
         return;
     }
     
@@ -594,15 +594,15 @@ document.getElementById('residentCommentForm').addEventListener('submit', async 
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Commentaire ajouté', 'success');
+            ShabakaSyndic.showToast('Commentaire ajouté', 'success');
             document.getElementById('resident-comment-text').value = '';
             loadResidentComments(requestId);
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 });
 
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMyRequests();
     
     if (window.location.hash === '#new') {
-        Shabaka Syndic.openModal('createRequestModal');
+        ShabakaSyndic.openModal('createRequestModal');
     }
 });
 </script>

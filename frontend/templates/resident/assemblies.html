@@ -65,7 +65,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900" id="view-assembly-title">Détails de l'assemblée</h3>
-                <button onclick="Shabaka Syndic.closeModal('viewAssemblyModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('viewAssemblyModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -102,7 +102,7 @@ async function loadAssemblies() {
         }
     } catch (error) {
         console.error('Error loading assemblies:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -128,7 +128,7 @@ function renderUpcomingAssemblies() {
                     <div class="mt-2 space-y-1 text-xs sm:text-sm text-gray-600">
                         <p class="flex items-center gap-2">
                             <span>📅</span>
-                            <span>${Shabaka Syndic.formatDate(assembly.scheduled_date)}</span>
+                            <span>${ShabakaSyndic.formatDate(assembly.scheduled_date)}</span>
                         </p>
                         ${assembly.location ? `
                         <p class="flex items-center gap-2">
@@ -174,7 +174,7 @@ function renderPastAssemblies() {
                 <div class="flex-1">
                     <h4 class="text-sm sm:text-base font-medium text-gray-900">${assembly.title}</h4>
                     <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                        ${Shabaka Syndic.formatDate(assembly.scheduled_date)} • ${getTypeLabel(assembly.assembly_type)}
+                        ${ShabakaSyndic.formatDate(assembly.scheduled_date)} • ${getTypeLabel(assembly.assembly_type)}
                     </p>
                 </div>
                 <div class="flex gap-2">
@@ -221,7 +221,7 @@ async function viewAssembly(assemblyId) {
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
                         <div>
                             <p class="text-xs sm:text-sm text-gray-500">Date</p>
-                            <p class="font-medium">${Shabaka Syndic.formatDate(assembly.scheduled_date)}</p>
+                            <p class="font-medium">${ShabakaSyndic.formatDate(assembly.scheduled_date)}</p>
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-500">Type</p>
@@ -304,11 +304,11 @@ async function viewAssembly(assemblyId) {
                 </div>
             `;
             
-            Shabaka Syndic.openModal('viewAssemblyModal');
+            ShabakaSyndic.openModal('viewAssemblyModal');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -348,17 +348,17 @@ async function vote(resolutionId, voteValue) {
         
         const result = await response.json();
         if (result.success) {
-            Shabaka Syndic.showToast('Vote enregistré avec succès', 'success');
+            ShabakaSyndic.showToast('Vote enregistré avec succès', 'success');
             myVotes.add(resolutionId);
             updateStats();
             loadAssemblies();
-            Shabaka Syndic.closeModal('viewAssemblyModal');
+            ShabakaSyndic.closeModal('viewAssemblyModal');
         } else {
-            Shabaka Syndic.showToast(result.message || 'Erreur', 'error');
+            ShabakaSyndic.showToast(result.message || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors du vote', 'error');
+        ShabakaSyndic.showToast('Erreur lors du vote', 'error');
     }
 }
 

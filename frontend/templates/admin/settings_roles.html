@@ -703,13 +703,13 @@ async function savePermissions() {
         });
         
         if (response.ok) {
-            Shabaka Syndic.showToast('✅ Permissions enregistrées avec succès', 'success');
+            ShabakaSyndic.showToast('✅ Permissions enregistrées avec succès', 'success');
         } else {
-            Shabaka Syndic.showToast('❌ Erreur lors de l\'enregistrement', 'error');
+            ShabakaSyndic.showToast('❌ Erreur lors de l\'enregistrement', 'error');
         }
     } catch (error) {
         console.error('Erreur:', error);
-        Shabaka Syndic.showToast('❌ Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('❌ Erreur de connexion', 'error');
     }
 }
 

@@ -914,20 +914,20 @@ function validateStep(step) {
             const city = document.getElementById('residence_city').value;
             
             if (!name || !address || !city) {
-                Shabaka Syndic.showToast('Veuillez remplir tous les champs obligatoires', 'error');
+                ShabakaSyndic.showToast('Veuillez remplir tous les champs obligatoires', 'error');
                 return false;
             }
             return true;
             
         case 2:
             if (!wizardData.divisionType) {
-                Shabaka Syndic.showToast('Veuillez sélectionner un type de découpe', 'error');
+                ShabakaSyndic.showToast('Veuillez sélectionner un type de découpe', 'error');
                 return false;
             }
             
             const divCount = parseInt(document.getElementById('division_count').value);
             if (!divCount || divCount < 1) {
-                Shabaka Syndic.showToast('Veuillez spécifier le nombre de divisions', 'error');
+                ShabakaSyndic.showToast('Veuillez spécifier le nombre de divisions', 'error');
                 return false;
             }
             
@@ -939,7 +939,7 @@ function validateStep(step) {
             
             // Vérifier que les divisions ont bien été créées
             if (!wizardData.divisions || wizardData.divisions.length === 0) {
-                Shabaka Syndic.showToast('Erreur lors de la création des divisions', 'error');
+                ShabakaSyndic.showToast('Erreur lors de la création des divisions', 'error');
                 return false;
             }
             
@@ -948,7 +948,7 @@ function validateStep(step) {
             
         case 3:
             if (wizardData.units.length === 0) {
-                Shabaka Syndic.showToast('Veuillez configurer au moins une unité', 'error');
+                ShabakaSyndic.showToast('Veuillez configurer au moins une unité', 'error');
                 return false;
             }
             return true;
@@ -984,7 +984,7 @@ function saveStepData(step) {
             
             // Afficher une notification de succès visuelle
             if (wizardData.divisions.length > 0 && typeof Shabaka Syndic !== 'undefined') {
-                Shabaka Syndic.showToast(`${wizardData.divisions.length} division(s) configurée(s) avec succès`, 'success');
+                ShabakaSyndic.showToast(`${wizardData.divisions.length} division(s) configurée(s) avec succès`, 'success');
             }
             break;
     }
@@ -1449,19 +1449,19 @@ async function submitResidence() {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Résidence créée avec succès !', 'success');
+            ShabakaSyndic.showToast('Résidence créée avec succès !', 'success');
             setTimeout(() => {
                 window.location.href = '/admin/residences';
             }, 1500);
         } else {
-            Shabaka Syndic.showToast(data.message || 'Erreur lors de la création', 'error');
+            ShabakaSyndic.showToast(data.message || 'Erreur lors de la création', 'error');
             nextBtn.disabled = false;
             nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4"></i> Créer la résidence';
             feather.replace();
         }
     } catch (error) {
         console.error('Error creating residence:', error);
-        Shabaka Syndic.showToast('Erreur lors de la création de la résidence', 'error');
+        ShabakaSyndic.showToast('Erreur lors de la création de la résidence', 'error');
         nextBtn.disabled = false;
         nextBtn.innerHTML = '<i data-feather="check" class="w-4 h-4"></i> Créer la résidence';
         feather.replace();

@@ -64,7 +64,7 @@ www.myoneart.com
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Nouvelle Charge</h2>
-                <button onclick="Shabaka Syndic.closeModal('chargeModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('chargeModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -136,7 +136,7 @@ www.myoneart.com
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="Shabaka Syndic.closeModal('chargeModal')" class="btn-secondary">
+                    <button type="button" onclick="ShabakaSyndic.closeModal('chargeModal')" class="btn-secondary">
                         Annuler
                     </button>
                     <button type="submit" class="btn-primary">
@@ -190,7 +190,7 @@ async function loadCharges() {
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -224,7 +224,7 @@ function displayCharges(chargesList) {
                         </td>
                         <td>${c.residence_name || '-'}</td>
                         <td><span class="badge badge-info">${c.charge_type}</span></td>
-                        <td class="font-semibold">${Shabaka Syndic.formatCurrency(c.total_amount)}</td>
+                        <td class="font-semibold">${ShabakaSyndic.formatCurrency(c.total_amount)}</td>
                         <td>${c.period_month ? c.period_month + '/' : ''}${c.period_year}</td>
                         <td>
                             <span class="badge ${c.status === 'published' ? 'badge-success' : 'badge-warning'}">
@@ -255,7 +255,7 @@ async function loadPayments() {
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -283,9 +283,9 @@ function displayPayments(paymentsList) {
             <tbody>
                 ${paymentsList.map(p => `
                     <tr>
-                        <td>${Shabaka Syndic.formatDate(p.payment_date)}</td>
+                        <td>${ShabakaSyndic.formatDate(p.payment_date)}</td>
                         <td>${p.unit_number || '-'}</td>
-                        <td class="font-semibold text-green-600">${Shabaka Syndic.formatCurrency(p.amount)}</td>
+                        <td class="font-semibold text-green-600">${ShabakaSyndic.formatCurrency(p.amount)}</td>
                         <td><span class="badge badge-info">${p.payment_method}</span></td>
                         <td class="text-sm">${p.reference || '-'}</td>
                         <td>
@@ -326,7 +326,7 @@ function switchTab(tab) {
 function openCreateChargeModal() {
     document.getElementById('chargeForm').reset();
     document.getElementById('charge-year').value = new Date().getFullYear();
-    Shabaka Syndic.openModal('chargeModal');
+    ShabakaSyndic.openModal('chargeModal');
 }
 
 async function publishCharge(chargeId) {
@@ -340,14 +340,14 @@ async function publishCharge(chargeId) {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Charge publiée avec succès', 'success');
+            ShabakaSyndic.showToast('Charge publiée avec succès', 'success');
             loadCharges();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -362,14 +362,14 @@ async function validatePayment(paymentId) {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Paiement validé', 'success');
+            ShabakaSyndic.showToast('Paiement validé', 'success');
             loadPayments();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 }
 
@@ -401,15 +401,15 @@ document.getElementById('chargeForm').addEventListener('submit', async (e) => {
         const data = await response.json();
         
         if (data.success) {
-            Shabaka Syndic.showToast('Charge créée (brouillon)', 'success');
-            Shabaka Syndic.closeModal('chargeModal');
+            ShabakaSyndic.showToast('Charge créée (brouillon)', 'success');
+            ShabakaSyndic.closeModal('chargeModal');
             loadCharges();
         } else {
-            Shabaka Syndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur de connexion', 'error');
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
 });
 

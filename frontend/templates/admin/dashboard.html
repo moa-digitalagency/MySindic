@@ -188,7 +188,7 @@ async function loadDashboardStats() {
             animateValue('stat-charges', 0, stats.total_charges || 0, 1000);
             animateValue('stat-maintenance', 0, stats.pending_maintenance || 0, 1000);
             
-            document.getElementById('stat-unpaid').textContent = Shabaka Syndic.formatCurrency(stats.total_unpaid || 0);
+            document.getElementById('stat-unpaid').textContent = ShabakaSyndic.formatCurrency(stats.total_unpaid || 0);
             
             // Update notification badge
             const notificationCount = stats.pending_maintenance || 0;
@@ -202,7 +202,7 @@ async function loadDashboardStats() {
         }
     } catch (error) {
         console.error('Error loading dashboard:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement des statistiques', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement des statistiques', 'error');
     }
 }
 
@@ -319,7 +319,7 @@ async function loadRecentActivity() {
                     iconBg: '#FEF3C7',
                     title: req.title,
                     desc: req.category || 'Autre',
-                    time: Shabaka Syndic.formatDate(req.created_at),
+                    time: ShabakaSyndic.formatDate(req.created_at),
                     status: req.status
                 });
             });
@@ -333,8 +333,8 @@ async function loadRecentActivity() {
                     icon: '💳',
                     iconBg: '#D1FAE5',
                     title: `Paiement reçu`,
-                    desc: Shabaka Syndic.formatCurrency(payment.amount),
-                    time: Shabaka Syndic.formatDate(payment.created_at),
+                    desc: ShabakaSyndic.formatCurrency(payment.amount),
+                    time: ShabakaSyndic.formatDate(payment.created_at),
                     status: payment.status
                 });
             });
@@ -374,7 +374,7 @@ async function loadRecentActivity() {
 }
 
 function refreshDashboard() {
-    Shabaka Syndic.showToast('Actualisation des données...', 'info');
+    ShabakaSyndic.showToast('Actualisation des données...', 'info');
     loadDashboardStats();
 }
 

@@ -18,7 +18,7 @@ www.myoneart.com
             <p class="mt-2 text-sm text-gray-700">Gestion des AG et des résolutions</p>
         </div>
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button onclick="Shabaka Syndic.openModal('addAssemblyModal')" class="btn-primary w-full sm:w-auto">
+            <button onclick="ShabakaSyndic.openModal('addAssemblyModal')" class="btn-primary w-full sm:w-auto">
                 <span class="hidden sm:inline">Nouvelle assemblée</span>
                 <span class="sm:hidden">+ Ajouter</span>
             </button>
@@ -99,7 +99,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Nouvelle Assemblée Générale</h3>
-                <button onclick="Shabaka Syndic.closeModal('addAssemblyModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('addAssemblyModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -150,7 +150,7 @@ www.myoneart.com
             </div>
 
             <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button type="button" onclick="Shabaka Syndic.closeModal('addAssemblyModal')" class="btn-secondary">
+                <button type="button" onclick="ShabakaSyndic.closeModal('addAssemblyModal')" class="btn-secondary">
                     Annuler
                 </button>
                 <button type="submit" class="btn-primary">
@@ -166,7 +166,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900" id="view-assembly-title">Détails de l'assemblée</h3>
-                <button onclick="Shabaka Syndic.closeModal('viewAssemblyModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('viewAssemblyModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -183,7 +183,7 @@ www.myoneart.com
         <div class="sticky top-0 bg-white border-b px-4 py-4 sm:px-6 z-10">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Nouvelle Résolution</h3>
-                <button onclick="Shabaka Syndic.closeModal('addResolutionModal')" class="text-gray-400 hover:text-gray-600">
+                <button onclick="ShabakaSyndic.closeModal('addResolutionModal')" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -220,7 +220,7 @@ www.myoneart.com
             </div>
 
             <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                <button type="button" onclick="Shabaka Syndic.closeModal('addResolutionModal')" class="btn-secondary">
+                <button type="button" onclick="ShabakaSyndic.closeModal('addResolutionModal')" class="btn-secondary">
                     Annuler
                 </button>
                 <button type="submit" class="btn-primary">
@@ -258,7 +258,7 @@ async function loadAssemblies() {
         }
     } catch (error) {
         console.error('Error loading assemblies:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -297,7 +297,7 @@ function renderAssemblies(assemblies) {
         const resolutionCount = assembly.resolutions?.length || 0;
         return `
             <tr class="hover:bg-gray-50">
-                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm">${Shabaka Syndic.formatDate(assembly.scheduled_date)}</td>
+                <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm">${ShabakaSyndic.formatDate(assembly.scheduled_date)}</td>
                 <td class="px-3 py-4 sm:px-6 text-xs sm:text-sm hidden sm:table-cell">${residence ? residence.name : '-'}</td>
                 <td class="px-3 py-4 sm:px-6">
                     <div class="text-xs sm:text-sm font-medium text-gray-900">${assembly.title}</div>
@@ -363,7 +363,7 @@ async function viewAssembly(assemblyId) {
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-500">Date</p>
-                            <p class="font-medium">${Shabaka Syndic.formatDate(currentAssembly.scheduled_date)}</p>
+                            <p class="font-medium">${ShabakaSyndic.formatDate(currentAssembly.scheduled_date)}</p>
                         </div>
                         <div>
                             <p class="text-xs sm:text-sm text-gray-500">Type</p>
@@ -444,11 +444,11 @@ async function viewAssembly(assemblyId) {
                 </div>
             `;
             
-            Shabaka Syndic.openModal('viewAssemblyModal');
+            ShabakaSyndic.openModal('viewAssemblyModal');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors du chargement', 'error');
+        ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
 }
 
@@ -473,8 +473,8 @@ function getResolutionStatusBadge(status) {
 
 function openAddResolution(assemblyId) {
     document.getElementById('resolution-assembly-id').value = assemblyId;
-    Shabaka Syndic.closeModal('viewAssemblyModal');
-    Shabaka Syndic.openModal('addResolutionModal');
+    ShabakaSyndic.closeModal('viewAssemblyModal');
+    ShabakaSyndic.openModal('addResolutionModal');
 }
 
 document.getElementById('addAssemblyForm').addEventListener('submit', async (e) => {
@@ -491,16 +491,16 @@ document.getElementById('addAssemblyForm').addEventListener('submit', async (e) 
         
         const result = await response.json();
         if (result.success) {
-            Shabaka Syndic.showToast('Assemblée créée avec succès', 'success');
-            Shabaka Syndic.closeModal('addAssemblyModal');
+            ShabakaSyndic.showToast('Assemblée créée avec succès', 'success');
+            ShabakaSyndic.closeModal('addAssemblyModal');
             e.target.reset();
             loadAssemblies();
         } else {
-            Shabaka Syndic.showToast(result.message || 'Erreur', 'error');
+            ShabakaSyndic.showToast(result.message || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors de la création', 'error');
+        ShabakaSyndic.showToast('Erreur lors de la création', 'error');
     }
 });
 
@@ -518,19 +518,19 @@ document.getElementById('addResolutionForm').addEventListener('submit', async (e
         
         const result = await response.json();
         if (result.success) {
-            Shabaka Syndic.showToast('Résolution ajoutée avec succès', 'success');
-            Shabaka Syndic.closeModal('addResolutionModal');
+            ShabakaSyndic.showToast('Résolution ajoutée avec succès', 'success');
+            ShabakaSyndic.closeModal('addResolutionModal');
             e.target.reset();
             loadAssemblies();
             if (currentAssembly) {
                 viewAssembly(currentAssembly.id);
             }
         } else {
-            Shabaka Syndic.showToast(result.message || 'Erreur', 'error');
+            ShabakaSyndic.showToast(result.message || 'Erreur', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        Shabaka Syndic.showToast('Erreur lors de l\'ajout', 'error');
+        ShabakaSyndic.showToast('Erreur lors de l\'ajout', 'error');
     }
 });
 
