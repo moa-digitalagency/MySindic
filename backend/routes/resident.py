@@ -119,6 +119,46 @@ def get_news_detail(news_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@resident_bp.route('/news', methods=['POST'])
+@login_required
+def create_news():
+    """Permet aux résidents de publier une actualité"""
+    try:
+        if not current_user.residence_id:
+            return jsonify({'success': False, 'error': 'Vous devez être associé à une résidence'}), 400
+        
+        data = request.get_json()
+        
+        if not data or 'content' not in data:
+            return jsonify({'success': False, 'error': 'Le contenu est requis'}), 400
+        
+        # Créer l'actualité
+        news = News(
+            residence_id=current_user.residence_id,
+            title=data.get('title', data['content'][:100]),
+            content=data['content'],
+            category=data.get('category', 'info'),
+            is_important=False,
+            is_pinned=False,
+            is_published=True,
+            published_at=datetime.utcnow(),
+            author_id=current_user.id
+        )
+        
+        db.session.add(news)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Actualité publiée avec succès',
+            'news': news.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== MAINTENANCE ====================
 
 @resident_bp.route('/maintenance', methods=['POST'])
