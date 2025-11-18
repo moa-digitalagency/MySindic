@@ -34,6 +34,15 @@ class GeneralAssembly(db.Model):
     assembly_type = db.Column(db.String(50), nullable=False)
     # Types: 'ordinaire', 'extraordinaire'
     
+    # Mode de réunion (NOUVEAU pour Agora.io)
+    meeting_mode = db.Column(db.String(20), default='physical')
+    # Modes: 'physical', 'online', 'both'
+    
+    # Agora.io fields
+    agora_channel_name = db.Column(db.String(100))
+    agora_recording_sid = db.Column(db.String(100))
+    agora_started_at = db.Column(db.DateTime)
+    
     # Dates
     scheduled_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime)
@@ -75,6 +84,9 @@ class GeneralAssembly(db.Model):
             'title': self.title,
             'description': self.description,
             'assembly_type': self.assembly_type,
+            'meeting_mode': self.meeting_mode,
+            'agora_channel_name': self.agora_channel_name,
+            'agora_started_at': self.agora_started_at.isoformat() if self.agora_started_at else None,
             'scheduled_date': self.scheduled_date.isoformat() if self.scheduled_date else None,
             'end_date': self.end_date.isoformat() if self.end_date else None,
             'location': self.location,
@@ -208,6 +220,11 @@ class Attendance(db.Model):
     is_present = db.Column(db.Boolean, default=False)
     represented_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # Représentant
     
+    # Mode de présence (NOUVEAU)
+    attendance_mode = db.Column(db.String(20))  # 'physical', 'online'
+    presence_marked_at = db.Column(db.DateTime)
+    marked_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # Qui a marqué la présence
+    
     # Métadonnées
     registered_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     
@@ -219,6 +236,9 @@ class Attendance(db.Model):
             'user_id': self.user_id,
             'is_present': self.is_present,
             'represented_by': self.represented_by,
+            'attendance_mode': self.attendance_mode,
+            'presence_marked_at': self.presence_marked_at.isoformat() if self.presence_marked_at else None,
+            'marked_by': self.marked_by,
             'registered_at': self.registered_at.isoformat() if self.registered_at else None
         }
     

@@ -1,0 +1,116 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Gestion des Unités - Shabaka Syndic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .units-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .unit-card {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.2s;
+    }
+    
+    .unit-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+    
+    .unit-name {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+    
+    .unit-info {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div style="margin-bottom: 2rem;">
+    <h2 style="color: #111827; margin-bottom: 0.5rem;">🏠 Gestion des Unités</h2>
+    <p style="color: #6b7280; font-size: 0.875rem;" id="residence-name">Chargement...</p>
+</div>
+
+<div id="units-container">
+    <div style="text-align: center; padding: 3rem;">
+        <div style="width: 40px; height: 40px; margin: 0 auto; border: 4px solid #f3f4f6; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+const residenceId = window.location.pathname.split('/')[3];
+
+async function loadUnits() {
+    try {
+        const [residencesRes, unitsRes] = await Promise.all([
+            fetch('/api/admin/residences'),
+            fetch(`/api/admin/residences/${residenceId}/units`)
+        ]);
+        
+        const residencesData = await residencesRes.json();
+        const unitsData = await unitsRes.json();
+        
+        if (residencesData.success) {
+            const residence = residencesData.residences.find(r => r.id == residenceId);
+            if (residence) {
+                document.getElementById('residence-name').textContent = `Résidence: ${residence.name}`;
+            }
+        }
+        
+        if (unitsData.success) {
+            displayUnits(unitsData.units);
+        } else {
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function displayUnits(units) {
+    const container = document.getElementById('units-container');
+    
+    if (units.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; background: white; border-radius: 12px;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🏘️</div>
+                <p style="color: #6b7280;">Aucune unité créée</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="units-grid">
+            ${units.map(unit => `
+                <div class="unit-card">
+                    <div class="unit-name">${unit.name}</div>
+                    <div class="unit-info">Type: ${unit.type || 'Non spécifié'}</div>
+                    <div class="unit-info">Étage: ${unit.floor || 'N/A'}</div>
+                    ${unit.owner_name ? `<div class="unit-info">Propriétaire: ${unit.owner_name}</div>` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+document.addEventListener('DOMContentLoaded', loadUnits);
+</script>
+{% endblock %}

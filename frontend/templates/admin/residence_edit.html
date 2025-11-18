@@ -1,0 +1,193 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Modifier la Résidence - Shabaka Syndic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.875rem;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+    
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 2px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="form-container">
+    <h2 style="margin-bottom: 2rem; color: #111827;">Modifier la Résidence</h2>
+    
+    <form id="editResidenceForm">
+        <div class="form-group">
+            <label class="form-label">Nom de la résidence *</label>
+            <input type="text" id="residence_name" class="form-input" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Adresse *</label>
+            <input type="text" id="residence_address" class="form-input" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Ville *</label>
+            <input type="text" id="residence_city" class="form-input" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Code Postal</label>
+            <input type="text" id="residence_postal" class="form-input">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="residence_description" class="form-input" rows="3"></textarea>
+        </div>
+        
+        <h3 style="margin: 2rem 0 1rem; color: #374151;">Informations du Syndic</h3>
+        
+        <div class="form-group">
+            <label class="form-label">Nom du Syndic</label>
+            <input type="text" id="syndic_name" class="form-input">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Email du Syndic</label>
+            <input type="email" id="syndic_email" class="form-input">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Téléphone du Syndic</label>
+            <input type="tel" id="syndic_phone" class="form-input">
+        </div>
+        
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="history.back()">Annuler</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+const residenceId = window.location.pathname.split('/')[3];
+
+async function loadResidence() {
+    try {
+        const response = await fetch(`/api/admin/residences`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const residence = data.residences.find(r => r.id == residenceId);
+            if (residence) {
+                document.getElementById('residence_name').value = residence.name || '';
+                document.getElementById('residence_address').value = residence.address || '';
+                document.getElementById('residence_city').value = residence.city || '';
+                document.getElementById('residence_postal').value = residence.postal_code || '';
+                document.getElementById('residence_description').value = residence.description || '';
+                document.getElementById('syndic_name').value = residence.syndic_name || '';
+                document.getElementById('syndic_email').value = residence.syndic_email || '';
+                document.getElementById('syndic_phone').value = residence.syndic_phone || '';
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de chargement', 'error');
+    }
+}
+
+document.getElementById('editResidenceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        name: document.getElementById('residence_name').value,
+        address: document.getElementById('residence_address').value,
+        city: document.getElementById('residence_city').value,
+        postal_code: document.getElementById('residence_postal').value,
+        description: document.getElementById('residence_description').value,
+        syndic_name: document.getElementById('syndic_name').value,
+        syndic_email: document.getElementById('syndic_email').value,
+        syndic_phone: document.getElementById('syndic_phone').value
+    };
+    
+    try {
+        const response = await fetch(`/api/admin/residences/${residenceId}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            ShabakaSyndic.showToast('Résidence mise à jour avec succès', 'success');
+            setTimeout(() => window.location.href = '/admin/residences', 1500);
+        } else {
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de sauvegarde', 'error');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', loadResidence);
+</script>
+{% endblock %}

@@ -31,6 +31,7 @@ from backend.models.maintenance_log import MaintenanceLog
 from backend.models.app_settings import AppSettings
 from backend.services.charge_calculator import ChargeCalculator
 from backend.services.notification_service import NotificationService
+from backend.services.agora_service import AgoraService
 
 # Créer le blueprint
 admin_bp = Blueprint('admin', __name__)
@@ -939,11 +940,19 @@ def create_assembly():
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
         
+        # Générer le nom du channel Agora si le mode est online ou both
+        meeting_mode = data.get('meeting_mode', 'physical')
+        agora_channel_name = None
+        if meeting_mode in ['online', 'both']:
+            agora_channel_name = AgoraService.generate_channel_name(0)
+        
         assembly = GeneralAssembly(
             residence_id=data['residence_id'],
             title=data['title'],
             description=data.get('description'),
             assembly_type=data['assembly_type'],
+            meeting_mode=meeting_mode,
+            agora_channel_name=agora_channel_name,
             scheduled_date=datetime.fromisoformat(data['scheduled_date']),
             location=data.get('location'),
             quorum_required=data.get('quorum_required', 50),
@@ -982,9 +991,214 @@ def send_convocations(assembly_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/assemblies/<int:assembly_id>/start', methods=['POST'])
+@login_required
+@admin_or_superadmin_required
+def start_assembly(assembly_id):
+    """Démarre une assemblée générale"""
+    try:
+        assembly = GeneralAssembly.query.get(assembly_id)
+        if not assembly:
+            return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        if assembly.status != 'planned':
+            return jsonify({'success': False, 'error': 'AG déjà démarrée ou terminée'}), 400
+        
+        assembly.status = 'in_progress'
+        assembly.agora_started_at = datetime.utcnow()
+        
+        # Démarrer l'enregistrement Agora si mode online/both
+        if assembly.meeting_mode in ['online', 'both'] and assembly.agora_channel_name:
+            recording_sid = AgoraService.start_cloud_recording(assembly.agora_channel_name, 0)
+            assembly.agora_recording_sid = recording_sid
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'AG démarrée', 'assembly': assembly.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/assemblies/<int:assembly_id>/end', methods=['POST'])
+@login_required
+@admin_or_superadmin_required
+def end_assembly(assembly_id):
+    """Termine une assemblée générale"""
+    try:
+        assembly = GeneralAssembly.query.get(assembly_id)
+        if not assembly:
+            return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        assembly.status = 'completed'
+        assembly.end_date = datetime.utcnow()
+        
+        # Arrêter l'enregistrement Agora
+        if assembly.agora_recording_sid:
+            AgoraService.stop_cloud_recording(assembly.agora_recording_sid)
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'AG terminée', 'assembly': assembly.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/assemblies/<int:assembly_id>/agora-token', methods=['GET'])
+@login_required
+def get_agora_token(assembly_id):
+    """Génère un token Agora pour rejoindre une AG en ligne"""
+    try:
+        assembly = GeneralAssembly.query.get(assembly_id)
+        if not assembly:
+            return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        if not assembly.agora_channel_name:
+            return jsonify({'success': False, 'error': 'Cette AG ne supporte pas le mode en ligne'}), 400
+        
+        # Générer le token RTC
+        uid = current_user.id
+        rtc_token = AgoraService.generate_rtc_token(
+            assembly.agora_channel_name,
+            uid,
+            role='publisher',
+            expiration_seconds=7200  # 2 heures
+        )
+        
+        return jsonify({
+            'success': True,
+            'app_id': AgoraService.get_app_id(),
+            'channel_name': assembly.agora_channel_name,
+            'token': rtc_token,
+            'uid': uid
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/assemblies/<int:assembly_id>/attendance', methods=['GET'])
+@login_required
+@admin_or_superadmin_required
+def get_attendance(assembly_id):
+    """Récupère la liste des présences pour une AG"""
+    try:
+        attendances = Attendance.query.filter_by(assembly_id=assembly_id).all()
+        users_data = []
+        
+        for attendance in attendances:
+            user = User.query.get(attendance.user_id)
+            if user:
+                users_data.append({
+                    'attendance_id': attendance.id,
+                    'user_id': user.id,
+                    'user_name': f"{user.first_name} {user.last_name}",
+                    'email': user.email,
+                    'is_present': attendance.is_present,
+                    'attendance_mode': attendance.attendance_mode,
+                    'presence_marked_at': attendance.presence_marked_at.isoformat() if attendance.presence_marked_at else None
+                })
+        
+        return jsonify({'success': True, 'attendances': users_data}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/assemblies/<int:assembly_id>/attendance/mark', methods=['POST'])
+@login_required
+@admin_or_superadmin_required
+def mark_attendance(assembly_id):
+    """Marque la présence d'un ou plusieurs utilisateurs (syndic uniquement)"""
+    try:
+        data = request.get_json()
+        user_ids = data.get('user_ids', [])
+        attendance_mode = data.get('attendance_mode', 'physical')
+        
+        if not user_ids:
+            return jsonify({'success': False, 'error': 'Aucun utilisateur spécifié'}), 400
+        
+        marked_count = 0
+        for user_id in user_ids:
+            # Chercher ou créer l'attendance
+            attendance = Attendance.query.filter_by(
+                assembly_id=assembly_id,
+                user_id=user_id
+            ).first()
+            
+            if not attendance:
+                attendance = Attendance(
+                    assembly_id=assembly_id,
+                    user_id=user_id
+                )
+                db.session.add(attendance)
+            
+            attendance.is_present = True
+            attendance.attendance_mode = attendance_mode
+            attendance.presence_marked_at = datetime.utcnow()
+            attendance.marked_by = current_user.id
+            marked_count += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'{marked_count} présence(s) marquée(s)',
+            'count': marked_count
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/assemblies/<int:assembly_id>/attendance/join-online', methods=['POST'])
+@login_required
+def join_online(assembly_id):
+    """Auto-marque la présence en ligne lorsqu'un utilisateur rejoint"""
+    try:
+        # Chercher ou créer l'attendance
+        attendance = Attendance.query.filter_by(
+            assembly_id=assembly_id,
+            user_id=current_user.id
+        ).first()
+        
+        if not attendance:
+            attendance = Attendance(
+                assembly_id=assembly_id,
+                user_id=current_user.id
+            )
+            db.session.add(attendance)
+        
+        attendance.is_present = True
+        attendance.attendance_mode = 'online'
+        attendance.presence_marked_at = datetime.utcnow()
+        attendance.marked_by = current_user.id  # Auto-marqué
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Présence en ligne enregistrée',
+            'attendance': attendance.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/assemblies/<int:assembly_id>/resolutions', methods=['GET'])
+@login_required
+def get_resolutions(assembly_id):
+    """Récupère les résolutions d'une AG"""
+    try:
+        resolutions = Resolution.query.filter_by(assembly_id=assembly_id).order_by(Resolution.order).all()
+        return jsonify({'success': True, 'resolutions': [r.to_dict() for r in resolutions]}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @admin_bp.route('/assemblies/<int:assembly_id>/resolutions', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_resolution(assembly_id):
     """Crée une résolution pour une AG"""
     try:
@@ -1006,6 +1220,115 @@ def create_resolution(assembly_id):
         db.session.commit()
         
         return jsonify({'success': True, 'message': 'Résolution créée', 'resolution': resolution.to_dict()}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/resolutions/<int:resolution_id>/vote', methods=['POST'])
+@login_required
+def submit_vote(resolution_id):
+    """Soumet un vote pour une résolution"""
+    try:
+        resolution = Resolution.query.get(resolution_id)
+        if not resolution:
+            return jsonify({'success': False, 'error': 'Résolution non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur est présent à l'AG
+        attendance = Attendance.query.filter_by(
+            assembly_id=resolution.assembly_id,
+            user_id=current_user.id,
+            is_present=True
+        ).first()
+        
+        if not attendance:
+            return jsonify({'success': False, 'error': 'Vous devez être marqué présent pour voter'}), 403
+        
+        data = request.get_json()
+        vote_value = data.get('vote_value')  # 'for', 'against', 'abstain'
+        
+        if vote_value not in ['for', 'against', 'abstain']:
+            return jsonify({'success': False, 'error': 'Valeur de vote invalide'}), 400
+        
+        # Chercher ou créer le vote
+        vote = Vote.query.filter_by(
+            resolution_id=resolution_id,
+            user_id=current_user.id
+        ).first()
+        
+        if vote:
+            # Mettre à jour le vote existant
+            old_value = vote.vote_value
+            vote.vote_value = vote_value
+            vote.voted_at = datetime.utcnow()
+            
+            # Ajuster les compteurs
+            if old_value == 'for':
+                resolution.votes_for -= 1
+            elif old_value == 'against':
+                resolution.votes_against -= 1
+            elif old_value == 'abstain':
+                resolution.votes_abstain -= 1
+        else:
+            # Créer un nouveau vote
+            vote = Vote(
+                resolution_id=resolution_id,
+                user_id=current_user.id,
+                vote_value=vote_value
+            )
+            db.session.add(vote)
+        
+        # Incrémenter les compteurs
+        if vote_value == 'for':
+            resolution.votes_for += 1
+        elif vote_value == 'against':
+            resolution.votes_against += 1
+        elif vote_value == 'abstain':
+            resolution.votes_abstain += 1
+        
+        # Mettre à jour le statut si nécessaire
+        if resolution.status == 'pending':
+            resolution.status = 'voting'
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Vote enregistré',
+            'vote': vote.to_dict(),
+            'resolution': resolution.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/resolutions/<int:resolution_id>/close', methods=['POST'])
+@login_required
+@admin_or_superadmin_required
+def close_resolution(resolution_id):
+    """Clôture une résolution et détermine le résultat"""
+    try:
+        resolution = Resolution.query.get(resolution_id)
+        if not resolution:
+            return jsonify({'success': False, 'error': 'Résolution non trouvée'}), 404
+        
+        total_votes = resolution.votes_for + resolution.votes_against + resolution.votes_abstain
+        
+        if total_votes == 0:
+            resolution.status = 'rejected'
+        elif resolution.votes_for > resolution.votes_against:
+            resolution.status = 'approved'
+        else:
+            resolution.status = 'rejected'
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Résolution clôturée',
+            'resolution': resolution.to_dict()
+        }), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500

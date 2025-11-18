@@ -152,6 +152,18 @@ def create_app():
         response.headers['Expires'] = '0'
         return response
     
+    @app.route('/admin/residences/<int:residence_id>/edit')
+    @superadmin_required
+    def admin_residence_edit(residence_id):
+        """Modification d'une résidence"""
+        return render_template('admin/residence_edit.html')
+    
+    @app.route('/admin/residences/<int:residence_id>/units')
+    @superadmin_required
+    def admin_residence_units(residence_id):
+        """Gestion des unités d'une résidence"""
+        return render_template('admin/residence_units.html')
+    
     @app.route('/admin/finances')
     @superadmin_required
     def admin_finances():
@@ -181,6 +193,12 @@ def create_app():
     def admin_assemblies():
         """Gestion des assemblées générales"""
         return render_template('admin/assemblies.html')
+    
+    @app.route('/admin/assemblies/<int:assembly_id>/live')
+    @login_required
+    def admin_assembly_live(assembly_id):
+        """Assemblée générale en direct"""
+        return render_template('admin/assembly_live.html')
     
     @app.route('/admin/documents')
     @superadmin_required

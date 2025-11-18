@@ -1,0 +1,372 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Assemblée Générale en Direct - Shabaka Syndic{% endblock %}
+
+{% block admin_extra_css %}
+<style>
+    .assembly-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        height: calc(100vh - 200px);
+    }
+    
+    .video-section {
+        background: #000;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    #agora-video {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .panel {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .panel-title {
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #111827;
+    }
+    
+    .attendance-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .attendance-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .resolution-item {
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .vote-buttons {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+    
+    .vote-btn {
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: 2px solid;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    .vote-btn.for {
+        border-color: #10b981;
+        color: #10b981;
+    }
+    
+    .vote-btn.for:hover, .vote-btn.for.selected {
+        background: #10b981;
+        color: white;
+    }
+    
+    .vote-btn.against {
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+    
+    .vote-btn.against:hover, .vote-btn.against.selected {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .vote-btn.abstain {
+        border-color: #6b7280;
+        color: #6b7280;
+    }
+    
+    .vote-btn.abstain:hover, .vote-btn.abstain.selected {
+        background: #6b7280;
+        color: white;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-badge.online {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-badge.physical {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div style="margin-bottom: 1.5rem;">
+    <h2 id="assembly-title" style="color: #111827; margin-bottom: 0.5rem;">Assemblée Générale</h2>
+    <p id="assembly-info" style="color: #6b7280; font-size: 0.875rem;"></p>
+</div>
+
+<div class="assembly-container">
+    <div class="video-section" id="video-container">
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white;">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📹</div>
+                <p id="video-status">Chargement du stream...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <div class="panel" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+            <h3 class="panel-title">📋 Présences (<span id="attendance-count">0</span>)</h3>
+            <div class="attendance-list" id="attendance-list" style="flex: 1;">
+                <p style="color: #9ca3af; text-align: center; padding: 2rem;">Chargement...</p>
+            </div>
+        </div>
+        
+        <div class="panel" style="flex: 2; overflow: hidden; display: flex; flex-direction: column;">
+            <h3 class="panel-title">🗳️ Votes en Cours</h3>
+            <div id="resolutions-list" style="flex: 1; overflow-y: auto;">
+                <p style="color: #9ca3af; text-align: center; padding: 2rem;">Aucun vote pour le moment</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_extra_js %}
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
+<script>
+let assemblyId = window.location.pathname.split('/')[3];
+let assembly = null;
+let agoraClient = null;
+let localAudioTrack = null;
+let localVideoTrack = null;
+
+async function loadAssembly() {
+    try {
+        const response = await fetch(`/api/admin/assemblies?residence_id=`);
+        const data = await response.json();
+        
+        if (data.success) {
+            assembly = data.assemblies.find(a => a.id == assemblyId);
+            if (assembly) {
+                document.getElementById('assembly-title').textContent = assembly.title;
+                document.getElementById('assembly-info').textContent = `${assembly.assembly_type} - ${new Date(assembly.scheduled_date).toLocaleString('fr-FR')}`;
+                
+                // Si mode online ou both, initialiser Agora
+                if (assembly.meeting_mode === 'online' || assembly.meeting_mode === 'both') {
+                    await initializeAgora();
+                } else {
+                    document.getElementById('video-status').textContent = 'Cette assemblée ne dispose pas de stream en ligne';
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function initializeAgora() {
+    try {
+        // Récupérer le token Agora
+        const tokenResponse = await fetch(`/api/admin/assemblies/${assemblyId}/agora-token`);
+        const tokenData = await tokenResponse.json();
+        
+        if (!tokenData.success) {
+            document.getElementById('video-status').textContent = 'Impossible de se connecter au stream';
+            return;
+        }
+        
+        // Marquer la présence en ligne
+        await fetch(`/api/admin/assemblies/${assemblyId}/attendance/join-online`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        
+        // Initialiser Agora RTC
+        agoraClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        
+        await agoraClient.join(
+            tokenData.app_id,
+            tokenData.channel_name,
+            tokenData.token,
+            tokenData.uid
+        );
+        
+        // Subscribe to remote users
+        agoraClient.on("user-published", async (user, mediaType) => {
+            await agoraClient.subscribe(user, mediaType);
+            
+            if (mediaType === "video") {
+                const remoteVideoTrack = user.videoTrack;
+                const videoContainer = document.getElementById('video-container');
+                videoContainer.innerHTML = '<div id="agora-video"></div>';
+                remoteVideoTrack.play("agora-video");
+            }
+            
+            if (mediaType === "audio") {
+                const remoteAudioTrack = user.audioTrack;
+                remoteAudioTrack.play();
+            }
+        });
+        
+        // Créer les tracks locaux (audio/video)
+        localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+        
+        // Publier les tracks
+        await agoraClient.publish([localAudioTrack, localVideoTrack]);
+        
+        // Afficher la vidéo locale
+        const videoContainer = document.getElementById('video-container');
+        videoContainer.innerHTML = '<div id="agora-video"></div>';
+        localVideoTrack.play("agora-video");
+        
+        document.getElementById('video-status').textContent = 'Connecté au stream';
+        
+    } catch (error) {
+        console.error('Agora error:', error);
+        document.getElementById('video-status').textContent = 'Erreur de connexion au stream';
+    }
+}
+
+async function loadAttendance() {
+    try {
+        const response = await fetch(`/api/admin/assemblies/${assemblyId}/attendance`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const container = document.getElementById('attendance-list');
+            document.getElementById('attendance-count').textContent = data.attendances.filter(a => a.is_present).length;
+            
+            if (data.attendances.length === 0) {
+                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 2rem;">Aucune présence</p>';
+                return;
+            }
+            
+            container.innerHTML = data.attendances
+                .filter(a => a.is_present)
+                .map(a => `
+                    <div class="attendance-item">
+                        <div>
+                            <div style="font-weight: 600; color: #111827;">${a.user_name}</div>
+                            <div style="font-size: 0.75rem; color: #6b7280;">${a.email}</div>
+                        </div>
+                        <span class="status-badge ${a.attendance_mode}">
+                            ${a.attendance_mode === 'online' ? '🌐 En ligne' : '🏢 Physique'}
+                        </span>
+                    </div>
+                `).join('');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function loadResolutions() {
+    try {
+        const response = await fetch(`/api/admin/assemblies/${assemblyId}/resolutions`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const container = document.getElementById('resolutions-list');
+            
+            if (data.resolutions.length === 0) {
+                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 2rem;">Aucun vote pour le moment</p>';
+                return;
+            }
+            
+            container.innerHTML = data.resolutions.map(r => `
+                <div class="resolution-item">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">${r.title}</div>
+                    ${r.description ? `<div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">${r.description}</div>` : ''}
+                    
+                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.75rem;">
+                        ✅ Pour: ${r.votes_for} | ❌ Contre: ${r.votes_against} | ⚪ Abstention: ${r.votes_abstain}
+                    </div>
+                    
+                    <div class="vote-buttons">
+                        <button class="vote-btn for" onclick="vote(${r.id}, 'for')">Pour</button>
+                        <button class="vote-btn against" onclick="vote(${r.id}, 'against')">Contre</button>
+                        <button class="vote-btn abstain" onclick="vote(${r.id}, 'abstain')">Abstention</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function vote(resolutionId, voteValue) {
+    try {
+        const response = await fetch(`/api/admin/resolutions/${resolutionId}/vote`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ vote_value: voteValue })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            ShabakaSyndic.showToast('Vote enregistré', 'success');
+            loadResolutions();
+        } else {
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de vote', 'error');
+    }
+}
+
+// Refresh data every 5 seconds
+setInterval(() => {
+    loadAttendance();
+    loadResolutions();
+}, 5000);
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadAssembly();
+    loadAttendance();
+    loadResolutions();
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', async () => {
+    if (localAudioTrack) localAudioTrack.close();
+    if (localVideoTrack) localVideoTrack.close();
+    if (agoraClient) await agoraClient.leave();
+});
+</script>
+{% endblock %}
