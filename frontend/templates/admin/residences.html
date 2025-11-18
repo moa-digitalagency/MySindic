@@ -280,17 +280,11 @@ function viewResidence(residenceId) {
 }
 
 function editResidence(residenceId) {
-    const residence = residences.find(r => r.id === residenceId);
-    if (!residence) return;
-    
-    ShabakaSyndic.showToast(`Modification de ${residence.name}`, 'info');
+    window.location.href = `/admin/residences/${residenceId}/edit`;
 }
 
 function manageUnits(residenceId) {
-    const residence = residences.find(r => r.id === residenceId);
-    if (!residence) return;
-    
-    ShabakaSyndic.showToast(`Gestion des unités de ${residence.name}`, 'info');
+    window.location.href = `/admin/residences/${residenceId}/units`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
