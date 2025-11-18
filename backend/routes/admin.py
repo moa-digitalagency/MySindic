@@ -1066,6 +1066,12 @@ def get_agora_token(assembly_id):
             expiration_seconds=7200  # 2 heures
         )
         
+        if not rtc_token:
+            return jsonify({
+                'success': False,
+                'error': 'Impossible de générer le token Agora. Vérifiez la configuration AGORA_APP_ID et AGORA_APP_CERTIFICATE.'
+            }), 500
+        
         return jsonify({
             'success': True,
             'app_id': AgoraService.get_app_id(),

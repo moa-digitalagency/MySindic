@@ -8,10 +8,7 @@ Service pour gérer l'intégration avec Agora.io pour les réunions en ligne
 
 import os
 import time
-import hmac
-import hashlib
-import base64
-from datetime import datetime, timedelta
+from agora_token_builder import RtcTokenBuilder, RtmTokenBuilder
 
 
 class AgoraService:
@@ -36,7 +33,7 @@ class AgoraService:
     @staticmethod
     def generate_rtc_token(channel_name, uid, role='publisher', expiration_seconds=3600):
         """
-        Génère un token RTC pour Agora.io
+        Génère un token RTC pour Agora.io avec le SDK officiel
         
         Args:
             channel_name: Nom du channel
@@ -51,32 +48,39 @@ class AgoraService:
         app_certificate = AgoraService.get_app_certificate()
         
         if not app_id or not app_certificate:
-            # En mode développement sans credentials, retourner un token factice
-            return f"dev_token_{channel_name}_{uid}"
+            print("Warning: AGORA_APP_ID ou AGORA_APP_CERTIFICATE non configuré")
+            return None
         
         try:
-            # Version simplifiée - en production, utiliser le SDK officiel Agora
-            # Pour l'instant, retourne un token de développement
-            current_timestamp = int(time.time())
-            expiration_timestamp = current_timestamp + expiration_seconds
+            # Calculer l'expiration (timestamp Unix)
+            privilege_expired_ts = int(time.time()) + expiration_seconds
             
-            # Token factice pour le développement
-            token_data = f"{app_id}:{channel_name}:{uid}:{expiration_timestamp}"
-            token = base64.b64encode(token_data.encode()).decode()
+            # Déterminer le rôle Agora
+            agora_role = RtcTokenBuilder.Role_Publisher if role == 'publisher' else RtcTokenBuilder.Role_Subscriber
             
-            return f"006{token}"
+            # Générer le token avec le SDK officiel Agora
+            token = RtcTokenBuilder.buildTokenWithUid(
+                app_id,
+                app_certificate,
+                channel_name,
+                uid,
+                agora_role,
+                privilege_expired_ts
+            )
+            
+            return token
             
         except Exception as e:
-            print(f"Erreur génération token Agora: {e}")
+            print(f"Erreur génération token RTC Agora: {e}")
             return None
     
     @staticmethod
     def generate_rtm_token(user_id, expiration_seconds=3600):
         """
-        Génère un token RTM (Real-Time Messaging) pour Agora.io
+        Génère un token RTM (Real-Time Messaging) pour Agora.io avec le SDK officiel
         
         Args:
-            user_id: ID de l'utilisateur
+            user_id: ID de l'utilisateur (string)
             expiration_seconds: Durée de validité en secondes
         
         Returns:
@@ -86,17 +90,23 @@ class AgoraService:
         app_certificate = AgoraService.get_app_certificate()
         
         if not app_id or not app_certificate:
-            return f"dev_rtm_token_{user_id}"
+            print("Warning: AGORA_APP_ID ou AGORA_APP_CERTIFICATE non configuré")
+            return None
         
         try:
-            current_timestamp = int(time.time())
-            expiration_timestamp = current_timestamp + expiration_seconds
+            # Calculer l'expiration
+            privilege_expired_ts = int(time.time()) + expiration_seconds
             
-            # Token factice pour le développement
-            token_data = f"{app_id}:rtm:{user_id}:{expiration_timestamp}"
-            token = base64.b64encode(token_data.encode()).decode()
+            # Générer le token RTM avec le SDK officiel
+            token = RtmTokenBuilder.buildToken(
+                app_id,
+                app_certificate,
+                str(user_id),
+                RtmTokenBuilder.Role_Rtm_User,
+                privilege_expired_ts
+            )
             
-            return f"007{token}"
+            return token
             
         except Exception as e:
             print(f"Erreur génération token RTM Agora: {e}")
