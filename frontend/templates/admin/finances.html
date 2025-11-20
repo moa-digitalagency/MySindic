@@ -276,6 +276,7 @@ function displayPayments(paymentsList) {
                     <th>Montant</th>
                     <th>Méthode</th>
                     <th>Référence</th>
+                    <th>Justificatif</th>
                     <th>Statut</th>
                     <th>Actions</th>
                 </tr>
@@ -288,6 +289,9 @@ function displayPayments(paymentsList) {
                         <td class="font-semibold text-green-600">${ShabakaSyndic.formatCurrency(p.amount)}</td>
                         <td><span class="badge badge-info">${p.payment_method}</span></td>
                         <td class="text-sm">${p.reference || '-'}</td>
+                        <td>
+                            ${p.proof_document ? `<a href="${p.proof_document}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm">📄 Voir</a>` : '-'}
+                        </td>
                         <td>
                             <span class="badge ${p.status === 'validated' ? 'badge-success' : p.status === 'pending' ? 'badge-warning' : 'badge-danger'}">
                                 ${p.status}

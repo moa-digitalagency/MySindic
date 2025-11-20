@@ -119,6 +119,12 @@ www.myoneart.com
                     <textarea id="payment-description" class="input-field" rows="2" placeholder="Notes additionnelles (optionnel)"></textarea>
                 </div>
                 
+                <div>
+                    <label class="label-field">Justificatif de paiement (image ou PDF)</label>
+                    <input type="file" id="payment-proof" class="input-field" accept="image/*,.pdf">
+                    <p class="text-xs text-gray-500 mt-1">Formats acceptés : JPG, PNG, PDF (max 16 MB)</p>
+                </div>
+                
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <div class="flex">
                         <svg class="h-5 w-5 text-yellow-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -260,6 +266,7 @@ async function loadPayments() {
                     <th>Montant</th>
                     <th>Méthode</th>
                     <th>Référence</th>
+                    <th>Justificatif</th>
                     <th>Statut</th>
                 </tr>
             </thead>
@@ -270,6 +277,9 @@ async function loadPayments() {
                         <td class="font-semibold text-green-600">${ShabakaSyndic.formatCurrency(p.amount)}</td>
                         <td><span class="badge badge-info">${p.payment_method}</span></td>
                         <td class="text-sm">${p.reference || '-'}</td>
+                        <td>
+                            ${p.proof_document ? `<a href="${p.proof_document}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm">📄 Voir</a>` : '-'}
+                        </td>
                         <td>
                             <span class="badge ${p.status === 'validated' ? 'badge-success' : p.status === 'pending' ? 'badge-warning' : 'badge-danger'}">
                                 ${p.status}
@@ -302,19 +312,24 @@ function switchTab(tab) {
 document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = {
-        amount: parseFloat(document.getElementById('payment-amount').value),
-        payment_date: document.getElementById('payment-date').value,
-        payment_method: document.getElementById('payment-method').value,
-        reference: document.getElementById('payment-reference').value,
-        description: document.getElementById('payment-description').value
-    };
+    // Utiliser FormData pour gérer l'upload de fichier
+    const formData = new FormData();
+    formData.append('amount', parseFloat(document.getElementById('payment-amount').value));
+    formData.append('payment_date', document.getElementById('payment-date').value);
+    formData.append('payment_method', document.getElementById('payment-method').value);
+    formData.append('reference', document.getElementById('payment-reference').value);
+    formData.append('description', document.getElementById('payment-description').value);
+    
+    // Ajouter le fichier si présent
+    const proofFile = document.getElementById('payment-proof').files[0];
+    if (proofFile) {
+        formData.append('proof_document', proofFile);
+    }
     
     try {
         const response = await fetch('/api/resident/payments', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
+            body: formData  // FormData définit automatiquement le Content-Type
         });
         
         const data = await response.json();

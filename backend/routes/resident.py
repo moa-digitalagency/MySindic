@@ -451,16 +451,43 @@ def get_balance():
 @login_required
 def declare_payment():
     """Déclare un paiement"""
+    import os
+    from werkzeug.utils import secure_filename
+    
     try:
         # SÉCURITÉ: Vérifier unit_id
         if not current_user.unit_id:
             return jsonify({'success': False, 'error': 'Aucun lot associé'}), 400
         
-        data = request.get_json()
+        # Gérer les données multipart/form-data pour l'upload de fichiers
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            data = request.form.to_dict()
+            proof_file = request.files.get('proof_document')
+        else:
+            data = request.get_json()
+            proof_file = None
+        
         required_fields = ['amount', 'payment_method', 'payment_date']
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Gérer l'upload du justificatif
+        proof_document_path = None
+        if proof_file and proof_file.filename:
+            # Créer le dossier uploads si nécessaire
+            upload_folder = os.path.join('frontend', 'static', 'uploads', 'payments')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            # Sécuriser le nom de fichier
+            filename = secure_filename(proof_file.filename)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"{timestamp}_{filename}"
+            
+            # Sauvegarder le fichier
+            file_path = os.path.join(upload_folder, filename)
+            proof_file.save(file_path)
+            proof_document_path = f"/static/uploads/payments/{filename}"
         
         # SÉCURITÉ: Utiliser unit_id et user_id de current_user (pas de la requête)
         payment = Payment(
@@ -471,6 +498,7 @@ def declare_payment():
             reference=data.get('reference'),
             description=data.get('description'),
             payment_date=datetime.fromisoformat(data['payment_date']),
+            proof_document=proof_document_path,
             status='pending'
         )
         
