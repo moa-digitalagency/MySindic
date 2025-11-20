@@ -40,14 +40,96 @@
 {% endblock %}
 
 {% block admin_content %}
-<div style="margin-bottom: 2rem;">
-    <h2 style="color: #111827; margin-bottom: 0.5rem;">🏠 Gestion des Unités</h2>
-    <p style="color: #6b7280; font-size: 0.875rem;" id="residence-name">Chargement...</p>
+<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h2 style="color: #111827; margin-bottom: 0.5rem;">🏠 Gestion des Unités</h2>
+        <p style="color: #6b7280; font-size: 0.875rem;" id="residence-name">Chargement...</p>
+    </div>
+    <button onclick="openAddUnitModal()" class="btn-primary">+ Ajouter une unité</button>
 </div>
 
 <div id="units-container">
     <div style="text-align: center; padding: 3rem;">
         <div style="width: 40px; height: 40px; margin: 0 auto; border: 4px solid #f3f4f6; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+</div>
+
+<div id="unitModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="modal-title">Ajouter une unité</h2>
+                <button onclick="ShabakaSyndic.closeModal('unitModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="unitForm" class="space-y-4">
+                <input type="hidden" id="unit-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Numéro d'unité *</label>
+                        <input type="text" id="unit-number" class="input-field" required placeholder="Ex: A101">
+                    </div>
+                    <div>
+                        <label class="label-field">Étage</label>
+                        <input type="number" id="unit-floor" class="input-field" placeholder="Ex: 1">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Bâtiment</label>
+                        <input type="text" id="unit-building" class="input-field" placeholder="Ex: Bâtiment A">
+                    </div>
+                    <div>
+                        <label class="label-field">Type</label>
+                        <select id="unit-type" class="input-field">
+                            <option value="">Sélectionner...</option>
+                            <option value="Appartement">Appartement</option>
+                            <option value="Commerce">Commerce</option>
+                            <option value="Parking">Parking</option>
+                            <option value="Cave">Cave</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="label-field">Superficie (m²)</label>
+                    <input type="number" step="0.01" id="unit-surface" class="input-field" placeholder="Ex: 75.5">
+                </div>
+                
+                <div>
+                    <label class="label-field">Nom du propriétaire</label>
+                    <input type="text" id="unit-owner-name" class="input-field" placeholder="Nom complet">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-field">Email du propriétaire</label>
+                        <input type="email" id="unit-owner-email" class="input-field" placeholder="email@exemple.com">
+                    </div>
+                    <div>
+                        <label class="label-field">Téléphone</label>
+                        <input type="tel" id="unit-owner-phone" class="input-field" placeholder="+212...">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="unit-occupied" class="mr-2" checked>
+                        <span class="text-sm">Unité occupée</span>
+                    </label>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="ShabakaSyndic.closeModal('unitModal')" class="btn-secondary">Annuler</button>
+                    <button type="submit" class="btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -101,14 +183,146 @@ function displayUnits(units) {
         <div class="units-grid">
             ${units.map(unit => `
                 <div class="unit-card">
-                    <div class="unit-name">${unit.name}</div>
-                    <div class="unit-info">Type: ${unit.type || 'Non spécifié'}</div>
+                    <div class="unit-name">${unit.unit_number}</div>
+                    <div class="unit-info">Type: ${unit.unit_type || 'Non spécifié'}</div>
                     <div class="unit-info">Étage: ${unit.floor || 'N/A'}</div>
                     ${unit.owner_name ? `<div class="unit-info">Propriétaire: ${unit.owner_name}</div>` : ''}
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button onclick="editUnit(${unit.id})" style="flex: 1; padding: 0.5rem; border: 2px solid #667eea; background: rgba(102, 126, 234, 0.05); color: #667eea; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer;">✏️ Modifier</button>
+                        <button onclick="deleteUnit(${unit.id})" style="padding: 0.5rem; border: 2px solid #ef4444; background: rgba(239, 68, 68, 0.05); color: #ef4444; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">🗑️</button>
+                    </div>
                 </div>
             `).join('')}
         </div>
     `;
+}
+
+let currentUnits = [];
+
+function openAddUnitModal() {
+    document.getElementById('modal-title').textContent = 'Ajouter une unité';
+    document.getElementById('unitForm').reset();
+    document.getElementById('unit-id').value = '';
+    document.getElementById('unit-occupied').checked = true;
+    ShabakaSyndic.openModal('unitModal');
+}
+
+function editUnit(unitId) {
+    const unit = currentUnits.find(u => u.id === unitId);
+    if (!unit) return;
+    
+    document.getElementById('modal-title').textContent = 'Modifier l\'unité';
+    document.getElementById('unit-id').value = unit.id;
+    document.getElementById('unit-number').value = unit.unit_number || '';
+    document.getElementById('unit-floor').value = unit.floor || '';
+    document.getElementById('unit-building').value = unit.building || '';
+    document.getElementById('unit-type').value = unit.unit_type || '';
+    document.getElementById('unit-surface').value = unit.surface_area || '';
+    document.getElementById('unit-owner-name').value = unit.owner_name || '';
+    document.getElementById('unit-owner-email').value = unit.owner_email || '';
+    document.getElementById('unit-owner-phone').value = unit.owner_phone || '';
+    document.getElementById('unit-occupied').checked = unit.is_occupied !== false;
+    
+    ShabakaSyndic.openModal('unitModal');
+}
+
+async function deleteUnit(unitId) {
+    if (!confirm('Voulez-vous vraiment supprimer cette unité ?')) return;
+    
+    try {
+        const response = await fetch(`/api/admin/units/${unitId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            ShabakaSyndic.showToast('Unité supprimée', 'success');
+            loadUnits();
+        } else {
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+document.getElementById('unitForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const unitId = document.getElementById('unit-id').value;
+    const formData = {
+        unit_number: document.getElementById('unit-number').value,
+        floor: document.getElementById('unit-floor').value ? parseInt(document.getElementById('unit-floor').value) : null,
+        building: document.getElementById('unit-building').value || null,
+        unit_type: document.getElementById('unit-type').value || null,
+        surface_area: document.getElementById('unit-surface').value ? parseFloat(document.getElementById('unit-surface').value) : null,
+        owner_name: document.getElementById('unit-owner-name').value || null,
+        owner_email: document.getElementById('unit-owner-email').value || null,
+        owner_phone: document.getElementById('unit-owner-phone').value || null,
+        is_occupied: document.getElementById('unit-occupied').checked
+    };
+    
+    try {
+        let response;
+        if (unitId) {
+            response = await fetch(`/api/admin/units/${unitId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+        } else {
+            formData.residence_id = parseInt(residenceId);
+            response = await fetch(`/api/admin/residences/${residenceId}/units`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            ShabakaSyndic.showToast(unitId ? 'Unité modifiée' : 'Unité créée', 'success');
+            ShabakaSyndic.closeModal('unitModal');
+            loadUnits();
+        } else {
+            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+});
+
+async function loadUnits() {
+    try {
+        const [residencesRes, unitsRes] = await Promise.all([
+            fetch('/api/admin/residences'),
+            fetch(`/api/admin/residences/${residenceId}/units`)
+        ]);
+        
+        const residencesData = await residencesRes.json();
+        const unitsData = await unitsRes.json();
+        
+        if (residencesData.success) {
+            const residence = residencesData.residences.find(r => r.id == residenceId);
+            if (residence) {
+                document.getElementById('residence-name').textContent = `Résidence: ${residence.name}`;
+            }
+        }
+        
+        if (unitsData.success) {
+            currentUnits = unitsData.units;
+            displayUnits(currentUnits);
+        } else {
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', loadUnits);

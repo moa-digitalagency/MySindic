@@ -300,6 +300,47 @@ def create_unit_simple():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/units/<int:unit_id>', methods=['PUT'])
+@login_required
+@superadmin_required
+def update_unit(unit_id):
+    """Met à jour un lot"""
+    try:
+        unit = Unit.query.get(unit_id)
+        if not unit:
+            return jsonify({'success': False, 'error': 'Lot non trouvé'}), 404
+        
+        data = request.get_json()
+        for field in ['unit_number', 'floor', 'building', 'unit_type', 'surface_area', 
+                      'owner_name', 'owner_email', 'owner_phone', 'is_occupied']:
+            if field in data:
+                setattr(unit, field, data[field])
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Lot mis à jour', 'unit': unit.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/units/<int:unit_id>', methods=['DELETE'])
+@login_required
+@superadmin_required
+def delete_unit(unit_id):
+    """Supprime un lot"""
+    try:
+        unit = Unit.query.get(unit_id)
+        if not unit:
+            return jsonify({'success': False, 'error': 'Lot non trouvé'}), 404
+        
+        db.session.delete(unit)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Lot supprimé'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== CHARGES ====================
 
 @admin_bp.route('/charges', methods=['GET'])
@@ -435,6 +476,50 @@ def get_unit_balance(unit_id):
         balance = ChargeCalculator.get_unit_balance(unit_id)
         unpaid = ChargeCalculator.get_unpaid_charges(unit_id)
         return jsonify({'success': True, 'balance': balance, 'unpaid_charges': unpaid}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/charges/<int:charge_id>/payment-status', methods=['GET'])
+@login_required
+@superadmin_required
+def get_charge_payment_status(charge_id):
+    """Récupère le statut des paiements pour une charge"""
+    try:
+        from backend.models.charge import ChargeDistribution
+        charge = Charge.query.get(charge_id)
+        if not charge:
+            return jsonify({'success': False, 'error': 'Charge non trouvée'}), 404
+        
+        distributions = ChargeDistribution.query.filter_by(charge_id=charge_id).all()
+        payment_status = []
+        
+        for dist in distributions:
+            unit = Unit.query.get(dist.unit_id)
+            if not unit:
+                continue
+            
+            paid_amount = db.session.query(db.func.sum(Payment.amount)).filter(
+                Payment.unit_id == dist.unit_id,
+                Payment.status == 'validated',
+                Payment.payment_date >= charge.created_at
+            ).scalar() or 0
+            
+            payment_status.append({
+                'unit_id': unit.id,
+                'unit_number': unit.unit_number,
+                'owner_name': unit.owner_name,
+                'amount_due': float(dist.amount_due),
+                'amount_paid': float(paid_amount),
+                'balance': float(dist.amount_due - paid_amount),
+                'is_paid': paid_amount >= dist.amount_due
+            })
+        
+        return jsonify({
+            'success': True,
+            'charge': charge.to_dict(),
+            'payment_status': payment_status
+        }), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 

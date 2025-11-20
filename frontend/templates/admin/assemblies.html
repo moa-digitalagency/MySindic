@@ -259,7 +259,7 @@ async function loadAssemblies() {
         
         if (assembliesData.success && residencesData.success) {
             allAssemblies = assembliesData.data || [];
-            residences = residencesData.data || [];
+            residences = residencesData.residences || residencesData.data || [];
             
             updateStats();
             populateResidenceFilters();

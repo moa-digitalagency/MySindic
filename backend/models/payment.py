@@ -44,6 +44,9 @@ class Payment(db.Model):
     status = db.Column(db.String(20), default='pending')
     # Statuts: 'pending', 'validated', 'rejected'
     
+    # Pièce jointe (justificatif de paiement)
+    proof_document = db.Column(db.String(255))  # Chemin vers le fichier (image ou PDF)
+    
     # Notes
     admin_notes = db.Column(db.Text)
     
@@ -66,6 +69,7 @@ class Payment(db.Model):
             'description': self.description,
             'payment_date': self.payment_date.isoformat() if self.payment_date else None,
             'status': self.status,
+            'proof_document': self.proof_document,
             'admin_notes': self.admin_notes,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
