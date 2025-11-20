@@ -286,10 +286,9 @@ function populateResidenceFilters() {
     const selects = document.querySelectorAll('select[name="residence_id"], #filter-residence');
     selects.forEach(select => {
         const isFilter = select.id === 'filter-residence';
-        select.innerHTML = isFilter ? '<option value="">Toutes les résidences</option>' : '<option value="">Sélectionner une résidence</option>';
-        residences.forEach(res => {
-            select.innerHTML += `<option value="${res.id}">${res.name}</option>`;
-        });
+        const defaultOption = isFilter ? '<option value="">Toutes les résidences</option>' : '<option value="">Sélectionner une résidence</option>';
+        const options = residences.map(res => `<option value="${res.id}">${res.name}</option>`).join('');
+        select.innerHTML = defaultOption + options;
     });
 }
 
