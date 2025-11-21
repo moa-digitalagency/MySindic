@@ -38,6 +38,35 @@ Shabaka Syndic is built as a PWA with a Python Flask backend and an HTML/CSS fro
     - **Resident Routes (`/api/resident/*`):** Secure, personalized dashboards for residents, including maintenance request tracking.
 - **Role Management System:** Supports `superadmin`, `admin`, `owner`, and `resident` roles with dedicated interfaces and permission checks.
 
+### Roles & Permissions
+
+#### 1. Super Admin (`superadmin`)
+- **Droits complets** : Accès à toutes les fonctionnalités de la plateforme
+- **Gestion des résidences** : Créer une résidence et assigner un ou plusieurs membres du bureau syndic
+- **Gestion globale** : Visualiser et gérer toutes les résidences, tous les utilisateurs, toutes les données
+
+#### 2. Bureau Syndic (`admin`)
+- **Gestion de résidences** : Gérer les résidences qui leur sont assignées
+- **Gestion des utilisateurs** : Ajouter et gérer les propriétaires et résidents de leurs résidences
+- **Assemblées générales** : Créer, gérer et suivre les assemblées générales
+- **Maintenances** : Gérer les demandes de maintenance et le carnet d'entretien
+- **Finances** : Gérer les charges, appels de fonds, paiements
+- **Documents** : Gérer les documents de la résidence
+- **Communications** : Publier des actualités pour informer les résidents
+
+#### 3. Propriétaire (`owner`)
+- **Assemblées générales** : Accès et participation aux AG de sa résidence
+- **Gestion des résidents** : Créer, ajouter, bloquer et supprimer un résident dans son unité
+- **Fil d'actualités** : Consulter les actualités de sa résidence
+- **Maintenances** : Faire des demandes de maintenance et suivre leur statut
+- **Finances** : Consulter les charges de son unité et l'historique des paiements
+- **Documents** : Consulter les documents de la résidence
+
+#### 4. Résident (`resident`)
+- **Fil d'actualités** : Consulter les actualités de sa résidence
+- **Maintenances** : Faire des demandes de maintenance et suivre leur statut uniquement
+- **Accès limité** : Pas d'accès aux finances, assemblées générales ou documents
+
 ### System Design Choices
 
 - **Database:** PostgreSQL for native Replit integration, ACID compliance, and scalability.
