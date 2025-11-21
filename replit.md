@@ -4,6 +4,31 @@
 
 **Shabaka Syndic** is a Progressive Web App (PWA) designed for condominium management in the Moroccan market. It aims to modernize property management for syndics (superadmins) and residents, offering a mobile-first, responsive experience. Key capabilities include automating administrative tasks like fund calls and charge distribution, facilitating communication, and providing comprehensive tools for managing units, finances, maintenance, news, and general assemblies. The project focuses on user-friendly design and robust functionality to streamline condominium operations.
 
+## Recent Changes (November 21, 2025)
+
+### CSS Border-Radius Standardization
+- Fixed critical CSS bug where `rounded-[10px]-[10px]` typo prevented border-radius from applying correctly
+- Standardized all border-radius values to **uniform 10px** across all templates (buttons, inputs, cards, modals)
+- Preserved special cases: badges (9999px for pill shape) and loading spinner (50% for circular shape)
+- Updated both inline styles and Tailwind CSS classes to use consistent 10px border-radius
+
+### Role-Based Access Control (RBAC) Implementation
+- Implemented comprehensive RBAC in `admin_base.html` with proper menu filtering:
+  - **Super Admin**: Dashboard, Actualités, Résidences, Utilisateurs, Finances, Maintenance, Carnet d'Entretien, Assemblées, Documents, Paramètres + Quick action "Nouvelle Résidence"
+  - **Bureau Syndic (admin)**: Dashboard, Actualités, Résidences, Utilisateurs, Finances, Maintenance, Carnet d'Entretien, Assemblées, Documents, Paramètres
+- Implemented RBAC in `resident_base.html` with role-specific menu visibility:
+  - **Owner**: Dashboard, Actualités, Maintenance, Finances, Assemblées, Documents
+  - **Resident**: Dashboard, Actualités, Maintenance (request/tracking only)
+- All role checks use User model helper methods: `is_superadmin()`, `is_admin()`, `is_owner()`, `is_resident()`
+
+### Demo Data Refresh
+- Created `clean_and_recreate_demo.py` script to safely delete and recreate demo data
+- Recreated demo accounts with correct role assignments:
+  - **superadmin@shabaka.ma** (password: Superadmin123!)
+  - **syndic@shabaka.ma** (password: Syndic123!)
+  - **proprietaire@shabaka.ma** (password: Proprietaire123!)
+  - **resident@shabaka.ma** (password: Resident123!)
+
 ## User Preferences
 
 - **Workflow:** Iterative development is preferred.
@@ -25,7 +50,7 @@ Shabaka Syndic is built as a PWA with a Python Flask backend and an HTML/CSS fro
 - **Frontend Framework:** Vanilla JavaScript for client-side interactions.
 - **Responsive Design:** Two-column layout for desktop (feed + sidebar) and bottom navigation with tabs for mobile.
 - **Modern Design System:** Rounded corners, soft shadows, gradient buttons, smooth transitions, pastel colors, and card-based layouts with hover animations.
-- **Button Design Standards:** Consistent solid borders (2px, 8-10px border-radius) for all clickable buttons. Informational blocks use dashed borders. Primary actions are indigo, secondary actions are green/orange, with hover effects.
+- **Button Design Standards:** Consistent solid borders (2px, **uniform 10px border-radius**) for all clickable buttons. Informational blocks use dashed borders. Primary actions are indigo, secondary actions are green/orange, with hover effects. Special cases: badges use 9999px for pill shape, loading spinner uses 50% for circular shape.
 
 ### Technical Implementations
 
