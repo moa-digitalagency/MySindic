@@ -54,7 +54,7 @@ www.myoneart.com
         <div id="tab-content-registry" class="card mt-4 hidden">
             <!-- Statistiques du registre -->
             <div id="registry-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-[10px]-[10px] p-4 border-2 border-blue-300">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-[10px] p-4 border-2 border-blue-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-blue-800">Total Unités</p>
@@ -65,7 +65,7 @@ www.myoneart.com
                         </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-[10px]-[10px] p-4 border-2 border-green-300">
+                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-[10px] p-4 border-2 border-green-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-green-800">À jour</p>
@@ -76,7 +76,7 @@ www.myoneart.com
                         </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-red-50 to-red-100 rounded-[10px]-[10px] p-4 border-2 border-red-300">
+                <div class="bg-gradient-to-r from-red-50 to-red-100 rounded-[10px] p-4 border-2 border-red-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-red-800">En retard</p>
@@ -87,7 +87,7 @@ www.myoneart.com
                         </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-[10px]-[10px] p-4 border-2 border-orange-300">
+                <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-[10px] p-4 border-2 border-orange-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-orange-800">Impayés</p>
@@ -118,7 +118,7 @@ www.myoneart.com
         <div id="tab-content-payments" class="card mt-4 hidden">
             <!-- Statistiques des paiements -->
             <div id="payment-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-[10px]-[10px] p-4 border-2 border-yellow-300">
+                <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-[10px] p-4 border-2 border-yellow-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-yellow-800">En attente</p>
@@ -129,7 +129,7 @@ www.myoneart.com
                         </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-[10px]-[10px] p-4 border-2 border-green-300">
+                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-[10px] p-4 border-2 border-green-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-green-800">Validés</p>
@@ -140,7 +140,7 @@ www.myoneart.com
                         </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-[10px]-[10px] p-4 border-2 border-indigo-300">
+                <div class="bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-[10px] p-4 border-2 border-indigo-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-indigo-800">Total</p>
@@ -194,7 +194,7 @@ www.myoneart.com
                 </button>
             </div>
             
-            <div id="payment-details" class="bg-gray-50 rounded-[10px]-[10px] p-4 mb-4 border border-gray-200">
+            <div id="payment-details" class="bg-gray-50 rounded-[10px] p-4 mb-4 border border-gray-200">
                 <p class="text-sm text-gray-600 mb-2">Détails du paiement :</p>
                 <div id="payment-info" class="space-y-1 text-sm">
                     <!-- Rempli dynamiquement -->
@@ -489,7 +489,7 @@ function displayPayments(paymentsList) {
             </td>
             <td class="text-center">
                 ${p.proof_document ? 
-                    `<a href="${p.proof_document}" target="_blank" class="inline-flex items-center px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-[10px]-[10px] text-sm font-medium transition-colors">
+                    `<a href="${p.proof_document}" target="_blank" class="inline-flex items-center px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-[10px] text-sm font-medium transition-colors">
                         📄 Voir
                     </a>` : 
                     '<span class="text-gray-400">-</span>'
@@ -506,7 +506,7 @@ function displayPayments(paymentsList) {
             <td class="text-center">
                 ${p.status === 'pending' ? 
                     `<button onclick='openValidatePaymentModal(${JSON.stringify(p).replace(/'/g, "&apos;")})' 
-                        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-[10px]-[10px] font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105">
+                        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-[10px] font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105">
                         ✓ Valider
                     </button>` :
                     p.status === 'validated' ? 

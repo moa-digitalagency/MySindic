@@ -117,7 +117,7 @@ www.myoneart.com
                     <div class="mt-1">
                         <input type="file" id="request-image" accept="image/*" class="block w-full text-sm text-gray-500
                             file:mr-4 file:py-2 file:px-4
-                            file:rounded-[10px]-[10px] file:border-0
+                            file:rounded-[10px] file:border-0
                             file:text-sm file:font-semibold
                             file:bg-indigo-50 file:text-indigo-700
                             hover:file:bg-indigo-100
@@ -125,14 +125,14 @@ www.myoneart.com
                         <p class="mt-1 text-xs text-gray-500">PNG, JPG, JPEG jusqu'à 5MB</p>
                     </div>
                     <div id="image-preview" class="mt-2 hidden">
-                        <img id="preview-img" class="rounded-[10px]-[10px] max-h-48 border border-gray-300" />
+                        <img id="preview-img" class="rounded-[10px] max-h-48 border border-gray-300" />
                         <button type="button" onclick="clearImage()" class="mt-2 text-sm text-red-600 hover:text-red-800">
                             ✕ Supprimer la photo
                         </button>
                     </div>
                 </div>
                 
-                <div class="bg-blue-50 border border-blue-200 rounded-[10px]-[10px] p-4">
+                <div class="bg-blue-50 border border-blue-200 rounded-[10px] p-4">
                     <div class="flex">
                         <svg class="h-5 w-5 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
@@ -301,7 +301,7 @@ function displayRequests() {
     };
     
     container.innerHTML = myRequests.map(request => `
-        <div class="bg-white border border-gray-200 rounded-[10px]-[10px] p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="viewRequestDetails(${request.id})">
+        <div class="bg-white border border-gray-200 rounded-[10px] p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="viewRequestDetails(${request.id})">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2">
@@ -408,7 +408,7 @@ async function viewRequestDetails(requestId) {
                 <div>
                     <label class="text-sm font-medium text-gray-500">Photo</label>
                     <div class="mt-2">
-                        <img src="${request.image_path}" alt="Photo de la demande" class="rounded-[10px]-[10px] max-h-64 border border-gray-300" />
+                        <img src="${request.image_path}" alt="Photo de la demande" class="rounded-[10px] max-h-64 border border-gray-300" />
                     </div>
                 </div>
             ` : ''}
@@ -496,7 +496,7 @@ function displayResidentComments(comments) {
     }
     
     container.innerHTML = comments.map(comment => `
-        <div class="bg-gray-50 rounded-[10px]-[10px] p-3">
+        <div class="bg-gray-50 rounded-[10px] p-3">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2">
