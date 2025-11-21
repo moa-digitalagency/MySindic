@@ -773,7 +773,7 @@ def register_attendance(assembly_id):
 @resident_bp.route('/resolutions/<int:resolution_id>/vote', methods=['POST'])
 @login_required
 def vote_resolution(resolution_id):
-    """Vote sur une résolution"""
+    """Vote sur une résolution - Uniquement pour les présents (physique ou online)"""
     try:
         resolution = Resolution.query.get(resolution_id)
         
@@ -785,6 +785,16 @@ def vote_resolution(resolution_id):
         if assembly.residence_id != current_user.residence_id:
             return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
+        # IMPORTANT: Vérifier que l'utilisateur est marqué présent à l'AG (physique ou online)
+        attendance = Attendance.query.filter_by(
+            assembly_id=resolution.assembly_id,
+            user_id=current_user.id,
+            is_present=True
+        ).first()
+        
+        if not attendance:
+            return jsonify({'success': False, 'error': 'Vous devez être marqué présent (physique ou en ligne) pour voter'}), 403
+        
         data = request.get_json()
         vote_value = data.get('vote_value')
         
@@ -795,8 +805,18 @@ def vote_resolution(resolution_id):
         existing_vote = Vote.query.filter_by(resolution_id=resolution_id, user_id=current_user.id).first()
         
         if existing_vote:
-            # Mettre à jour le vote
+            # Mettre à jour le vote existant
+            old_value = existing_vote.vote_value
             existing_vote.vote_value = vote_value
+            existing_vote.voted_at = datetime.utcnow()
+            
+            # Ajuster les compteurs
+            if old_value == 'for':
+                resolution.votes_for -= 1
+            elif old_value == 'against':
+                resolution.votes_against -= 1
+            elif old_value == 'abstain':
+                resolution.votes_abstain -= 1
         else:
             # SÉCURITÉ: Créer un nouveau vote avec user_id de current_user
             vote = Vote(
@@ -806,16 +826,17 @@ def vote_resolution(resolution_id):
             )
             db.session.add(vote)
         
+        # Incrémenter les compteurs
+        if vote_value == 'for':
+            resolution.votes_for += 1
+        elif vote_value == 'against':
+            resolution.votes_against += 1
+        elif vote_value == 'abstain':
+            resolution.votes_abstain += 1
+        
         db.session.commit()
         
-        # Mettre à jour les compteurs de la résolution
-        votes = Vote.query.filter_by(resolution_id=resolution_id).all()
-        resolution.votes_for = sum(1 for v in votes if v.vote_value == 'for')
-        resolution.votes_against = sum(1 for v in votes if v.vote_value == 'against')
-        resolution.votes_abstain = sum(1 for v in votes if v.vote_value == 'abstain')
-        db.session.commit()
-        
-        return jsonify({'success': True, 'message': 'Vote enregistré'}), 200
+        return jsonify({'success': True, 'message': 'Vote enregistré', 'attendance_mode': attendance.attendance_mode}), 200
         
     except Exception as e:
         db.session.rollback()

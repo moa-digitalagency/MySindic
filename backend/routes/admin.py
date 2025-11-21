@@ -100,11 +100,31 @@ def dashboard():
 
 @admin_bp.route('/residences', methods=['GET'])
 @login_required
-@superadmin_required
 def get_residences():
-    """Récupère la liste des résidences"""
+    """Récupère la liste des résidences - Accessible par admin, syndic et owner"""
     try:
-        residences = Residence.query.all()
+        # Vérifier que l'utilisateur a les droits (admin, syndic ou owner)
+        if not (current_user.is_superadmin() or current_user.is_admin() or current_user.is_owner()):
+            return jsonify({'success': False, 'error': 'Accès non autorisé. Seuls les administrateurs, syndics et propriétaires peuvent accéder à cette ressource.'}), 403
+        
+        if current_user.is_superadmin():
+            # Superadmin voit toutes les résidences
+            residences = Residence.query.all()
+        elif current_user.is_admin():
+            # Admin/Syndic voit seulement les résidences qui lui sont assignées
+            assignments = ResidenceAdmin.query.filter_by(user_id=current_user.id).all()
+            residence_ids = [a.residence_id for a in assignments]
+            residences = Residence.query.filter(Residence.id.in_(residence_ids)).all() if residence_ids else []
+        elif current_user.is_owner():
+            # Owner voit seulement sa résidence
+            residences = []
+            if current_user.residence_id:
+                residence = Residence.query.get(current_user.residence_id)
+                if residence:
+                    residences = [residence]
+        else:
+            residences = []
+        
         return jsonify({'success': True, 'residences': [r.to_dict() for r in residences]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -438,11 +458,38 @@ def get_charge_distributions(charge_id):
 
 @admin_bp.route('/payments', methods=['GET'])
 @login_required
-@superadmin_required
 def get_payments():
-    """Récupère tous les paiements"""
+    """Récupère tous les paiements - Admin/Syndic/Owner voient tout, Resident ne peut pas accéder"""
     try:
-        payments = Payment.query.order_by(Payment.created_at.desc()).all()
+        # Vérifier le rôle - seuls admin, syndic et owner ont accès
+        if not (current_user.is_superadmin() or current_user.is_admin() or current_user.is_owner()):
+            return jsonify({'success': False, 'error': 'Accès non autorisé. Seuls les administrateurs, syndics et propriétaires peuvent voir tous les paiements.'}), 403
+        
+        # Filtrer les paiements selon le rôle
+        if current_user.is_superadmin():
+            # Superadmin voit tous les paiements
+            payments = Payment.query.order_by(Payment.created_at.desc()).all()
+        elif current_user.is_admin():
+            # Admin/Syndic voit les paiements de ses résidences assignées
+            assignments = ResidenceAdmin.query.filter_by(user_id=current_user.id).all()
+            residence_ids = [a.residence_id for a in assignments]
+            
+            # Récupérer les unités de ces résidences
+            units = Unit.query.filter(Unit.residence_id.in_(residence_ids)).all() if residence_ids else []
+            unit_ids = [u.id for u in units]
+            
+            payments = Payment.query.filter(Payment.unit_id.in_(unit_ids)).order_by(Payment.created_at.desc()).all() if unit_ids else []
+        elif current_user.is_owner():
+            # Owner voit les paiements de sa résidence
+            if current_user.residence_id:
+                units = Unit.query.filter_by(residence_id=current_user.residence_id).all()
+                unit_ids = [u.id for u in units]
+                payments = Payment.query.filter(Payment.unit_id.in_(unit_ids)).order_by(Payment.created_at.desc()).all() if unit_ids else []
+            else:
+                payments = []
+        else:
+            payments = []
+        
         return jsonify({'success': True, 'payments': [p.to_dict() for p in payments]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -450,15 +497,31 @@ def get_payments():
 
 @admin_bp.route('/payments/<int:payment_id>/validate', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def validate_payment(payment_id):
-    """Valide un paiement"""
+    """Valide un paiement - Seuls admin et syndic peuvent valider"""
     try:
         payment = Payment.query.get(payment_id)
         if not payment:
             return jsonify({'success': False, 'error': 'Paiement non trouvé'}), 404
         
+        # Vérifier que l'admin a accès à cette résidence
+        if current_user.is_admin():
+            unit = Unit.query.get(payment.unit_id)
+            if not unit:
+                return jsonify({'success': False, 'error': 'Unité non trouvée'}), 404
+            
+            # Vérifier que le syndic est assigné à cette résidence
+            assignment = ResidenceAdmin.query.filter_by(
+                residence_id=unit.residence_id,
+                user_id=current_user.id
+            ).first()
+            
+            if not assignment:
+                return jsonify({'success': False, 'error': 'Vous n\'êtes pas autorisé à valider ce paiement'}), 403
+        
         payment.status = 'validated'
+        payment.admin_notes = f"Validé par {current_user.get_full_name()} le {datetime.utcnow().strftime('%d/%m/%Y')}"
         db.session.commit()
         
         return jsonify({'success': True, 'message': 'Paiement validé'}), 200
