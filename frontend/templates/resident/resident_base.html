@@ -81,7 +81,7 @@ www.myoneart.com
     .icon-btn {
         width: 32px;
         height: 32px;
-        border-radius: 8px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -110,7 +110,7 @@ www.myoneart.com
         color: white;
         font-size: 0.625rem;
         padding: 0.075rem 0.25rem;
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: 600;
     }
     
@@ -133,7 +133,7 @@ www.myoneart.com
     .user-avatar {
         width: 28px;
         height: 28px;
-        border-radius: 8px;
+        border-radius: 10px;
         background: rgba(16, 185, 129, 0.1);
         border: 2px solid #10b981;
         display: flex;
@@ -174,7 +174,7 @@ www.myoneart.com
     .nav-tabs-card {
         background: rgba(255, 255, 255, 0.6);
         border: 2px solid #e5e7eb;
-        border-radius: 12px;
+        border-radius: 10px;
         padding: 0.75rem;
         margin-bottom: 1rem;
     }
@@ -184,7 +184,7 @@ www.myoneart.com
         align-items: center;
         gap: 0.625rem;
         padding: 0.625rem 0.75rem;
-        border-radius: 8px;
+        border-radius: 10px;
         text-decoration: none;
         color: #6b7280;
         font-size: 0.8rem;
@@ -314,6 +314,7 @@ www.myoneart.com
                 <span class="nav-tab-icon">🔧</span>
                 <span>Maintenance</span>
             </a>
+            {% if current_user.is_owner() %}
             <a href="/resident/finances" class="nav-tab {% if request.path == '/resident/finances' %}active{% endif %}">
                 <span class="nav-tab-icon">💰</span>
                 <span>Mes Finances</span>
@@ -326,6 +327,7 @@ www.myoneart.com
                 <span class="nav-tab-icon">📄</span>
                 <span>Documents</span>
             </a>
+            {% endif %}
         </div>
         
         <a href="/resident/maintenance#new" class="quick-action-btn">
@@ -335,7 +337,7 @@ www.myoneart.com
         
         <!-- Ma Résidence Section -->
         {% if current_user.residence %}
-        <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-top: 1rem;">
+        <div style="background: white; border: 2px solid #e5e7eb; border-radius: 10px; padding: 1rem; margin-top: 1rem;">
             <h3 style="font-size: 0.875rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
                 <span>🏢</span>
                 <span>Ma Résidence</span>
@@ -371,7 +373,7 @@ www.myoneart.com
     
     <aside class="right-sidebar">
         <!-- Calendrier Section -->
-        <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="background: white; border: 2px solid #e5e7eb; border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
             <h3 style="font-size: 0.875rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
                 <span>📅</span>
                 <span>Calendrier</span>
@@ -390,7 +392,7 @@ www.myoneart.com
             </div>
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
                 <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.5rem;">📌 Prochains événements</p>
-                <div style="background: #f9fafb; border-radius: 8px; padding: 0.75rem; font-size: 0.75rem; color: #9ca3af; text-align: center;">
+                <div style="background: #f9fafb; border-radius: 10px; padding: 0.75rem; font-size: 0.75rem; color: #9ca3af; text-align: center;">
                     <p style="font-style: italic;">Aucun événement à venir</p>
                     <p style="font-size: 0.7rem; margin-top: 0.25rem; color: #d1d5db;">Les événements apparaîtront ici</p>
                 </div>
@@ -398,7 +400,7 @@ www.myoneart.com
         </div>
         
         <!-- Sondage Section -->
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 1.25rem; color: white;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 1.25rem; color: white;">
             <h3 style="font-size: 0.875rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
                 <span>📊</span>
                 <span>Sondages</span>
