@@ -49,11 +49,110 @@ www.myoneart.com
         </div>
 
         <div id="tab-content-payments" class="card mt-4 hidden">
+            <!-- Statistiques des paiements -->
+            <div id="payment-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-4 border-2 border-yellow-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-yellow-800">En attente</p>
+                            <p id="stat-pending" class="text-2xl font-bold text-yellow-900">-</p>
+                        </div>
+                        <div class="h-12 w-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                            ⏳
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border-2 border-green-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-green-800">Validés</p>
+                            <p id="stat-validated" class="text-2xl font-bold text-green-900">-</p>
+                        </div>
+                        <div class="h-12 w-12 bg-green-200 rounded-full flex items-center justify-center">
+                            ✓
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-lg p-4 border-2 border-indigo-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-indigo-800">Total</p>
+                            <p id="stat-total" class="text-2xl font-bold text-indigo-900">-</p>
+                        </div>
+                        <div class="h-12 w-12 bg-indigo-200 rounded-full flex items-center justify-center">
+                            💰
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtres -->
+            <div class="mb-4 flex gap-4">
+                <div class="flex-1">
+                    <label class="label-field">Filtrer par statut</label>
+                    <select id="filter-payment-status" class="input-field" onchange="loadPayments()">
+                        <option value="">Tous les paiements</option>
+                        <option value="pending">En attente de validation</option>
+                        <option value="validated">Validés</option>
+                        <option value="rejected">Rejetés</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="label-field">Filtrer par résidence</label>
+                    <select id="filter-payment-residence" class="input-field" onchange="loadPayments()">
+                        <option value="">Toutes les résidences</option>
+                    </select>
+                </div>
+            </div>
+            
             <div id="payments-list" class="overflow-x-auto">
                 <div class="flex justify-center py-8">
                     <div class="loading-spinner border-indigo-600"></div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Validation Paiement -->
+<div id="validatePaymentModal" class="modal-backdrop hidden">
+    <div class="modal-content max-w-lg">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Valider le paiement</h2>
+                <button onclick="ShabakaSyndic.closeModal('validatePaymentModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="payment-details" class="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+                <p class="text-sm text-gray-600 mb-2">Détails du paiement :</p>
+                <div id="payment-info" class="space-y-1 text-sm">
+                    <!-- Rempli dynamiquement -->
+                </div>
+            </div>
+            
+            <form id="validatePaymentForm" class="space-y-4">
+                <input type="hidden" id="validate-payment-id">
+                
+                <div>
+                    <label class="label-field">Note de validation *</label>
+                    <textarea id="validate-admin-notes" class="input-field" rows="3" required 
+                              placeholder="Ex: Paiement vérifié, correspond au virement du 15/11/2025"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Cette note sera visible par le résident</p>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="ShabakaSyndic.closeModal('validatePaymentModal')" class="btn-secondary">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        ✓ Valider le paiement
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -165,10 +264,14 @@ async function loadResidences() {
             
             const filterSelect = document.getElementById('filter-residence');
             const chargeSelect = document.getElementById('charge-residence');
+            const paymentResidenceSelect = document.getElementById('filter-payment-residence');
             
             residences.forEach(r => {
                 filterSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
                 chargeSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+                if (paymentResidenceSelect) {
+                    paymentResidenceSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+                }
             });
         }
     } catch (error) {
@@ -246,17 +349,37 @@ function displayCharges(chargesList) {
 
 async function loadPayments() {
     try {
-        const response = await fetch('/api/admin/payments');
+        const statusFilter = document.getElementById('filter-payment-status')?.value || '';
+        const residenceFilter = document.getElementById('filter-payment-residence')?.value || '';
+        
+        let url = '/api/admin/payments';
+        const params = new URLSearchParams();
+        if (statusFilter) params.append('status', statusFilter);
+        if (residenceFilter) params.append('residence_id', residenceFilter);
+        if (params.toString()) url += '?' + params.toString();
+        
+        const response = await fetch(url);
         const data = await response.json();
         
         if (data.success) {
             payments = data.payments;
+            updatePaymentStats(payments);
             displayPayments(payments);
         }
     } catch (error) {
         console.error('Error:', error);
         ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
     }
+}
+
+function updatePaymentStats(paymentsList) {
+    const pending = paymentsList.filter(p => p.status === 'pending').length;
+    const validated = paymentsList.filter(p => p.status === 'validated').length;
+    const totalAmount = paymentsList.reduce((sum, p) => sum + (p.amount || 0), 0);
+    
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-validated').textContent = validated;
+    document.getElementById('stat-total').textContent = ShabakaSyndic.formatCurrency(totalAmount);
 }
 
 function displayPayments(paymentsList) {
@@ -272,7 +395,9 @@ function displayPayments(paymentsList) {
             <thead>
                 <tr>
                     <th>Date</th>
+                    <th>Résidence</th>
                     <th>Lot</th>
+                    <th>Utilisateur</th>
                     <th>Montant</th>
                     <th>Méthode</th>
                     <th>Référence</th>
@@ -283,24 +408,27 @@ function displayPayments(paymentsList) {
             </thead>
             <tbody>
                 ${paymentsList.map(p => `
-                    <tr>
+                    <tr class="${p.status === 'pending' ? 'bg-yellow-50' : ''}">
                         <td>${ShabakaSyndic.formatDate(p.payment_date)}</td>
-                        <td>${p.unit_number || '-'}</td>
+                        <td class="text-sm">${p.residence_name || '-'}</td>
+                        <td class="font-medium">${p.unit_number || '-'}</td>
+                        <td class="text-sm">${p.user_name || '-'}</td>
                         <td class="font-semibold text-green-600">${ShabakaSyndic.formatCurrency(p.amount)}</td>
                         <td><span class="badge badge-info">${p.payment_method}</span></td>
-                        <td class="text-sm">${p.reference || '-'}</td>
+                        <td class="text-sm font-mono">${p.reference || '-'}</td>
                         <td>
                             ${p.proof_document ? `<a href="${p.proof_document}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm">📄 Voir</a>` : '-'}
                         </td>
                         <td>
                             <span class="badge ${p.status === 'validated' ? 'badge-success' : p.status === 'pending' ? 'badge-warning' : 'badge-danger'}">
-                                ${p.status}
+                                ${p.status === 'pending' ? '⏳ En attente' : p.status === 'validated' ? '✓ Validé' : 'Rejeté'}
                             </span>
+                            ${p.admin_notes ? `<div class="text-xs text-gray-500 mt-1">Note: ${p.admin_notes.substring(0, 40)}...</div>` : ''}
                         </td>
                         <td>
                             ${p.status === 'pending' ? 
-                                `<button onclick="validatePayment(${p.id})" style="padding: 0.375rem 0.75rem; border: 2px solid #10b981; background: rgba(16, 185, 129, 0.05); color: #10b981; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.1)'" onmouseout="this.style.background='rgba(16, 185, 129, 0.05)'">Valider</button>` :
-                                '-'
+                                `<button onclick='openValidatePaymentModal(${JSON.stringify(p).replace(/'/g, "&apos;")})' style="padding: 0.375rem 0.75rem; border: 2px solid #10b981; background: rgba(16, 185, 129, 0.05); color: #10b981; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.1)'" onmouseout="this.style.background='rgba(16, 185, 129, 0.05)'">Valider</button>` :
+                                `<span class="text-gray-400 text-sm">-</span>`
                             }
                         </td>
                     </tr>
@@ -355,21 +483,41 @@ async function publishCharge(chargeId) {
     }
 }
 
-async function validatePayment(paymentId) {
-    if (!confirm('Voulez-vous valider ce paiement ?')) return;
+function openValidatePaymentModal(payment) {
+    document.getElementById('validate-payment-id').value = payment.id;
+    document.getElementById('validate-admin-notes').value = '';
     
+    // Afficher les détails du paiement
+    const detailsHtml = `
+        <div class="font-medium text-gray-900">${payment.user_name || 'Utilisateur inconnu'}</div>
+        <div class="text-gray-700">Lot: <span class="font-semibold">${payment.unit_number || '-'}</span></div>
+        <div class="text-gray-700">Montant: <span class="font-semibold text-green-600">${ShabakaSyndic.formatCurrency(payment.amount)}</span></div>
+        <div class="text-gray-700">Méthode: <span class="font-semibold">${payment.payment_method}</span></div>
+        <div class="text-gray-700">Référence: <span class="font-mono text-sm">${payment.reference || '-'}</span></div>
+        <div class="text-gray-700">Date: ${ShabakaSyndic.formatDate(payment.payment_date)}</div>
+        ${payment.description ? `<div class="text-gray-600 mt-2 text-xs italic">${payment.description}</div>` : ''}
+    `;
+    
+    document.getElementById('payment-info').innerHTML = detailsHtml;
+    ShabakaSyndic.openModal('validatePaymentModal');
+}
+
+async function submitValidatePayment(paymentId, adminNotes) {
     try {
         const response = await fetch(`/api/admin/payments/${paymentId}/validate`, {
-            method: 'POST'
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin_notes: adminNotes })
         });
         
         const data = await response.json();
         
         if (data.success) {
-            ShabakaSyndic.showToast('Paiement validé', 'success');
+            ShabakaSyndic.showToast('✓ Paiement validé avec succès', 'success');
+            ShabakaSyndic.closeModal('validatePaymentModal');
             loadPayments();
         } else {
-            ShabakaSyndic.showToast(data.error || 'Erreur', 'error');
+            ShabakaSyndic.showToast(data.error || 'Erreur lors de la validation', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -415,6 +563,20 @@ document.getElementById('chargeForm').addEventListener('submit', async (e) => {
         console.error('Error:', error);
         ShabakaSyndic.showToast('Erreur de connexion', 'error');
     }
+});
+
+document.getElementById('validatePaymentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const paymentId = parseInt(document.getElementById('validate-payment-id').value);
+    const adminNotes = document.getElementById('validate-admin-notes').value;
+    
+    if (!adminNotes.trim()) {
+        ShabakaSyndic.showToast('Veuillez ajouter une note de validation', 'error');
+        return;
+    }
+    
+    await submitValidatePayment(paymentId, adminNotes);
 });
 
 document.addEventListener('DOMContentLoaded', () => {
