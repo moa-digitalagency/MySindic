@@ -6,27 +6,33 @@
 
 ## Recent Changes (November 21, 2025)
 
-### CSS Border-Radius Standardization
-- Fixed critical CSS bug where `rounded-[10px]-[10px]` typo prevented border-radius from applying correctly
-- Standardized all border-radius values to **uniform 10px** across all templates (buttons, inputs, cards, modals)
-- Preserved special cases: badges (9999px for pill shape) and loading spinner (50% for circular shape)
-- Updated both inline styles and Tailwind CSS classes to use consistent 10px border-radius
+### Dual News Feed System Implementation
+- Implemented two separate news feed types with role-based access control:
+  - **Fil d'actualité** (feed): Accessible to all users (super admin, bureau syndic, propriétaires, résidents)
+  - **Actualités et annonces** (announcement): Restricted to super admin, bureau syndic, and propriétaires only
+- Added `news_type` field to News model ('feed' or 'announcement')
+- Created separate frontend pages for both feed types (admin/feed.html, admin/announcements.html, resident/feed.html, resident/announcements.html)
+- Updated navigation menus to display both feeds as separate menu items with appropriate role-based visibility
+- Implemented proper access control at both route and API levels (403 Forbidden for unauthorized access)
 
-### Role-Based Access Control (RBAC) Implementation
-- Implemented comprehensive RBAC in `admin_base.html` with proper menu filtering:
-  - **Super Admin**: Dashboard, Actualités, Résidences, Utilisateurs, Finances, Maintenance, Carnet d'Entretien, Assemblées, Documents, Paramètres + Quick action "Nouvelle Résidence"
-  - **Bureau Syndic (admin)**: Dashboard, Actualités, Résidences, Utilisateurs, Finances, Maintenance, Carnet d'Entretien, Assemblées, Documents, Paramètres
-- Implemented RBAC in `resident_base.html` with role-specific menu visibility:
-  - **Owner**: Dashboard, Actualités, Maintenance, Finances, Assemblées, Documents
-  - **Resident**: Dashboard, Actualités, Maintenance (request/tracking only)
-- All role checks use User model helper methods: `is_superadmin()`, `is_admin()`, `is_owner()`, `is_resident()`
+### Role-Based Access Control (RBAC) Complete Implementation
+- Comprehensive RBAC system with four distinct user roles and specific menu access for each:
+  - **Super Admin**: Dashboard Super Admin, Fil d'actualité, Actualités et annonces, Résidences (create/view/assign admins), Utilisateurs, Finances, Maintenance, Carnet d'Entretien, Assemblées, Documents, Paramètres + Quick action "Nouvelle Résidence"
+  - **Bureau Syndic (admin)**: Dashboard Syndic, Fil d'actualité, Actualités et annonces, Résidences (view assigned only, cannot create/modify/delete), Utilisateurs, Finances (approve payments), Maintenance, Carnet d'Entretien, Assemblées, Documents, Paramètres (view only)
+  - **Propriétaire (owner)**: Dashboard Propriétaire, Fil d'actualité, Actualités et annonces, Maintenance, Finances, Assemblées, Documents
+  - **Résident**: Dashboard Résident, Fil d'actualité (feed only), Maintenance (request and tracking only)
+- All role checks use User model helper methods with precise role validation
+- Role badge visible in user interface for all roles
 
-### Demo Data Refresh
-- Created `clean_and_recreate_demo.py` script to safely delete and recreate demo data
-- Recreated demo accounts with correct role assignments:
-  - **superadmin@shabaka.ma** (password: Superadmin123!)
+### Demo Data Creation & Documentation
+- Updated `clean_and_recreate_demo.py` script to create comprehensive demo data including:
+  - 4 user accounts (one for each role)
+  - 1 residence with 5 units
+  - 4 news articles (2 feed + 2 announcements)
+- New demo account credentials:
+  - **superadmin@shabaka.ma** (password: Super123!)
   - **syndic@shabaka.ma** (password: Syndic123!)
-  - **proprietaire@shabaka.ma** (password: Proprietaire123!)
+  - **proprietaire@shabaka.ma** (password: Owner123!)
   - **resident@shabaka.ma** (password: Resident123!)
 
 ## User Preferences
@@ -66,31 +72,97 @@ Shabaka Syndic is built as a PWA with a Python Flask backend and an HTML/CSS fro
 ### Roles & Permissions
 
 #### 1. Super Admin (`superadmin`)
-- **Droits complets** : Accès à toutes les fonctionnalités de la plateforme
-- **Gestion des résidences** : Créer une résidence et assigner un ou plusieurs membres du bureau syndic
-- **Gestion globale** : Visualiser et gérer toutes les résidences, tous les utilisateurs, toutes les données
+**Tous les droits sur la plateforme** - Le seul rôle avec droits complets
+
+**Menus accessibles :**
+- 📊 Dashboard Super Admin
+- 📱 Fil d'actualité (accessible à tous)
+- 📰 Actualités et annonces (super admin, syndic, propriétaires uniquement)
+- 🏢 Résidences (voir toutes les résidences de la plateforme, créer, modifier, assigner bureau syndic)
+- 👥 Utilisateurs
+- 💰 Finances
+- 🔧 Maintenance
+- 📝 Carnet d'Entretien
+- 🗳️ Assemblées
+- 📄 Documents
+- ⚙️ Paramètres
+- 🚪 Déconnexion
+
+**Action rapide :** 🏗️ Nouvelle Résidence (seul le super admin peut créer des résidences)
+
+**Droits spécifiques :**
+- Voir toutes les résidences de la plateforme
+- Créer une résidence et assigner un ou plusieurs membres du bureau syndic
+- Gestion globale de toutes les données
 
 #### 2. Bureau Syndic (`admin`)
-- **Gestion de résidences** : Gérer les résidences qui leur sont assignées
-- **Gestion des utilisateurs** : Ajouter et gérer les propriétaires et résidents de leurs résidences
-- **Assemblées générales** : Créer, gérer et suivre les assemblées générales
-- **Maintenances** : Gérer les demandes de maintenance et le carnet d'entretien
-- **Finances** : Gérer les charges, appels de fonds, paiements
-- **Documents** : Gérer les documents de la résidence
-- **Communications** : Publier des actualités pour informer les résidents
+**Gestion opérationnelle des résidences assignées**
+
+**Menus accessibles :**
+- 📊 Dashboard Syndic
+- 📱 Fil d'actualité (accessible à tous)
+- 📰 Actualités et annonces (super admin, syndic, propriétaires uniquement)
+- 🏢 Résidences (voir uniquement les résidences assignées - **ne peut pas créer/modifier/supprimer**)
+- 👥 Utilisateurs (ajouter et gérer propriétaires/résidents)
+- 💰 Finances (gérer charges, appels de fonds, **approuver déclarations de paiement après vérification**)
+- 🔧 Maintenance
+- 📝 Carnet d'Entretien
+- 🗳️ Assemblées (créer, gérer et suivre les assemblées générales)
+- 📄 Documents
+- ⚙️ Paramètres (consultation uniquement)
+- 🚪 Déconnexion
+
+**Rôle visible :** Le rôle "Bureau Syndic" est affiché dans l'interface utilisateur
+
+**Droits spécifiques :**
+- Gère uniquement sa/ses résidences assignées
+- Seul à pouvoir approuver les déclarations de paiement après vérification
+- Publier des actualités pour informer les résidents
 
 #### 3. Propriétaire (`owner`)
-- **Assemblées générales** : Accès et participation aux AG de sa résidence
-- **Gestion des résidents** : Créer, ajouter, bloquer et supprimer un résident dans son unité
-- **Fil d'actualités** : Consulter les actualités de sa résidence
-- **Maintenances** : Faire des demandes de maintenance et suivre leur statut
-- **Finances** : Consulter les charges de son unité et l'historique des paiements
-- **Documents** : Consulter les documents de la résidence
+**Propriétaire d'un logement dans la résidence**
+
+**Menus accessibles :**
+- 📊 Dashboard Propriétaire
+- 📱 Fil d'actualité (accessible à tous)
+- 📰 Actualités et annonces (super admin, syndic, propriétaires uniquement)
+- 🔧 Maintenance (demande, commentaire et suivi)
+- 💰 Finances (consulter charges de son unité et historique des paiements)
+- 🗳️ Assemblées (accès et participation aux AG de sa résidence)
+- 📄 Documents (consulter les documents de la résidence)
+- 🚪 Déconnexion
+
+**Droits spécifiques :**
+- Créer/ajouter/bloquer/supprimer un résident dans son unité
+- Participer aux assemblées générales
 
 #### 4. Résident (`resident`)
-- **Fil d'actualités** : Consulter les actualités de sa résidence
-- **Maintenances** : Faire des demandes de maintenance et suivre leur statut uniquement
-- **Accès limité** : Pas d'accès aux finances, assemblées générales ou documents
+**Résident locataire d'un logement** - Accès limité
+
+**Menus accessibles :**
+- 📊 Dashboard Résident
+- 📱 Fil d'actualité (accessible à tous - **PAS d'accès aux Actualités et annonces**)
+- 🔧 Maintenance (demande, commentaire et suivi uniquement)
+- 🚪 Déconnexion
+
+**Restrictions :**
+- ❌ Pas d'accès aux Actualités et annonces
+- ❌ Pas d'accès aux finances
+- ❌ Pas d'accès aux assemblées générales
+- ❌ Pas d'accès aux documents
+
+### Dual News Feed System
+
+**Fil d'actualité** (news_type='feed')
+- Accessible à **tous les utilisateurs** (super admin, bureau syndic, propriétaires, résidents)
+- Actualités générales de la résidence (horaires, événements, informations pratiques)
+- Menu séparé dans la navigation
+
+**Actualités et annonces** (news_type='announcement')
+- Accessible uniquement à **super admin, bureau syndic, et propriétaires**
+- Résidents bloqués avec erreur 403 Forbidden
+- Annonces officielles (convocations AG, appels de fonds, décisions importantes)
+- Menu séparé dans la navigation
 
 ### System Design Choices
 

@@ -181,6 +181,60 @@ def clean_and_recreate():
         db.session.commit()
         print(f"✅ Résident créé: {resident.email} / Resident123! (Unité: {units[1].unit_number})\n")
         
+        # 7. Créer des actualités de démo
+        print("📰 Création des actualités de démo...")
+        
+        # Fil d'actualité (accessible à tous)
+        news_feed_1 = News(
+            residence_id=residence.id,
+            author_id=bureau_syndic.id,
+            title="Bienvenue sur Shabaka Syndic! 🎉",
+            content="Nous sommes ravis de vous accueillir sur notre nouvelle plateforme de gestion de copropriété. Vous pourrez désormais consulter toutes les actualités de votre résidence en temps réel.",
+            news_type="feed",
+            is_published=True,
+            is_pinned=True,
+            published_at=datetime.utcnow()
+        )
+        db.session.add(news_feed_1)
+        
+        news_feed_2 = News(
+            residence_id=residence.id,
+            author_id=bureau_syndic.id,
+            title="Horaires de collecte des ordures",
+            content="Les ordures ménagères sont collectées tous les mardis et vendredis à partir de 7h00. Merci de déposer vos sacs la veille au soir.",
+            news_type="feed",
+            is_published=True,
+            published_at=datetime.utcnow()
+        )
+        db.session.add(news_feed_2)
+        
+        # Actualités et annonces (super admin, syndic, propriétaires uniquement)
+        news_announcement_1 = News(
+            residence_id=residence.id,
+            author_id=bureau_syndic.id,
+            title="📋 Convocation à l'Assemblée Générale Ordinaire",
+            content="Chers copropriétaires, vous êtes convoqués à l'Assemblée Générale Ordinaire qui se tiendra le 15 décembre 2025 à 18h00 dans la salle commune. Ordre du jour : approbation des comptes, budget prévisionnel, travaux d'entretien.",
+            news_type="announcement",
+            is_published=True,
+            is_pinned=True,
+            published_at=datetime.utcnow()
+        )
+        db.session.add(news_announcement_1)
+        
+        news_announcement_2 = News(
+            residence_id=residence.id,
+            author_id=bureau_syndic.id,
+            title="💰 Appel de fonds trimestriel - Q4 2025",
+            content="L'appel de fonds pour le 4ème trimestre 2025 a été émis. Montant : 450 DH par quote-part. Date limite de paiement : 30 novembre 2025. Merci de procéder au règlement dans les délais.",
+            news_type="announcement",
+            is_published=True,
+            published_at=datetime.utcnow()
+        )
+        db.session.add(news_announcement_2)
+        
+        db.session.commit()
+        print(f"✅ 4 actualités créées (2 feed + 2 announcements)\n")
+        
         # Résumé final
         print("=" * 70)
         print("✨ Base de données nettoyée et recréée avec succès!")
