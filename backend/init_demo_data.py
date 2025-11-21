@@ -112,8 +112,8 @@ def init_demo_data(app, db):
         # 4. Créer des utilisateurs avec différents rôles
         print("👥 Création des comptes utilisateurs...")
         
-        # Administrateur (Bureau Syndic)
-        admin_user = User(
+        # Administrateur 1 (Bureau Syndic - Responsable principal)
+        admin_user1 = User(
             email="admin.syndic@mysindic.ma",
             first_name="Hassan",
             last_name="Tazi",
@@ -123,8 +123,22 @@ def init_demo_data(app, db):
             email_verified=True,
             residence_id=residence.id
         )
-        admin_user.set_password("Admin123!")
-        db.session.add(admin_user)
+        admin_user1.set_password("Admin123!")
+        db.session.add(admin_user1)
+        
+        # Administrateur 2 (Bureau Syndic - Comptable)
+        admin_user2 = User(
+            email="bureau.syndic@mysindic.ma",
+            first_name="Leila",
+            last_name="Mansouri",
+            phone="+212600000010",
+            role="admin",
+            is_active=True,
+            email_verified=True,
+            residence_id=residence.id
+        )
+        admin_user2.set_password("Admin123!")
+        db.session.add(admin_user2)
         
         # Propriétaire
         owner = User(
@@ -165,7 +179,7 @@ def init_demo_data(app, db):
             residents.append(resident)
         
         db.session.commit()
-        print(f"✅ 1 admin syndic, 1 propriétaire et {len(residents_data)} résidents créés\n")
+        print(f"✅ 2 admins syndic (bureau), 1 propriétaire et {len(residents_data)} résidents créés\n")
         
         # 5. Créer des charges (appels de fonds)
         print("💰 Création des charges...")
