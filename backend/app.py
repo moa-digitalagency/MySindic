@@ -97,12 +97,22 @@ def create_app():
             return f(*args, **kwargs)
         return decorated_function
     
+    # Décorateur pour vérifier que l'utilisateur est admin ou superadmin
+    def admin_or_superadmin_required(f):
+        @wraps(f)
+        @login_required
+        def decorated_function(*args, **kwargs):
+            if not (current_user.is_admin() or current_user.is_superadmin()):
+                return redirect(url_for('resident_dashboard'))
+            return f(*args, **kwargs)
+        return decorated_function
+    
     # Routes de base
     @app.route('/')
     def index():
         """Page d'accueil"""
         if current_user.is_authenticated:
-            if current_user.is_superadmin():
+            if current_user.is_superadmin() or current_user.is_admin():
                 return redirect(url_for('admin_dashboard'))
             else:
                 return redirect(url_for('resident_dashboard'))
@@ -112,7 +122,7 @@ def create_app():
     def login_page():
         """Page de connexion"""
         if current_user.is_authenticated:
-            if current_user.is_superadmin():
+            if current_user.is_superadmin() or current_user.is_admin():
                 return redirect(url_for('admin_dashboard'))
             else:
                 return redirect(url_for('resident_dashboard'))
@@ -122,7 +132,7 @@ def create_app():
     def register_page():
         """Page d'inscription"""
         if current_user.is_authenticated:
-            if current_user.is_superadmin():
+            if current_user.is_superadmin() or current_user.is_admin():
                 return redirect(url_for('admin_dashboard'))
             else:
                 return redirect(url_for('resident_dashboard'))
@@ -130,19 +140,19 @@ def create_app():
     
     # Routes Admin (pages HTML)
     @app.route('/admin/dashboard')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_dashboard():
         """Dashboard administrateur"""
         return render_template('admin/dashboard.html')
     
     @app.route('/admin/residences')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_residences():
         """Gestion des résidences"""
         return render_template('admin/residences.html')
     
     @app.route('/admin/residences/new')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_residence_wizard():
         """Assistant de création de résidence"""
         response = make_response(render_template('admin/residence_wizard.html'))
@@ -153,43 +163,43 @@ def create_app():
         return response
     
     @app.route('/admin/residences/<int:residence_id>/edit')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_residence_edit(residence_id):
         """Modification d'une résidence"""
         return render_template('admin/residence_edit.html')
     
     @app.route('/admin/residences/<int:residence_id>/units')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_residence_units(residence_id):
         """Gestion des unités d'une résidence"""
         return render_template('admin/residence_units.html')
     
     @app.route('/admin/finances')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_finances():
         """Gestion financière"""
         return render_template('admin/finances.html')
     
     @app.route('/admin/maintenance')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_maintenance():
         """Gestion de la maintenance"""
         return render_template('admin/maintenance.html')
     
     @app.route('/admin/users')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_users():
         """Gestion des utilisateurs"""
         return render_template('admin/users.html')
     
     @app.route('/admin/maintenance-log')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_maintenance_log():
         """Carnet d'entretien"""
         return render_template('admin/maintenance_log.html')
     
     @app.route('/admin/assemblies')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_assemblies():
         """Gestion des assemblées générales"""
         return render_template('admin/assemblies.html')
@@ -201,13 +211,13 @@ def create_app():
         return render_template('admin/assembly_live.html')
     
     @app.route('/admin/documents')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_documents():
         """Gestion des documents"""
         return render_template('admin/documents.html')
     
     @app.route('/admin/news')
-    @superadmin_required
+    @admin_or_superadmin_required
     def admin_news():
         """Gestion des actualités"""
         return render_template('admin/news.html')
@@ -253,7 +263,7 @@ def create_app():
     @login_required
     def resident_dashboard():
         """Dashboard résident"""
-        if current_user.is_superadmin():
+        if current_user.is_superadmin() or current_user.is_admin():
             return redirect(url_for('admin_dashboard'))
         return render_template('resident/dashboard.html')
     
