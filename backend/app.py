@@ -152,9 +152,9 @@ def create_app():
         return render_template('admin/residences.html')
     
     @app.route('/admin/residences/new')
-    @admin_or_superadmin_required
+    @superadmin_required
     def admin_residence_wizard():
-        """Assistant de création de résidence"""
+        """Assistant de création de résidence (superadmin uniquement)"""
         response = make_response(render_template('admin/residence_wizard.html'))
         # Désactiver le cache pour forcer le rechargement
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'

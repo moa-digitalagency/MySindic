@@ -65,33 +65,107 @@ def admin_or_superadmin_required(f):
 
 @admin_bp.route('/dashboard', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def dashboard():
-    """Tableau de bord du superadmin avec statistiques complètes"""
+    """Tableau de bord avec statistiques (superadmin ou admin)"""
     try:
-        total_residences = Residence.query.count()
-        total_users = User.query.count()
-        total_units = Unit.query.count()
-        total_charges = Charge.query.filter_by(status='published').count()
-        total_maintenance = MaintenanceRequest.query.count()
-        pending_maintenance = MaintenanceRequest.query.filter_by(status='pending').count()
+        if current_user.is_superadmin():
+            # Superadmin voit toutes les statistiques
+            total_residences = Residence.query.count()
+            total_users = User.query.count()
+            total_units = Unit.query.count()
+            total_charges = Charge.query.filter_by(status='published').count()
+            total_maintenance = MaintenanceRequest.query.count()
+            pending_maintenance = MaintenanceRequest.query.filter_by(status='pending').count()
+            
+            # Statistiques financières
+            unpaid_distributions = ChargeDistribution.query.filter_by(is_paid=False).all()
+            total_unpaid = sum(float(d.amount) for d in unpaid_distributions)
+            
+            return jsonify({
+                'success': True,
+                'stats': {
+                    'total_residences': total_residences,
+                    'total_users': total_users,
+                    'total_units': total_units,
+                    'total_charges': total_charges,
+                    'total_maintenance': total_maintenance,
+                    'pending_maintenance': pending_maintenance,
+                    'total_unpaid': total_unpaid
+                }
+            }), 200
         
-        # Statistiques financières
-        unpaid_distributions = ChargeDistribution.query.filter_by(is_paid=False).all()
-        total_unpaid = sum(float(d.amount) for d in unpaid_distributions)
+        elif current_user.is_admin():
+            # Admin voit seulement les stats de ses résidences assignées
+            assignments = ResidenceAdmin.query.filter_by(user_id=current_user.id).all()
+            residence_ids = [a.residence_id for a in assignments]
+            
+            if not residence_ids:
+                return jsonify({
+                    'success': True,
+                    'stats': {
+                        'total_residences': 0,
+                        'total_users': 0,
+                        'total_units': 0,
+                        'total_charges': 0,
+                        'total_maintenance': 0,
+                        'pending_maintenance': 0,
+                        'total_unpaid': 0
+                    }
+                }), 200
+            
+            # Compter les résidences assignées
+            total_residences = len(residence_ids)
+            
+            # Compter les unités dans ces résidences
+            total_units = Unit.query.filter(Unit.residence_id.in_(residence_ids)).count()
+            
+            # Compter les utilisateurs de ces résidences
+            total_users = User.query.filter(User.residence_id.in_(residence_ids)).count()
+            
+            # Compter les charges de ces résidences
+            total_charges = Charge.query.filter(
+                Charge.residence_id.in_(residence_ids),
+                Charge.status == 'published'
+            ).count()
+            
+            # Compter les maintenances de ces résidences
+            total_maintenance = MaintenanceRequest.query.filter(
+                MaintenanceRequest.residence_id.in_(residence_ids)
+            ).count()
+            
+            pending_maintenance = MaintenanceRequest.query.filter(
+                MaintenanceRequest.residence_id.in_(residence_ids),
+                MaintenanceRequest.status == 'pending'
+            ).count()
+            
+            # Statistiques financières pour ces résidences
+            units_in_residences = Unit.query.filter(Unit.residence_id.in_(residence_ids)).all()
+            unit_ids = [u.id for u in units_in_residences]
+            
+            unpaid_distributions = ChargeDistribution.query.filter(
+                ChargeDistribution.unit_id.in_(unit_ids),
+                ChargeDistribution.is_paid == False
+            ).all() if unit_ids else []
+            
+            total_unpaid = sum(float(d.amount) for d in unpaid_distributions)
+            
+            return jsonify({
+                'success': True,
+                'stats': {
+                    'total_residences': total_residences,
+                    'total_users': total_users,
+                    'total_units': total_units,
+                    'total_charges': total_charges,
+                    'total_maintenance': total_maintenance,
+                    'pending_maintenance': pending_maintenance,
+                    'total_unpaid': total_unpaid
+                }
+            }), 200
         
-        return jsonify({
-            'success': True,
-            'stats': {
-                'total_residences': total_residences,
-                'total_users': total_users,
-                'total_units': total_units,
-                'total_charges': total_charges,
-                'total_maintenance': total_maintenance,
-                'pending_maintenance': pending_maintenance,
-                'total_unpaid': total_unpaid
-            }
-        }), 200
+        else:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+            
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
