@@ -296,57 +296,73 @@ www.myoneart.com
                 <span>{% if current_user.is_superadmin() %}Dashboard Super Admin{% elif current_user.is_admin() %}Dashboard Syndic{% else %}Dashboard{% endif %}</span>
             </a>
             
-            {% if current_user.is_admin() or current_user.is_superadmin() %}
+            <!-- Fil d'Actualité - Tous les admins -->
             <a href="{{ url_for('admin_feed') }}" class="nav-tab {% if request.endpoint == 'admin_feed' %}active{% endif %}">
                 <span class="nav-tab-icon">📱</span>
                 <span>Fil d'Actualité</span>
             </a>
+            
+            <!-- Actualités et Annonces - Tous les admins -->
             <a href="{{ url_for('admin_announcements') }}" class="nav-tab {% if request.endpoint == 'admin_announcements' %}active{% endif %}">
                 <span class="nav-tab-icon">📰</span>
                 <span>Actualités et Annonces</span>
             </a>
+            
+            <!-- Résidences - Super Admin seulement -->
+            {% if current_user.is_superadmin() %}
             <a href="{{ url_for('admin_residences') }}" class="nav-tab {% if request.endpoint == 'admin_residences' or request.endpoint == 'admin_residence_wizard' %}active{% endif %}">
                 <span class="nav-tab-icon">🏢</span>
                 <span>Résidences</span>
             </a>
             {% endif %}
             
-            {% if current_user.is_admin() or current_user.is_superadmin() %}
+            <!-- Utilisateurs - Super Admin et Bureau Syndic -->
             <a href="{{ url_for('admin_users') }}" class="nav-tab {% if request.endpoint == 'admin_users' %}active{% endif %}">
                 <span class="nav-tab-icon">👥</span>
                 <span>Utilisateurs</span>
             </a>
-            {% endif %}
             
-            {% if current_user.is_admin() or current_user.is_superadmin() %}
+            <!-- Finances - Super Admin et Bureau Syndic -->
             <a href="{{ url_for('admin_finances') }}" class="nav-tab {% if request.endpoint == 'admin_finances' %}active{% endif %}">
                 <span class="nav-tab-icon">💰</span>
                 <span>Finances</span>
             </a>
+            
+            <!-- Maintenance - Super Admin et Bureau Syndic -->
             <a href="{{ url_for('admin_maintenance') }}" class="nav-tab {% if request.endpoint == 'admin_maintenance' %}active{% endif %}">
                 <span class="nav-tab-icon">🔧</span>
                 <span>Maintenance</span>
             </a>
+            
+            <!-- Carnet d'Entretien - Super Admin et Bureau Syndic -->
             <a href="{{ url_for('admin_maintenance_log') }}" class="nav-tab {% if request.endpoint == 'admin_maintenance_log' %}active{% endif %}">
                 <span class="nav-tab-icon">📝</span>
                 <span>Carnet d'Entretien</span>
             </a>
+            
+            <!-- Assemblées - Super Admin et Bureau Syndic -->
             <a href="{{ url_for('admin_assemblies') }}" class="nav-tab {% if request.endpoint == 'admin_assemblies' %}active{% endif %}">
                 <span class="nav-tab-icon">🗳️</span>
                 <span>Assemblées</span>
             </a>
+            
+            <!-- Documents - Super Admin et Bureau Syndic -->
             <a href="{{ url_for('admin_documents') }}" class="nav-tab {% if request.endpoint == 'admin_documents' %}active{% endif %}">
                 <span class="nav-tab-icon">📄</span>
                 <span>Documents</span>
             </a>
-            {% endif %}
             
+            <!-- Paramètres - Super Admin seulement -->
+            {% if current_user.is_superadmin() %}
             <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
                 <a href="{{ url_for('admin_settings') }}" class="nav-tab {% if request.endpoint == 'admin_settings' or request.endpoint == 'admin_settings_roles' %}active{% endif %}">
                     <span class="nav-tab-icon">⚙️</span>
                     <span>Paramètres</span>
                 </a>
             </div>
+            {% endif %}
+            
+            <!-- Déconnexion -->
             <div style="border-top: 1px solid #f3f4f6; margin: 0.5rem 0; padding-top: 0.5rem;">
                 <a href="#" class="nav-tab" onclick="event.preventDefault(); ShabakaSyndic.logout();" style="color: #dc2626;">
                     <span class="nav-tab-icon">🚪</span>
@@ -367,12 +383,10 @@ www.myoneart.com
                 <span style="font-size: 1.5rem;">👤</span>
                 <span>Nouvel Utilisateur</span>
             </a>
-            {% if current_user.is_admin() or current_user.is_superadmin() %}
             <a href="{{ url_for('admin_finances') }}#create" class="quick-action-btn orange">
                 <span style="font-size: 1.5rem;">💳</span>
                 <span>Appel de Fonds</span>
             </a>
-            {% endif %}
         </div>
     </aside>
     
