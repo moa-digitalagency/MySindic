@@ -106,7 +106,7 @@ www.myoneart.com
                         </div>
                         <div class="flex items-end">
                             <label class="flex items-center">
-                                <input type="checkbox" id="comment-internal" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <input type="checkbox" id="comment-internal" class="rounded-[10px] border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                 <span class="ml-2 text-sm text-gray-700">Commentaire interne (admins seulement)</span>
                             </label>
                         </div>
@@ -412,7 +412,7 @@ async function viewRequest(requestId) {
                 <div class="col-span-2">
                     <label class="text-sm font-medium text-gray-500">Photo jointe</label>
                     <div class="mt-2">
-                        <img src="${request.image_path}" alt="Photo" class="rounded-md max-h-64 border border-gray-300" />
+                        <img src="${request.image_path}" alt="Photo" class="rounded-[10px]-[10px] max-h-64 border border-gray-300" />
                     </div>
                 </div>
             ` : ''}
@@ -484,7 +484,7 @@ function displayComments(comments) {
     }
     
     container.innerHTML = comments.map(comment => `
-        <div class="bg-gray-50 rounded-md p-3 ${comment.is_internal ? 'border-l-4 border-yellow-400' : ''}">
+        <div class="bg-gray-50 rounded-[10px]-[10px] p-3 ${comment.is_internal ? 'border-l-4 border-yellow-400' : ''}">
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2">

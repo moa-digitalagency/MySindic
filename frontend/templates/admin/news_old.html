@@ -87,17 +87,17 @@
                 
                 <div class="flex gap-4">
                     <label class="flex items-center">
-                        <input type="checkbox" id="is_important" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <input type="checkbox" id="is_important" class="rounded-[10px] border-gray-300 text-indigo-600 focus:ring-indigo-500">
                         <span class="ml-2 text-sm font-medium text-gray-700">★ Important</span>
                     </label>
                     
                     <label class="flex items-center">
-                        <input type="checkbox" id="is_pinned" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <input type="checkbox" id="is_pinned" class="rounded-[10px] border-gray-300 text-indigo-600 focus:ring-indigo-500">
                         <span class="ml-2 text-sm font-medium text-gray-700">📌 Épingler</span>
                     </label>
                     
                     <label class="flex items-center">
-                        <input type="checkbox" id="is_published" checked class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <input type="checkbox" id="is_published" checked class="rounded-[10px] border-gray-300 text-indigo-600 focus:ring-indigo-500">
                         <span class="ml-2 text-sm font-medium text-gray-700">Publier</span>
                     </label>
                 </div>
@@ -320,7 +320,7 @@ function displayNews(newsList) {
                             <p class="mt-1 text-sm text-gray-500">Résidence: ${news.residence_name || 'N/A'}</p>
                             <p class="mt-2 text-gray-600 line-clamp-2">${news.content}</p>
                         </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(news.category)} ml-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-[10px]-full text-xs font-medium ${getCategoryColor(news.category)} ml-4">
                             ${news.category}
                         </span>
                     </div>
@@ -329,7 +329,7 @@ function displayNews(newsList) {
                         <div class="flex items-center space-x-4">
                             <span>📅 ${ShabakaSyndic.formatDate(news.published_at || news.created_at)}</span>
                             ${news.author_name ? `<span>✍️ ${news.author_name}</span>` : ''}
-                            <span class="inline-flex items-center px-2 py-1 rounded text-xs ${news.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">
+                            <span class="inline-flex items-center px-2 py-1 rounded-[10px] text-xs ${news.is_published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">
                                 ${news.is_published ? '✓ Publié' : '🔒 Brouillon'}
                             </span>
                         </div>

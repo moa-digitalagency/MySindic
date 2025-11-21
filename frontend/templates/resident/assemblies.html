@@ -121,7 +121,7 @@ function renderUpcomingAssemblies() {
     }
     
     container.innerHTML = upcomingAssemblies.map(assembly => `
-        <div class="border rounded-md p-4 hover:shadow-md transition bg-gradient-to-r from-blue-50 to-white">
+        <div class="border rounded-[10px]-[10px] p-4 hover:shadow-md transition bg-gradient-to-r from-blue-50 to-white">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div class="flex-1">
                     <h4 class="text-base sm:text-lg font-semibold text-gray-900">${assembly.title}</h4>
@@ -169,7 +169,7 @@ function renderPastAssemblies() {
     }
     
     container.innerHTML = pastAssemblies.slice(0, 5).map(assembly => `
-        <div class="border rounded-md p-3 sm:p-4 hover:bg-gray-50 transition">
+        <div class="border rounded-[10px]-[10px] p-3 sm:p-4 hover:bg-gray-50 transition">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex-1">
                     <h4 class="text-sm sm:text-base font-medium text-gray-900">${assembly.title}</h4>
@@ -254,7 +254,7 @@ async function viewAssembly(assemblyId) {
                         ` : `
                         <div class="space-y-4">
                             ${resolutions.map((res, index) => `
-                                <div class="border rounded-md p-3 sm:p-4 bg-gray-50">
+                                <div class="border rounded-[10px]-[10px] p-3 sm:p-4 bg-gray-50">
                                     <div class="flex flex-col gap-3">
                                         <div>
                                             <p class="font-medium text-sm sm:text-base">${index + 1}. ${res.title}</p>
@@ -279,15 +279,15 @@ async function viewAssembly(assemblyId) {
                                             ${getResolutionStatusBadge(res.status)}
                                             ${res.status === 'approved' || res.status === 'rejected' ? `
                                             <div class="mt-3 grid grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
-                                                <div class="text-center p-2 bg-green-50 rounded">
+                                                <div class="text-center p-2 bg-green-50 rounded-[10px]">
                                                     <p class="text-green-600 font-semibold">${res.votes_for || 0}</p>
                                                     <p class="text-gray-500">Pour</p>
                                                 </div>
-                                                <div class="text-center p-2 bg-red-50 rounded">
+                                                <div class="text-center p-2 bg-red-50 rounded-[10px]">
                                                     <p class="text-red-600 font-semibold">${res.votes_against || 0}</p>
                                                     <p class="text-gray-500">Contre</p>
                                                 </div>
-                                                <div class="text-center p-2 bg-gray-100 rounded">
+                                                <div class="text-center p-2 bg-gray-100 rounded-[10px]">
                                                     <p class="text-gray-600 font-semibold">${res.votes_abstain || 0}</p>
                                                     <p class="text-gray-500">Abstention</p>
                                                 </div>

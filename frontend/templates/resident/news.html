@@ -65,19 +65,19 @@ www.myoneart.com
     <div class="mt-8">
         <div class="mb-4">
             <div class="flex flex-wrap gap-2">
-                <button onclick="filterByCategory('')" id="filter-all" class="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white">
+                <button onclick="filterByCategory('')" id="filter-all" class="px-4 py-2 rounded-[10px]-[10px] text-sm font-medium bg-indigo-600 text-white">
                     Toutes
                 </button>
-                <button onclick="filterByCategory('info')" id="filter-info" class="px-4 py-2 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <button onclick="filterByCategory('info')" id="filter-info" class="px-4 py-2 rounded-[10px]-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
                     Info
                 </button>
-                <button onclick="filterByCategory('announcement')" id="filter-announcement" class="px-4 py-2 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <button onclick="filterByCategory('announcement')" id="filter-announcement" class="px-4 py-2 rounded-[10px]-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
                     Annonce
                 </button>
-                <button onclick="filterByCategory('warning')" id="filter-warning" class="px-4 py-2 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <button onclick="filterByCategory('warning')" id="filter-warning" class="px-4 py-2 rounded-[10px]-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
                     Alerte
                 </button>
-                <button onclick="filterByCategory('maintenance')" id="filter-maintenance" class="px-4 py-2 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <button onclick="filterByCategory('maintenance')" id="filter-maintenance" class="px-4 py-2 rounded-[10px]-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
                     Travaux
                 </button>
             </div>
@@ -411,11 +411,11 @@ async function viewNewsDetails(newsId) {
                     <div class="flex items-center space-x-3">
                         <span class="text-4xl">${getCategoryIcon(news.category)}</span>
                         <div>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(news.category)}">
+                            <span class="inline-flex items-center px-3 py-1 rounded-[10px]-full text-sm font-medium ${getCategoryColor(news.category)}">
                                 ${news.category}
                             </span>
-                            ${news.is_important ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">★ Important</span>' : ''}
-                            ${news.is_pinned ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">📌 Épinglé</span>' : ''}
+                            ${news.is_important ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-[10px]-full text-xs font-bold bg-red-100 text-red-800">★ Important</span>' : ''}
+                            ${news.is_pinned ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-[10px]-full text-xs font-medium bg-indigo-100 text-indigo-800">📌 Épinglé</span>' : ''}
                         </div>
                     </div>
                     
