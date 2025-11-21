@@ -30,6 +30,9 @@ class News(db.Model):
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     
+    # Type de fil d'actualité
+    news_type = db.Column(db.String(20), default='feed')  # 'feed' (fil d'actualité pour tous) ou 'announcement' (actualités et annonces pour admin/syndic/propriétaires)
+    
     # Catégorie
     category = db.Column(db.String(50))  # 'info', 'travaux', 'urgent', 'evenement'
     
@@ -60,6 +63,7 @@ class News(db.Model):
             'residence_id': self.residence_id,
             'title': self.title,
             'content': self.content,
+            'news_type': self.news_type,
             'category': self.category,
             'is_important': self.is_important,
             'is_pinned': self.is_pinned,

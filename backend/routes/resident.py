@@ -87,11 +87,20 @@ def get_news():
         if not current_user.residence_id:
             return jsonify({'success': True, 'news': []}), 200
         
+        news_type = request.args.get('type', 'feed')  # 'feed' ou 'announcement'
+        
         # SÉCURISÉ: Filtre par residence_id
-        news = News.query.filter_by(
+        query = News.query.filter_by(
             residence_id=current_user.residence_id,
-            is_published=True
-        ).order_by(News.is_pinned.desc(), News.published_at.desc()).all()
+            is_published=True,
+            news_type=news_type
+        )
+        
+        # Si c'est un résident simple (pas propriétaire), il ne peut voir que le fil d'actualité
+        if current_user.role == 'resident' and news_type == 'announcement':
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        
+        news = query.order_by(News.is_pinned.desc(), News.published_at.desc()).all()
         
         return jsonify({'success': True, 'news': [n.to_dict() for n in news]}), 200
         
@@ -137,6 +146,7 @@ def create_news():
             residence_id=current_user.residence_id,
             title=data.get('title', data['content'][:100]),
             content=data['content'],
+            news_type='feed',  # Les résidents ne peuvent créer que des posts dans le fil d'actualité
             category=data.get('category', 'info'),
             is_important=False,
             is_pinned=False,

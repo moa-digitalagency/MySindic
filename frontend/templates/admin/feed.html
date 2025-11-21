@@ -1,0 +1,422 @@
+<!--
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
+-->
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Fil d'Actualité - Shabaka Syndic{% endblock %}
+
+{% block admin_content %}
+<div class="content-card">
+    <div class="card-header">
+        <div>
+            <h1 class="page-title">📱 Fil d'Actualité</h1>
+            <p class="page-subtitle">Accessible à tous les résidents - Partagez des informations générales</p>
+        </div>
+    </div>
+
+    <!-- Filtre par résidence -->
+    <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+            🏢 Résidence
+        </label>
+        <select id="residence-filter" onchange="onResidenceChange()" style="width: 100%; max-width: 400px; padding: 0.625rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; background: white; outline: none; cursor: pointer;">
+            <option value="all">🌐 Toutes les résidences</option>
+        </select>
+    </div>
+
+    <!-- Zone de publication -->
+    <div id="publish-section" style="margin-bottom: 2rem;">
+        <div style="background: white; border: 2px solid #667eea; border-radius: 16px; padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <span style="font-size: 1.25rem;">📝</span>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: #111827;">Fil d'Actualité</h3>
+            </div>
+            <p id="publish-subtitle" style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">Publication dans toutes les résidences</p>
+            
+            <textarea id="news-content" placeholder="Quoi de neuf ?" style="width: 100%; padding: 0.875rem; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 0.9375rem; resize: vertical; min-height: 100px; outline: none; background: #f9fafb; margin-bottom: 0.75rem;"></textarea>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button onclick="ShabakaSyndic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>🖼️</span> Photo
+                    </button>
+                    <button onclick="ShabakaSyndic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>🎥</span> Vidéo
+                    </button>
+                    <button onclick="ShabakaSyndic.showToast('Fonctionnalité à venir', 'info')" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>😊</span> Emoji
+                    </button>
+                    <button onclick="toggleAdvancedOptions()" style="padding: 0.5rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                        <span>⚙️</span> Format
+                    </button>
+                </div>
+                
+                <button onclick="publishNews()" style="padding: 0.625rem 2rem; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#5568d3'" onmouseout="this.style.background='#667eea'">
+                    Publier
+                </button>
+            </div>
+            
+            <!-- Options avancées -->
+            <div id="advanced-options" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="is_important" style="width: 1.125rem; height: 1.125rem; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 0.875rem; font-weight: 500;">⭐ Important</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="is_pinned" style="width: 1.125rem; height: 1.125rem; border-radius: 4px; cursor: pointer;">
+                        <span style="font-size: 0.875rem; font-weight: 500;">📌 Épingler</span>
+                    </label>
+                    
+                    <select id="category" style="padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; outline: none; cursor: pointer;">
+                        <option value="info">ℹ️ Info</option>
+                        <option value="announcement">📢 Annonce</option>
+                        <option value="warning">⚠️ Alerte</option>
+                        <option value="maintenance">🔧 Travaux</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fil d'actualités -->
+    <div id="news-feed">
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+            <p style="color: #9ca3af;">Chargement des actualités...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+let allNews = [];
+let allResidences = [];
+let selectedResidenceId = 'all';
+
+function toggleAdvancedOptions() {
+    const options = document.getElementById('advanced-options');
+    options.style.display = options.style.display === 'none' ? 'block' : 'none';
+}
+
+async function loadResidences() {
+    try {
+        const response = await fetch('/api/admin/residences');
+        const data = await response.json();
+        
+        if (data.success) {
+            allResidences = data.residences;
+            const select = document.getElementById('residence-filter');
+            select.innerHTML = '<option value="all">🌐 Toutes les résidences</option>';
+            data.residences.forEach(res => {
+                select.innerHTML += `<option value="${res.id}">${res.name}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function onResidenceChange() {
+    const select = document.getElementById('residence-filter');
+    selectedResidenceId = select.value;
+    
+    const subtitle = document.getElementById('publish-subtitle');
+    if (selectedResidenceId === 'all') {
+        subtitle.textContent = 'Publication dans toutes les résidences';
+    } else {
+        const residence = allResidences.find(r => r.id === parseInt(selectedResidenceId));
+        subtitle.textContent = residence ? `Publication dans ${residence.name}` : 'Dernières nouvelles de votre résidence';
+    }
+    
+    loadNews();
+}
+
+async function loadNews() {
+    try {
+        const response = await fetch('/api/admin/news?type=feed');
+        const data = await response.json();
+        
+        if (data.success) {
+            if (selectedResidenceId === 'all') {
+                allNews = data.news || [];
+            } else {
+                allNews = (data.news || []).filter(n => n.residence_id === parseInt(selectedResidenceId));
+            }
+            displayNews(allNews);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function displayNews(newsList) {
+    const container = document.getElementById('news-feed');
+    
+    if (newsList.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 12px; margin-top: 1rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                <p style="color: #9ca3af; font-size: 0.9375rem;">Aucune actualité pour le moment</p>
+                <p style="color: #d1d5db; font-size: 0.8125rem; margin-top: 0.5rem;">Publiez la première actualité</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const pinnedNews = newsList.filter(n => n.is_pinned).sort((a, b) => new Date(b.published_at || b.created_at) - new Date(a.published_at || a.created_at));
+    const regularNews = newsList.filter(n => !n.is_pinned).sort((a, b) => new Date(b.published_at || b.created_at) - new Date(a.published_at || a.created_at));
+    
+    let html = '<div style="margin-top: 1.5rem;">';
+    
+    if (pinnedNews.length > 0) {
+        html += '<div style="margin-bottom: 2rem;"><h3 style="font-size: 0.875rem; font-weight: 600; color: #6b7280; margin-bottom: 1rem;">📌 Actualités épinglées</h3>';
+        html += pinnedNews.map(news => createNewsCard(news, true)).join('');
+        html += '</div>';
+    }
+    
+    if (regularNews.length > 0) {
+        if (pinnedNews.length > 0) {
+            html += '<h3 style="font-size: 0.875rem; font-weight: 600; color: #6b7280; margin-bottom: 1rem;">Actualités récentes</h3>';
+        }
+        html += regularNews.map(news => createNewsCard(news, false)).join('');
+    }
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function getRoleBadge(role) {
+    const badges = {
+        'superadmin': {
+            label: 'Super Admin',
+            icon: '👑',
+            bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: '#ffffff'
+        },
+        'admin_syndic': {
+            label: 'Bureau de Syndic',
+            icon: '🏛️',
+            bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            color: '#ffffff'
+        },
+        'owner': {
+            label: 'Propriétaire',
+            icon: '🏠',
+            bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            color: '#ffffff'
+        },
+        'resident': {
+            label: 'Résident',
+            icon: '👤',
+            bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            color: '#ffffff'
+        }
+    };
+    
+    const badge = badges[role] || { label: 'Utilisateur', icon: '👤', bg: '#e5e7eb', color: '#6b7280' };
+    
+    return `
+        <span style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; background: ${badge.bg}; color: ${badge.color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <span>${badge.icon}</span>
+            <span>${badge.label}</span>
+        </span>
+    `;
+}
+
+function createNewsCard(news, isPinned) {
+    const categoryEmoji = {
+        'info': 'ℹ️',
+        'announcement': '📢',
+        'warning': '⚠️',
+        'maintenance': '🔧'
+    };
+    
+    const categoryColor = {
+        'info': '#3b82f6',
+        'announcement': '#10b981',
+        'warning': '#f59e0b',
+        'maintenance': '#ef4444'
+    };
+    
+    const date = new Date(news.published_at || news.created_at);
+    const formattedDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    
+    return `
+        <div style="background: white; border: 2px solid ${isPinned ? '#a5b4fc' : '#e5e7eb'}; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; ${isPinned ? 'background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);' : ''}">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div style="flex-shrink: 0; font-size: 2.5rem;">
+                    ${categoryEmoji[news.category] || 'ℹ️'}
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                                ${news.is_important ? '<span style="color: #ef4444; font-size: 1.25rem;">⭐</span>' : ''}
+                                ${news.is_pinned ? '<span style="font-size: 1rem;">📌</span>' : ''}
+                                <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: ${categoryColor[news.category] || '#3b82f6'}20; color: ${categoryColor[news.category] || '#3b82f6'};">
+                                    ${news.category || 'info'}
+                                </span>
+                                ${selectedResidenceId === 'all' && news.residence_name ? `
+                                    <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: #f3f4f6; color: #6b7280;">
+                                        🏢 ${news.residence_name}
+                                    </span>
+                                ` : ''}
+                            </div>
+                            <p style="color: #111827; font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap;">${news.content}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8125rem; color: #9ca3af; flex-wrap: wrap;">
+                            <span>📅 ${formattedDate}</span>
+                            ${news.author_name ? `
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>✍️ ${news.author_name}</span>
+                                    ${news.author_role ? getRoleBadge(news.author_role) : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="editNews(${news.id})" style="padding: 0.5rem 0.875rem; color: #667eea; border: 1px solid #667eea; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+                                ✏️ Modifier
+                            </button>
+                            <button onclick="deleteNews(${news.id})" style="padding: 0.5rem 0.875rem; color: #dc2626; border: 1px solid #fca5a5; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">
+                                🗑️ Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function publishNews() {
+    const content = document.getElementById('news-content').value.trim();
+    const isImportant = document.getElementById('is_important').checked;
+    const isPinned = document.getElementById('is_pinned').checked;
+    const category = document.getElementById('category').value;
+    
+    if (!content) {
+        ShabakaSyndic.showToast('Veuillez écrire un message', 'error');
+        return;
+    }
+    
+    try {
+        if (selectedResidenceId === 'all') {
+            // Publier dans toutes les résidences
+            if (allResidences.length === 0) {
+                ShabakaSyndic.showToast('Aucune résidence disponible', 'error');
+                return;
+            }
+            
+            const publishPromises = allResidences.map(residence => 
+                fetch('/api/admin/news', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        residence_id: residence.id,
+                        title: content.substring(0, 100),
+                        news_type: 'feed',
+                        content: content,
+                        category: category,
+                        is_important: isImportant,
+                        is_pinned: isPinned,
+                        is_published: true
+                    })
+                })
+            );
+            
+            const results = await Promise.all(publishPromises);
+            const allSuccess = results.every(r => r.ok);
+            
+            if (allSuccess) {
+                ShabakaSyndic.showToast(`Actualité publiée dans ${allResidences.length} résidence(s) !`, 'success');
+                document.getElementById('news-content').value = '';
+                document.getElementById('is_important').checked = false;
+                document.getElementById('is_pinned').checked = false;
+                document.getElementById('category').value = 'info';
+                document.getElementById('advanced-options').style.display = 'none';
+                loadNews();
+            } else {
+                ShabakaSyndic.showToast('Erreur lors de la publication dans certaines résidences', 'error');
+            }
+        } else {
+            // Publier dans une résidence spécifique
+            const response = await fetch('/api/admin/news', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    residence_id: parseInt(selectedResidenceId),
+                    title: content.substring(0, 100),
+                    content: content,
+                    news_type: 'feed',
+                    category: category,
+                    is_important: isImportant,
+                    is_pinned: isPinned,
+                    is_published: true
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                ShabakaSyndic.showToast('Actualité publiée !', 'success');
+                document.getElementById('news-content').value = '';
+                document.getElementById('is_important').checked = false;
+                document.getElementById('is_pinned').checked = false;
+                document.getElementById('category').value = 'info';
+                document.getElementById('advanced-options').style.display = 'none';
+                loadNews();
+            } else {
+                ShabakaSyndic.showToast(data.error || 'Erreur lors de la publication', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+async function editNews(newsId) {
+    ShabakaSyndic.showToast('Fonctionnalité de modification à venir', 'info');
+}
+
+async function deleteNews(newsId) {
+    if (!confirm('Supprimer cette actualité ?')) return;
+    
+    try {
+        const response = await fetch(`/api/admin/news/${newsId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            ShabakaSyndic.showToast('Actualité supprimée', 'success');
+            loadNews();
+        } else {
+            ShabakaSyndic.showToast(data.error || 'Erreur lors de la suppression', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadResidences().then(() => {
+        loadNews();
+    });
+});
+</script>
+{% endblock %}

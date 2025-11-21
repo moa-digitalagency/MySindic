@@ -822,11 +822,24 @@ def get_payment_registry():
 
 @admin_bp.route('/news', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_all_news():
     """Récupère toutes les actualités"""
     try:
-        news = News.query.order_by(News.is_pinned.desc(), News.published_at.desc()).all()
+        news_type = request.args.get('type', 'announcement')  # 'feed' ou 'announcement'
+        query = News.query.filter_by(news_type=news_type)
+        
+        # Si l'utilisateur est admin (syndic), filtrer par ses résidences
+        if current_user.is_admin() and not current_user.is_superadmin():
+            from backend.models.residence_admin import ResidenceAdmin
+            admin_residences = ResidenceAdmin.query.filter_by(user_id=current_user.id).all()
+            residence_ids = [admin.residence_id for admin in admin_residences]
+            if residence_ids:
+                query = query.filter(News.residence_id.in_(residence_ids))
+            else:
+                return jsonify({'success': True, 'news': []}), 200
+        
+        news = query.order_by(News.is_pinned.desc(), News.published_at.desc()).all()
         return jsonify({
             'success': True,
             'news': [n.to_dict() for n in news]
@@ -837,7 +850,7 @@ def get_all_news():
 
 @admin_bp.route('/news', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_news():
     """Crée une nouvelle actualité"""
     try:
@@ -847,10 +860,21 @@ def create_news():
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
         
+        # Vérifier que l'admin a accès à cette résidence
+        if current_user.is_admin() and not current_user.is_superadmin():
+            from backend.models.residence_admin import ResidenceAdmin
+            admin_access = ResidenceAdmin.query.filter_by(
+                user_id=current_user.id,
+                residence_id=data['residence_id']
+            ).first()
+            if not admin_access:
+                return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+        
         news = News(
             residence_id=data['residence_id'],
             title=data['title'],
             content=data['content'],
+            news_type=data.get('news_type', 'feed'),
             category=data.get('category', 'info'),
             is_important=data.get('is_important', False),
             is_pinned=data.get('is_pinned', False),
@@ -869,7 +893,7 @@ def create_news():
 
 @admin_bp.route('/news/<int:news_id>', methods=['PUT'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def update_news(news_id):
     """Met à jour une actualité"""
     try:
@@ -877,8 +901,18 @@ def update_news(news_id):
         if not news:
             return jsonify({'success': False, 'error': 'Actualité non trouvée'}), 404
         
+        # Vérifier que l'admin a accès à cette résidence
+        if current_user.is_admin() and not current_user.is_superadmin():
+            from backend.models.residence_admin import ResidenceAdmin
+            admin_access = ResidenceAdmin.query.filter_by(
+                user_id=current_user.id,
+                residence_id=news.residence_id
+            ).first()
+            if not admin_access:
+                return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        
         data = request.get_json()
-        for field in ['title', 'content', 'category', 'is_important', 'is_pinned', 'is_published']:
+        for field in ['title', 'content', 'news_type', 'category', 'is_important', 'is_pinned', 'is_published']:
             if field in data:
                 setattr(news, field, data[field])
         
@@ -891,13 +925,23 @@ def update_news(news_id):
 
 @admin_bp.route('/news/<int:news_id>', methods=['DELETE'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def delete_news(news_id):
     """Supprime une actualité"""
     try:
         news = News.query.get(news_id)
         if not news:
             return jsonify({'success': False, 'error': 'Actualité non trouvée'}), 404
+        
+        # Vérifier que l'admin a accès à cette résidence
+        if current_user.is_admin() and not current_user.is_superadmin():
+            from backend.models.residence_admin import ResidenceAdmin
+            admin_access = ResidenceAdmin.query.filter_by(
+                user_id=current_user.id,
+                residence_id=news.residence_id
+            ).first()
+            if not admin_access:
+                return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         db.session.delete(news)
         db.session.commit()

@@ -1,0 +1,463 @@
+<!--
+Shabaka Syndic - Solution complète et digitale pour les syndics et résidents au Maroc.
+
+Shabaka Syndic
+Par : Aisance KALONJI
+Mail : moa@myoneart.com
+www.myoneart.com
+-->
+{% extends "resident/resident_base.html" %}
+
+{% block title %}Actualités et Annonces - Shabaka Syndic{% endblock %}
+
+{% block resident_content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold text-gray-900">📰 Actualités et Annonces</h1>
+            <p class="mt-2 text-sm text-gray-700">Annonces officielles réservées aux propriétaires</p>
+        </div>
+    </div>
+
+    <!-- News Creation Section -->
+    <div class="content-card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+            <div>
+                <h2 class="card-title">✍️ Partager une actualité</h2>
+                <p class="card-subtitle">Partagez des informations avec vos voisins</p>
+            </div>
+        </div>
+        
+        <div style="background: #f9fafb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;">
+            <textarea id="news-content" placeholder="Quoi de neuf dans votre résidence ? Partagez avec vos voisins..." style="width: 100%; min-height: 120px; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.875rem; resize: vertical; font-family: inherit; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37, 99, 235, 0.1)'" onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='none'"></textarea>
+            
+            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; flex-wrap: wrap;">
+                <div style="flex: 1; display: flex; gap: 0.5rem; align-items: center;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem; background: white; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.8rem; font-weight: 500; color: #374151; transition: all 0.2s;" onmouseover="this.style.borderColor='#2563eb'; this.style.color='#2563eb'" onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='#374151'">
+                        <span>📷</span>
+                        <span>Photo</span>
+                        <input type="file" id="news-image-upload" accept="image/*" style="display: none;" onchange="handleNewsImageUpload(event)">
+                    </label>
+                    
+                    <select id="news-category" style="padding: 0.5rem 0.875rem; background: white; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.8rem; font-weight: 500; color: #374151; cursor: pointer; outline: none;">
+                        <option value="info">ℹ️ Info</option>
+                        <option value="announcement">📢 Annonce</option>
+                        <option value="warning">⚠️ Alerte</option>
+                        <option value="maintenance">🔧 Travaux</option>
+                    </select>
+                </div>
+                
+                <button onclick="publishNews()" style="padding: 0.625rem 1.5rem; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; border: none; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(37, 99, 235, 0.4)'" onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 8px rgba(37, 99, 235, 0.3)'">
+                    📤 Publier
+                </button>
+            </div>
+            
+            <!-- Image Preview -->
+            <div id="news-media-preview" style="display: none; margin-top: 1rem; position: relative;">
+                <div style="position: relative; display: inline-block;">
+                    <img id="news-preview-image" src="" alt="Aperçu" style="max-width: 300px; max-height: 200px; border-radius: 12px; border: 2px solid #e5e7eb;">
+                    <button onclick="removeNewsMedia()" style="position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">✕</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="mb-4">
+            <div class="flex flex-wrap gap-2">
+                <button onclick="filterByCategory('')" id="filter-all" class="px-4 py-2 rounded-[10px] text-sm font-medium bg-indigo-600 text-white">
+                    Toutes
+                </button>
+                <button onclick="filterByCategory('info')" id="filter-info" class="px-4 py-2 rounded-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Info
+                </button>
+                <button onclick="filterByCategory('announcement')" id="filter-announcement" class="px-4 py-2 rounded-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Annonce
+                </button>
+                <button onclick="filterByCategory('warning')" id="filter-warning" class="px-4 py-2 rounded-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Alerte
+                </button>
+                <button onclick="filterByCategory('maintenance')" id="filter-maintenance" class="px-4 py-2 rounded-[10px] text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Travaux
+                </button>
+            </div>
+        </div>
+
+        <div id="news-list" class="space-y-4">
+            <div class="flex justify-center py-8">
+                <div class="loading-spinner border-indigo-600"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails Actualité -->
+<div id="newsModal" class="modal-backdrop hidden">
+    <div class="modal-content">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold" id="modal-title">Détails de l'actualité</h2>
+                <button onclick="ShabakaSyndic.closeModal('newsModal')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="news-details" class="space-y-4">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block resident_extra_js %}
+<script>
+let allNews = [];
+let currentCategory = '';
+let newsUploadedImage = null;
+
+function handleNewsImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+        alert('Veuillez sélectionner une image');
+        return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+        alert('L\'image ne doit pas dépasser 5 MB');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        newsUploadedImage = e.target.result;
+        document.getElementById('news-preview-image').src = e.target.result;
+        document.getElementById('news-media-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeNewsMedia() {
+    newsUploadedImage = null;
+    document.getElementById('news-media-preview').style.display = 'none';
+    document.getElementById('news-image-upload').value = '';
+}
+
+async function publishNews() {
+    const content = document.getElementById('news-content').value.trim();
+    const category = document.getElementById('news-category').value;
+    
+    if (!content) {
+        alert('Veuillez saisir un contenu pour votre actualité');
+        return;
+    }
+    
+    const newsData = {
+        title: content.substring(0, 100),
+        content: content,
+        category: category,
+        image: newsUploadedImage
+    };
+    
+    try {
+        const response = await fetch('/api/resident/news', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newsData)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Actualité publiée:', result);
+            
+            // Reset form
+            document.getElementById('news-content').value = '';
+            document.getElementById('news-category').value = 'info';
+            removeNewsMedia();
+            
+            // Show success message
+            ShabakaSyndic.showToast('Actualité publiée avec succès!', 'success');
+            
+            // Reload news feed
+            loadNews();
+        } else {
+            const error = await response.json();
+            console.error('❌ Erreur lors de la publication:', error);
+            ShabakaSyndic.showToast('Erreur: ' + (error.error || 'Impossible de publier l\'actualité'), 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erreur réseau:', error);
+        ShabakaSyndic.showToast('Erreur de connexion. Veuillez réessayer.', 'error');
+    }
+}
+
+async function loadNews() {
+    try {
+        const response = await fetch('/api/resident/news?type=announcement');
+        const data = await response.json();
+        
+        if (data.success) {
+            allNews = data.news;
+            filterByCategory(currentCategory);
+        } else {
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+function filterByCategory(category) {
+    currentCategory = category;
+    
+    document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+    });
+    
+    const activeBtn = category ? document.getElementById(`filter-${category}`) : document.getElementById('filter-all');
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+        activeBtn.classList.add('bg-indigo-600', 'text-white');
+    }
+    
+    const filtered = category ? allNews.filter(n => n.category === category) : allNews;
+    displayNews(filtered);
+}
+
+function getRoleBadge(role) {
+    const badges = {
+        'superadmin': {
+            label: 'Super Admin',
+            icon: '👑',
+            bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: '#ffffff'
+        },
+        'admin_syndic': {
+            label: 'Bureau de Syndic',
+            icon: '🏛️',
+            bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            color: '#ffffff'
+        },
+        'owner': {
+            label: 'Propriétaire',
+            icon: '🏠',
+            bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            color: '#ffffff'
+        },
+        'resident': {
+            label: 'Résident',
+            icon: '👤',
+            bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            color: '#ffffff'
+        }
+    };
+    
+    const badge = badges[role] || { label: 'Utilisateur', icon: '👤', bg: '#e5e7eb', color: '#6b7280' };
+    
+    return `
+        <span style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; border-radius: 12px; font-size: 0.6875rem; font-weight: 600; background: ${badge.bg}; color: ${badge.color}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <span>${badge.icon}</span>
+            <span>${badge.label}</span>
+        </span>
+    `;
+}
+
+function displayNews(newsList) {
+    const container = document.getElementById('news-list');
+    
+    if (newsList.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune actualité</h3>
+                <p class="mt-1 text-sm text-gray-500">Aucune actualité n'est disponible pour le moment.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const getCategoryIcon = (category) => {
+        switch(category) {
+            case 'info': return 'ℹ️';
+            case 'announcement': return '📢';
+            case 'warning': return '⚠️';
+            case 'maintenance': return '🔧';
+            default: return '📄';
+        }
+    };
+    
+    const getCategoryColor = (category) => {
+        switch(category) {
+            case 'info': return 'badge-info';
+            case 'announcement': return 'badge-success';
+            case 'warning': return 'badge-warning';
+            case 'maintenance': return 'badge-danger';
+            default: return 'badge-info';
+        }
+    };
+    
+    const pinnedNews = newsList.filter(n => n.is_pinned);
+    const regularNews = newsList.filter(n => !n.is_pinned);
+    
+    let html = '';
+    
+    if (pinnedNews.length > 0) {
+        html += '<div class="mb-6"><h3 class="text-sm font-medium text-gray-500 mb-3">📌 Épinglées</h3>';
+        html += pinnedNews.map(news => createNewsCard(news, getCategoryIcon, getCategoryColor, true)).join('');
+        html += '</div>';
+    }
+    
+    if (regularNews.length > 0) {
+        if (pinnedNews.length > 0) {
+            html += '<h3 class="text-sm font-medium text-gray-500 mb-3">Actualités récentes</h3>';
+        }
+        html += regularNews.map(news => createNewsCard(news, getCategoryIcon, getCategoryColor, false)).join('');
+    }
+    
+    container.innerHTML = html;
+}
+
+function createNewsCard(news, getCategoryIcon, getCategoryColor, isPinned) {
+    const categoryColors = {
+        'info': '#3b82f6',
+        'announcement': '#10b981',
+        'warning': '#f59e0b',
+        'maintenance': '#ef4444'
+    };
+    
+    const date = new Date(news.published_at || news.created_at);
+    const formattedDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    
+    return `
+        <div style="background: white; border: 2px solid ${isPinned ? '#a5b4fc' : '#e5e7eb'}; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; ${isPinned ? 'background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);' : ''} cursor: pointer; transition: all 0.3s;" onclick="viewNewsDetails(${news.id})" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex-shrink: 0; font-size: 2.5rem;">
+                    ${getCategoryIcon(news.category)}
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                        ${news.is_important ? '<span style="color: #ef4444; font-size: 1.25rem;">⭐</span>' : ''}
+                        ${news.is_pinned ? '<span style="font-size: 1rem;">📌</span>' : ''}
+                        <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600; background: ${categoryColors[news.category] || '#3b82f6'}20; color: ${categoryColors[news.category] || '#3b82f6'};">
+                            ${news.category || 'info'}
+                        </span>
+                    </div>
+                    <p style="color: #111827; font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; margin-bottom: 0.75rem;">${news.content}</p>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.8125rem; color: #9ca3af; flex-wrap: wrap;">
+                            <span>📅 ${formattedDate}</span>
+                            ${news.author_name ? `
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>✍️ ${news.author_name}</span>
+                                    ${news.author_role ? getRoleBadge(news.author_role) : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <button style="padding: 0.5rem 0.875rem; color: #667eea; border: 1px solid #667eea; border-radius: 8px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; background: white; transition: all 0.2s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'" onclick="event.stopPropagation(); viewNewsDetails(${news.id})">
+                            Lire plus →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+async function viewNewsDetails(newsId) {
+    try {
+        const response = await fetch(`/api/resident/news/${newsId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const news = data.news;
+            
+            document.getElementById('modal-title').textContent = news.title;
+            
+            const getCategoryIcon = (category) => {
+                switch(category) {
+                    case 'info': return 'ℹ️';
+                    case 'announcement': return '📢';
+                    case 'warning': return '⚠️';
+                    case 'maintenance': return '🔧';
+                    default: return '📄';
+                }
+            };
+            
+            const getCategoryColor = (category) => {
+                switch(category) {
+                    case 'info': return 'bg-blue-100 text-blue-800';
+                    case 'announcement': return 'bg-green-100 text-green-800';
+                    case 'warning': return 'bg-yellow-100 text-yellow-800';
+                    case 'maintenance': return 'bg-red-100 text-red-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            };
+            
+            const details = `
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-4xl">${getCategoryIcon(news.category)}</span>
+                        <div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-[10px]-full text-sm font-medium ${getCategoryColor(news.category)}">
+                                ${news.category}
+                            </span>
+                            ${news.is_important ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-[10px]-full text-xs font-bold bg-red-100 text-red-800">★ Important</span>' : ''}
+                            ${news.is_pinned ? '<span class="ml-2 inline-flex items-center px-2 py-1 rounded-[10px]-full text-xs font-medium bg-indigo-100 text-indigo-800">📌 Épinglé</span>' : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <div class="prose max-w-none">
+                            ${news.content.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4 text-sm text-gray-500">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="font-medium">Publié le</label>
+                                <p>${ShabakaSyndic.formatDate(news.published_at || news.created_at)}</p>
+                            </div>
+                            ${news.author_name ? `
+                                <div>
+                                    <label class="font-medium">Auteur</label>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <p>${news.author_name}</p>
+                                        ${news.author_role ? getRoleBadge(news.author_role) : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('news-details').innerHTML = details;
+            ShabakaSyndic.openModal('newsModal');
+        } else {
+            ShabakaSyndic.showToast('Erreur lors du chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur de connexion', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadNews();
+});
+</script>
+{% endblock %}

@@ -293,13 +293,17 @@ www.myoneart.com
         <div class="nav-tabs-card">
             <a href="{{ url_for('admin_dashboard') }}" class="nav-tab {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
                 <span class="nav-tab-icon">📊</span>
-                <span>Dashboard</span>
+                <span>{% if current_user.is_superadmin() %}Dashboard Super Admin{% elif current_user.is_admin() %}Dashboard Syndic{% else %}Dashboard{% endif %}</span>
             </a>
             
             {% if current_user.is_admin() or current_user.is_superadmin() %}
-            <a href="{{ url_for('admin_news') }}" class="nav-tab {% if request.endpoint == 'admin_news' %}active{% endif %}">
+            <a href="{{ url_for('admin_feed') }}" class="nav-tab {% if request.endpoint == 'admin_feed' %}active{% endif %}">
+                <span class="nav-tab-icon">📱</span>
+                <span>Fil d'Actualité</span>
+            </a>
+            <a href="{{ url_for('admin_announcements') }}" class="nav-tab {% if request.endpoint == 'admin_announcements' %}active{% endif %}">
                 <span class="nav-tab-icon">📰</span>
-                <span>Actualités</span>
+                <span>Actualités et Annonces</span>
             </a>
             <a href="{{ url_for('admin_residences') }}" class="nav-tab {% if request.endpoint == 'admin_residences' or request.endpoint == 'admin_residence_wizard' %}active{% endif %}">
                 <span class="nav-tab-icon">🏢</span>

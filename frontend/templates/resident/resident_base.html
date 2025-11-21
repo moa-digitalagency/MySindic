@@ -304,12 +304,18 @@ www.myoneart.com
         <div class="nav-tabs-card">
             <a href="/resident/dashboard" class="nav-tab {% if request.path == '/resident/dashboard' %}active{% endif %}">
                 <span class="nav-tab-icon">📊</span>
-                <span>Tableau de bord</span>
+                <span>{% if current_user.is_owner() %}Dashboard Propriétaire{% else %}Dashboard Résident{% endif %}</span>
             </a>
-            <a href="/resident/news" class="nav-tab {% if request.path == '/resident/news' %}active{% endif %}">
+            <a href="/resident/feed" class="nav-tab {% if request.path == '/resident/feed' %}active{% endif %}">
+                <span class="nav-tab-icon">📱</span>
+                <span>Fil d'Actualité</span>
+            </a>
+            {% if current_user.is_owner() %}
+            <a href="/resident/announcements" class="nav-tab {% if request.path == '/resident/announcements' %}active{% endif %}">
                 <span class="nav-tab-icon">📰</span>
-                <span>Fil d'Actualités</span>
+                <span>Actualités et Annonces</span>
             </a>
+            {% endif %}
             <a href="/resident/maintenance" class="nav-tab {% if request.path == '/resident/maintenance' %}active{% endif %}">
                 <span class="nav-tab-icon">🔧</span>
                 <span>Maintenance</span>

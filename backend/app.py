@@ -216,11 +216,17 @@ def create_app():
         """Gestion des documents"""
         return render_template('admin/documents.html')
     
-    @app.route('/admin/news')
+    @app.route('/admin/feed')
     @admin_or_superadmin_required
-    def admin_news():
-        """Gestion des actualités"""
-        return render_template('admin/news.html')
+    def admin_feed():
+        """Gestion du fil d'actualité (pour tous)"""
+        return render_template('admin/feed.html')
+    
+    @app.route('/admin/announcements')
+    @admin_or_superadmin_required
+    def admin_announcements():
+        """Gestion des actualités et annonces (admin/syndic/propriétaires)"""
+        return render_template('admin/announcements.html')
     
     @app.route('/admin/settings')
     @superadmin_required
@@ -279,11 +285,22 @@ def create_app():
         """Mes finances"""
         return render_template('resident/finances.html')
     
-    @app.route('/resident/news')
+    @app.route('/resident/feed')
     @login_required
-    def resident_news():
-        """Actualités"""
-        return render_template('resident/news.html')
+    def resident_feed():
+        """Fil d'actualité (pour tous)"""
+        return render_template('resident/feed.html')
+    
+    @app.route('/resident/announcements')
+    @login_required
+    def resident_announcements():
+        """Actualités et annonces (propriétaires seulement)"""
+        # Bloquer l'accès pour les résidents simples (role='resident')
+        # Les propriétaires (role='owner') ont accès
+        if current_user.role == 'resident':
+            from flask import abort
+            abort(403)  # Forbidden
+        return render_template('resident/announcements.html')
     
     @app.route('/resident/assemblies')
     @login_required
