@@ -11,7 +11,6 @@ www.myoneart.com
 
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from functools import wraps
 from datetime import datetime
 from decimal import Decimal
 
@@ -32,33 +31,16 @@ from backend.models.app_settings import AppSettings
 from backend.services.charge_calculator import ChargeCalculator
 from backend.services.notification_service import NotificationService
 from backend.services.agora_service import AgoraService
+from backend.utils.decorators import (
+    get_user_residence_ids, 
+    check_residence_access, 
+    residence_access_required,
+    superadmin_required,
+    admin_or_superadmin_required
+)
 
 # Créer le blueprint
 admin_bp = Blueprint('admin', __name__)
-
-
-def superadmin_required(f):
-    """Décorateur pour vérifier que l'utilisateur est un superadmin"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return jsonify({'success': False, 'error': 'Authentification requise'}), 401
-        if not current_user.is_superadmin():
-            return jsonify({'success': False, 'error': 'Accès réservé aux superadmins'}), 403
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def admin_or_superadmin_required(f):
-    """Décorateur pour vérifier que l'utilisateur est un admin ou un superadmin"""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return jsonify({'success': False, 'error': 'Authentification requise'}), 401
-        if not (current_user.is_admin() or current_user.is_superadmin()):
-            return jsonify({'success': False, 'error': 'Accès réservé aux administrateurs'}), 403
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 # ==================== DASHBOARD ====================
@@ -316,7 +298,8 @@ def update_residence(residence_id):
 
 @admin_bp.route('/residences/<int:residence_id>/units', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
+@residence_access_required
 def get_units(residence_id):
     """Récupère les lots d'une résidence"""
     try:
@@ -328,7 +311,8 @@ def get_units(residence_id):
 
 @admin_bp.route('/residences/<int:residence_id>/units', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
+@residence_access_required
 def create_unit(residence_id):
     """Crée un nouveau lot"""
     try:
@@ -396,13 +380,17 @@ def create_unit_simple():
 
 @admin_bp.route('/units/<int:unit_id>', methods=['PUT'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def update_unit(unit_id):
     """Met à jour un lot"""
     try:
         unit = Unit.query.get(unit_id)
         if not unit:
             return jsonify({'success': False, 'error': 'Lot non trouvé'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(unit.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         data = request.get_json()
         for field in ['unit_number', 'floor', 'building', 'unit_type', 'surface_area', 
@@ -419,13 +407,17 @@ def update_unit(unit_id):
 
 @admin_bp.route('/units/<int:unit_id>', methods=['DELETE'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def delete_unit(unit_id):
     """Supprime un lot"""
     try:
         unit = Unit.query.get(unit_id)
         if not unit:
             return jsonify({'success': False, 'error': 'Lot non trouvé'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(unit.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         db.session.delete(unit)
         db.session.commit()
@@ -439,15 +431,31 @@ def delete_unit(unit_id):
 
 @admin_bp.route('/charges', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_charges():
     """Récupère toutes les charges"""
     try:
-        residence_id = request.args.get('residence_id')
-        query = Charge.query
-        if residence_id:
-            query = query.filter_by(residence_id=int(residence_id))
-        charges = query.order_by(Charge.created_at.desc()).all()
+        residence_ids = get_user_residence_ids()
+        
+        if residence_ids is None:
+            # Superadmin voit toutes les charges
+            residence_id = request.args.get('residence_id')
+            query = Charge.query
+            if residence_id:
+                query = query.filter_by(residence_id=int(residence_id))
+            charges = query.order_by(Charge.created_at.desc()).all()
+        else:
+            # Admin/Owner voit seulement les charges de ses résidences
+            residence_id = request.args.get('residence_id')
+            if residence_id:
+                # Vérifier que la résidence demandée est autorisée
+                if int(residence_id) in residence_ids:
+                    charges = Charge.query.filter_by(residence_id=int(residence_id)).order_by(Charge.created_at.desc()).all()
+                else:
+                    return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+            else:
+                charges = Charge.query.filter(Charge.residence_id.in_(residence_ids)).order_by(Charge.created_at.desc()).all()
+        
         return jsonify({'success': True, 'charges': [c.to_dict() for c in charges]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -455,7 +463,7 @@ def get_charges():
 
 @admin_bp.route('/charges', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_charge():
     """Crée un nouvel appel de fonds"""
     try:
@@ -464,6 +472,10 @@ def create_charge():
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(data['residence_id']):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         charge = Charge(
             residence_id=data['residence_id'],
@@ -488,13 +500,17 @@ def create_charge():
 
 @admin_bp.route('/charges/<int:charge_id>/publish', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def publish_charge(charge_id):
     """Publie une charge et calcule la répartition"""
     try:
         charge = Charge.query.get(charge_id)
         if not charge:
             return jsonify({'success': False, 'error': 'Charge non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(charge.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         # Calculer la répartition
         distributions = ChargeCalculator.calculate_distribution(charge_id)
@@ -518,10 +534,18 @@ def publish_charge(charge_id):
 
 @admin_bp.route('/charges/<int:charge_id>/distributions', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_charge_distributions(charge_id):
     """Récupère les distributions d'une charge"""
     try:
+        charge = Charge.query.get(charge_id)
+        if not charge:
+            return jsonify({'success': False, 'error': 'Charge non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(charge.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+        
         distributions = ChargeDistribution.query.filter_by(charge_id=charge_id).all()
         return jsonify({'success': True, 'distributions': [d.to_dict() for d in distributions]}), 200
     except Exception as e:
@@ -827,17 +851,14 @@ def get_all_news():
     """Récupère toutes les actualités"""
     try:
         news_type = request.args.get('type', 'announcement')  # 'feed' ou 'announcement'
-        query = News.query.filter_by(news_type=news_type)
+        residence_ids = get_user_residence_ids()
         
-        # Si l'utilisateur est admin (syndic), filtrer par ses résidences
-        if current_user.is_admin() and not current_user.is_superadmin():
-            from backend.models.residence_admin import ResidenceAdmin
-            admin_residences = ResidenceAdmin.query.filter_by(user_id=current_user.id).all()
-            residence_ids = [admin.residence_id for admin in admin_residences]
-            if residence_ids:
-                query = query.filter(News.residence_id.in_(residence_ids))
-            else:
-                return jsonify({'success': True, 'news': []}), 200
+        if residence_ids is None:
+            # Superadmin voit toutes les actualités
+            query = News.query.filter_by(news_type=news_type)
+        else:
+            # Admin/Owner voit seulement les actualités de ses résidences
+            query = News.query.filter_by(news_type=news_type).filter(News.residence_id.in_(residence_ids))
         
         news = query.order_by(News.is_pinned.desc(), News.published_at.desc()).all()
         return jsonify({
@@ -860,15 +881,9 @@ def create_news():
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
         
-        # Vérifier que l'admin a accès à cette résidence
-        if current_user.is_admin() and not current_user.is_superadmin():
-            from backend.models.residence_admin import ResidenceAdmin
-            admin_access = ResidenceAdmin.query.filter_by(
-                user_id=current_user.id,
-                residence_id=data['residence_id']
-            ).first()
-            if not admin_access:
-                return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(data['residence_id']):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         news = News(
             residence_id=data['residence_id'],
@@ -901,15 +916,9 @@ def update_news(news_id):
         if not news:
             return jsonify({'success': False, 'error': 'Actualité non trouvée'}), 404
         
-        # Vérifier que l'admin a accès à cette résidence
-        if current_user.is_admin() and not current_user.is_superadmin():
-            from backend.models.residence_admin import ResidenceAdmin
-            admin_access = ResidenceAdmin.query.filter_by(
-                user_id=current_user.id,
-                residence_id=news.residence_id
-            ).first()
-            if not admin_access:
-                return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(news.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         data = request.get_json()
         for field in ['title', 'content', 'news_type', 'category', 'is_important', 'is_pinned', 'is_published']:
@@ -933,15 +942,9 @@ def delete_news(news_id):
         if not news:
             return jsonify({'success': False, 'error': 'Actualité non trouvée'}), 404
         
-        # Vérifier que l'admin a accès à cette résidence
-        if current_user.is_admin() and not current_user.is_superadmin():
-            from backend.models.residence_admin import ResidenceAdmin
-            admin_access = ResidenceAdmin.query.filter_by(
-                user_id=current_user.id,
-                residence_id=news.residence_id
-            ).first()
-            if not admin_access:
-                return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(news.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
         db.session.delete(news)
         db.session.commit()
@@ -959,7 +962,15 @@ def delete_news(news_id):
 def get_all_maintenance():
     """Récupère toutes les demandes de maintenance"""
     try:
-        requests = MaintenanceRequest.query.order_by(MaintenanceRequest.created_at.desc()).all()
+        residence_ids = get_user_residence_ids()
+        
+        if residence_ids is None:
+            # Superadmin voit toutes les demandes
+            requests = MaintenanceRequest.query.order_by(MaintenanceRequest.created_at.desc()).all()
+        else:
+            # Admin/Owner voit seulement les demandes de ses résidences
+            requests = MaintenanceRequest.query.filter(MaintenanceRequest.residence_id.in_(residence_ids)).order_by(MaintenanceRequest.created_at.desc()).all()
+        
         return jsonify({'success': True, 'maintenance_requests': [r.to_dict() for r in requests]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -974,6 +985,10 @@ def update_maintenance(request_id):
         maintenance_request = MaintenanceRequest.query.get(request_id)
         if not maintenance_request:
             return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(maintenance_request.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         data = request.get_json()
         
@@ -1082,6 +1097,10 @@ def get_maintenance_comments(request_id):
         if not maintenance_request:
             return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
         
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(maintenance_request.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+        
         # Récupérer tous les commentaires (incluant les internes)
         comments = MaintenanceComment.query.filter_by(
             maintenance_request_id=request_id
@@ -1108,6 +1127,10 @@ def add_maintenance_comment(request_id):
         maintenance_request = MaintenanceRequest.query.get(request_id)
         if not maintenance_request:
             return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(maintenance_request.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         data = request.get_json()
         
@@ -1146,7 +1169,7 @@ def add_maintenance_comment(request_id):
 
 @admin_bp.route('/maintenance/<int:request_id>/documents', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_maintenance_documents(request_id):
     """Récupère les documents d'une demande de maintenance"""
     try:
@@ -1156,6 +1179,10 @@ def get_maintenance_documents(request_id):
         maintenance_request = MaintenanceRequest.query.get(request_id)
         if not maintenance_request:
             return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(maintenance_request.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         # Récupérer tous les documents
         documents = MaintenanceDocument.query.filter_by(
@@ -1173,7 +1200,7 @@ def get_maintenance_documents(request_id):
 
 @admin_bp.route('/maintenance/<int:request_id>/documents', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def upload_maintenance_document(request_id):
     """Upload un document pour une demande de maintenance"""
     import os
@@ -1185,6 +1212,10 @@ def upload_maintenance_document(request_id):
         maintenance_request = MaintenanceRequest.query.get(request_id)
         if not maintenance_request:
             return jsonify({'success': False, 'error': 'Demande non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(maintenance_request.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         # Gérer l'upload de fichier
         if 'file' not in request.files:
@@ -1245,7 +1276,7 @@ def upload_maintenance_document(request_id):
 
 @admin_bp.route('/maintenance/documents/<int:document_id>', methods=['DELETE'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def delete_maintenance_document(document_id):
     """Supprime un document de maintenance"""
     import os
@@ -1255,6 +1286,11 @@ def delete_maintenance_document(document_id):
         document = MaintenanceDocument.query.get(document_id)
         if not document:
             return jsonify({'success': False, 'error': 'Document non trouvé'}), 404
+        
+        # Vérifier l'accès via la demande de maintenance associée
+        maintenance_request = MaintenanceRequest.query.get(document.maintenance_request_id)
+        if maintenance_request and not check_residence_access(maintenance_request.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         # Supprimer le fichier physique
         try:
@@ -1279,15 +1315,31 @@ def delete_maintenance_document(document_id):
 
 @admin_bp.route('/maintenance-logs', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_maintenance_logs():
     """Récupère le carnet d'entretien"""
     try:
-        residence_id = request.args.get('residence_id')
-        query = MaintenanceLog.query
-        if residence_id:
-            query = query.filter_by(residence_id=int(residence_id))
-        logs = query.order_by(MaintenanceLog.intervention_date.desc()).all()
+        residence_ids = get_user_residence_ids()
+        
+        if residence_ids is None:
+            # Superadmin voit tous les logs
+            residence_id = request.args.get('residence_id')
+            query = MaintenanceLog.query
+            if residence_id:
+                query = query.filter_by(residence_id=int(residence_id))
+            logs = query.order_by(MaintenanceLog.intervention_date.desc()).all()
+        else:
+            # Admin/Owner voit seulement les logs de ses résidences
+            residence_id = request.args.get('residence_id')
+            if residence_id:
+                # Vérifier que la résidence demandée est autorisée
+                if int(residence_id) in residence_ids:
+                    logs = MaintenanceLog.query.filter_by(residence_id=int(residence_id)).order_by(MaintenanceLog.intervention_date.desc()).all()
+                else:
+                    return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+            else:
+                logs = MaintenanceLog.query.filter(MaintenanceLog.residence_id.in_(residence_ids)).order_by(MaintenanceLog.intervention_date.desc()).all()
+        
         return jsonify({'success': True, 'logs': [l.to_dict() for l in logs]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1295,7 +1347,7 @@ def get_maintenance_logs():
 
 @admin_bp.route('/maintenance-logs', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_maintenance_log():
     """Crée une entrée dans le carnet d'entretien"""
     try:
@@ -1304,6 +1356,10 @@ def create_maintenance_log():
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(data['residence_id']):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         log = MaintenanceLog(
             residence_id=data['residence_id'],
@@ -1337,15 +1393,31 @@ def create_maintenance_log():
 
 @admin_bp.route('/assemblies', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_assemblies():
     """Récupère les assemblées générales"""
     try:
-        residence_id = request.args.get('residence_id')
-        query = GeneralAssembly.query
-        if residence_id:
-            query = query.filter_by(residence_id=int(residence_id))
-        assemblies = query.order_by(GeneralAssembly.scheduled_date.desc()).all()
+        residence_ids = get_user_residence_ids()
+        
+        if residence_ids is None:
+            # Superadmin voit toutes les assemblées
+            residence_id = request.args.get('residence_id')
+            query = GeneralAssembly.query
+            if residence_id:
+                query = query.filter_by(residence_id=int(residence_id))
+            assemblies = query.order_by(GeneralAssembly.scheduled_date.desc()).all()
+        else:
+            # Admin/Owner voit seulement les assemblées de ses résidences
+            residence_id = request.args.get('residence_id')
+            if residence_id:
+                # Vérifier que la résidence demandée est autorisée
+                if int(residence_id) in residence_ids:
+                    assemblies = GeneralAssembly.query.filter_by(residence_id=int(residence_id)).order_by(GeneralAssembly.scheduled_date.desc()).all()
+                else:
+                    return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+            else:
+                assemblies = GeneralAssembly.query.filter(GeneralAssembly.residence_id.in_(residence_ids)).order_by(GeneralAssembly.scheduled_date.desc()).all()
+        
         return jsonify({'success': True, 'assemblies': [a.to_dict() for a in assemblies]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1353,7 +1425,7 @@ def get_assemblies():
 
 @admin_bp.route('/assemblies', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_assembly():
     """Crée une nouvelle assemblée générale"""
     try:
@@ -1362,6 +1434,10 @@ def create_assembly():
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(data['residence_id']):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         # Générer le nom du channel Agora si le mode est online ou both
         meeting_mode = data.get('meeting_mode', 'physical')
@@ -1393,13 +1469,17 @@ def create_assembly():
 
 @admin_bp.route('/assemblies/<int:assembly_id>/send-convocations', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def send_convocations(assembly_id):
     """Envoie les convocations pour une AG"""
     try:
         assembly = GeneralAssembly.query.get(assembly_id)
         if not assembly:
             return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(assembly.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         # Envoyer les convocations
         NotificationService.notify_assembly_convocation(assembly)
@@ -1423,6 +1503,10 @@ def start_assembly(assembly_id):
         assembly = GeneralAssembly.query.get(assembly_id)
         if not assembly:
             return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(assembly.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         if assembly.status != 'planned':
             return jsonify({'success': False, 'error': 'AG déjà démarrée ou terminée'}), 400
@@ -1453,6 +1537,10 @@ def end_assembly(assembly_id):
         if not assembly:
             return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
         
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(assembly.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+        
         assembly.status = 'completed'
         assembly.end_date = datetime.utcnow()
         
@@ -1476,6 +1564,10 @@ def get_agora_token(assembly_id):
         assembly = GeneralAssembly.query.get(assembly_id)
         if not assembly:
             return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(assembly.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         if not assembly.agora_channel_name:
             return jsonify({'success': False, 'error': 'Cette AG ne supporte pas le mode en ligne'}), 400
@@ -1512,6 +1604,14 @@ def get_agora_token(assembly_id):
 def get_attendance(assembly_id):
     """Récupère la liste des présences pour une AG"""
     try:
+        assembly = GeneralAssembly.query.get(assembly_id)
+        if not assembly:
+            return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(assembly.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+        
         attendances = Attendance.query.filter_by(assembly_id=assembly_id).all()
         users_data = []
         
@@ -1539,6 +1639,14 @@ def get_attendance(assembly_id):
 def mark_attendance(assembly_id):
     """Marque la présence d'un ou plusieurs utilisateurs (syndic uniquement)"""
     try:
+        assembly = GeneralAssembly.query.get(assembly_id)
+        if not assembly:
+            return jsonify({'success': False, 'error': 'AG non trouvée'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(assembly.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+        
         data = request.get_json()
         user_ids = data.get('user_ids', [])
         attendance_mode = data.get('attendance_mode', 'physical')
@@ -1767,15 +1875,31 @@ def close_resolution(resolution_id):
 
 @admin_bp.route('/litigations', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_litigations():
     """Récupère les contentieux"""
     try:
-        residence_id = request.args.get('residence_id')
-        query = Litigation.query
-        if residence_id:
-            query = query.filter_by(residence_id=int(residence_id))
-        litigations = query.order_by(Litigation.start_date.desc()).all()
+        residence_ids = get_user_residence_ids()
+        
+        if residence_ids is None:
+            # Superadmin voit tous les contentieux
+            residence_id = request.args.get('residence_id')
+            query = Litigation.query
+            if residence_id:
+                query = query.filter_by(residence_id=int(residence_id))
+            litigations = query.order_by(Litigation.start_date.desc()).all()
+        else:
+            # Admin/Owner voit seulement les contentieux de ses résidences
+            residence_id = request.args.get('residence_id')
+            if residence_id:
+                # Vérifier que la résidence demandée est autorisée
+                if int(residence_id) in residence_ids:
+                    litigations = Litigation.query.filter_by(residence_id=int(residence_id)).order_by(Litigation.start_date.desc()).all()
+                else:
+                    return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
+            else:
+                litigations = Litigation.query.filter(Litigation.residence_id.in_(residence_ids)).order_by(Litigation.start_date.desc()).all()
+        
         return jsonify({'success': True, 'litigations': [l.to_dict() for l in litigations]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1783,7 +1907,7 @@ def get_litigations():
 
 @admin_bp.route('/litigations', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_litigation():
     """Crée un nouveau contentieux"""
     try:
@@ -1792,6 +1916,10 @@ def create_litigation():
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(data['residence_id']):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         # Générer un numéro de référence
         import uuid
@@ -1826,13 +1954,17 @@ def create_litigation():
 
 @admin_bp.route('/litigations/<int:litigation_id>', methods=['PUT'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def update_litigation(litigation_id):
     """Met à jour un contentieux"""
     try:
         litigation = Litigation.query.get(litigation_id)
         if not litigation:
             return jsonify({'success': False, 'error': 'Contentieux non trouvé'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(litigation.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         data = request.get_json()
         
@@ -1857,7 +1989,7 @@ def update_litigation(litigation_id):
 
 @admin_bp.route('/polls', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def create_poll():
     """Crée un nouveau sondage"""
     try:
@@ -1866,6 +1998,10 @@ def create_poll():
         for field in required_fields:
             if field not in data:
                 return jsonify({'success': False, 'error': f'Le champ {field} est requis'}), 400
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(data['residence_id']):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         poll = Poll(
             residence_id=data['residence_id'],
@@ -1899,13 +2035,17 @@ def create_poll():
 
 @admin_bp.route('/polls/<int:poll_id>/close', methods=['POST'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def close_poll(poll_id):
     """Ferme un sondage"""
     try:
         poll = Poll.query.get(poll_id)
         if not poll:
             return jsonify({'success': False, 'error': 'Sondage non trouvé'}), 404
+        
+        # Vérifier que l'utilisateur a accès à cette résidence
+        if not check_residence_access(poll.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         poll.status = 'closed'
         db.session.commit()
@@ -1920,11 +2060,19 @@ def close_poll(poll_id):
 
 @admin_bp.route('/users', methods=['GET'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def get_users():
     """Récupère la liste des utilisateurs"""
     try:
-        users = User.query.all()
+        residence_ids = get_user_residence_ids()
+        
+        if residence_ids is None:
+            # Superadmin voit tous les utilisateurs
+            users = User.query.all()
+        else:
+            # Admin/Owner voit seulement les utilisateurs de ses résidences
+            users = User.query.filter(User.residence_id.in_(residence_ids)).all()
+        
         return jsonify({'success': True, 'users': [u.to_dict() for u in users]}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -1932,7 +2080,7 @@ def get_users():
 
 @admin_bp.route('/users/<int:user_id>', methods=['PUT'])
 @login_required
-@superadmin_required
+@admin_or_superadmin_required
 def update_user(user_id):
     """Met à jour un utilisateur"""
     try:
@@ -1940,7 +2088,16 @@ def update_user(user_id):
         if not user:
             return jsonify({'success': False, 'error': 'Utilisateur non trouvé'}), 404
         
+        # Vérifier que l'utilisateur appartient à une résidence autorisée
+        if user.residence_id and not check_residence_access(user.residence_id):
+            return jsonify({'success': False, 'error': 'Accès non autorisé à cet utilisateur'}), 403
+        
         data = request.get_json()
+        
+        # Si residence_id est modifié, vérifier l'accès
+        if 'residence_id' in data and data['residence_id']:
+            if not check_residence_access(data['residence_id']):
+                return jsonify({'success': False, 'error': 'Accès non autorisé à cette résidence'}), 403
         
         for field in ['first_name', 'last_name', 'phone', 'role', 'is_active', 'residence_id', 'unit_id']:
             if field in data:

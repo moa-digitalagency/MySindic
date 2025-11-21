@@ -29,6 +29,7 @@ load_dotenv()
 # Imports locaux
 from backend.config import get_config
 from backend.models import db, migrate, init_db
+from backend.utils.decorators import owner_or_above_required
 
 # Initialiser Flask-Login
 login_manager = LoginManager()
@@ -292,14 +293,9 @@ def create_app():
         return render_template('resident/feed.html')
     
     @app.route('/resident/announcements')
-    @login_required
+    @owner_or_above_required
     def resident_announcements():
-        """Actualités et annonces (propriétaires seulement)"""
-        # Bloquer l'accès pour les résidents simples (role='resident')
-        # Les propriétaires (role='owner') ont accès
-        if current_user.role == 'resident':
-            from flask import abort
-            abort(403)  # Forbidden
+        """Actualités et annonces (propriétaires, admins et superadmins uniquement)"""
         return render_template('resident/announcements.html')
     
     @app.route('/resident/assemblies')
