@@ -181,6 +181,22 @@ def init_demo_data(app, db):
         db.session.commit()
         print(f"✅ 2 admins syndic (bureau), 1 propriétaire et {len(residents_data)} résidents créés\n")
         
+        # Assigner les admins à la résidence
+        print("🔗 Assignation des admins à la résidence...")
+        admin_assignment1 = ResidenceAdmin(
+            residence_id=residence.id,
+            user_id=admin_user1.id,
+            assigned_by=admin.id
+        )
+        admin_assignment2 = ResidenceAdmin(
+            residence_id=residence.id,
+            user_id=admin_user2.id,
+            assigned_by=admin.id
+        )
+        db.session.add_all([admin_assignment1, admin_assignment2])
+        db.session.commit()
+        print(f"✅ 2 admins assignés à la résidence '{residence.name}'\n")
+        
         # 5. Créer des charges (appels de fonds)
         print("💰 Création des charges...")
         charge1 = Charge(
