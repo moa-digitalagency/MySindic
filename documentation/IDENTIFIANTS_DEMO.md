@@ -40,6 +40,62 @@ Utilisez ce compte pour accéder à toutes les fonctionnalités d'administration
 
 ---
 
+## 👔 Comptes Bureau Syndic (Administrateurs)
+
+Utilisez ces comptes pour gérer la résidence (validation des paiements, gestion des charges, maintenance, etc.).
+
+### Bureau Syndic 1 - Responsable Principal
+**Email :** `admin.syndic@mysindic.ma`  
+**Mot de passe :** `Admin123!`
+- **Résidence :** Résidence Les Jardins
+- **Rôle :** Administrateur (admin)
+- **Accès :** Gestion complète de la résidence assignée
+
+### Bureau Syndic 2 - Comptable
+**Email :** `bureau.syndic@mysindic.ma`  
+**Mot de passe :** `Admin123!`
+- **Résidence :** Résidence Les Jardins
+- **Rôle :** Administrateur (admin)
+- **Accès :** Gestion complète de la résidence assignée
+
+### Accès Bureau Syndic:
+- ✅ Dashboard avec statistiques de la résidence
+- ✅ Gestion des charges (création, publication, répartition)
+- ✅ **Validation des paiements avec notes**
+- ✅ **Filtres et statistiques des paiements**
+- ✅ Gestion de la maintenance
+- ✅ Carnet d'entretien
+- ✅ Assemblées générales et résolutions
+- ✅ Documents et actualités
+- ✅ Gestion des résidents de leur résidence
+
+**Pages accessibles :**
+- `/admin/dashboard` - Tableau de bord
+- `/admin/finances` - Gestion financière (charges et paiements)
+- `/admin/maintenance` - Gestion de la maintenance
+- `/admin/assemblies` - Assemblées générales
+- `/admin/documents` - Gestion des documents
+
+---
+
+## 👨‍💼 Compte Propriétaire
+
+### Propriétaire 1
+**Email :** `owner@mysindic.ma`  
+**Mot de passe :** `Owner123!`
+- **Résidence :** Résidence Les Jardins
+- **Unité :** A101 (Appartement F3, 85.5 m²)
+- **Rôle :** Propriétaire (owner)
+
+### Accès Propriétaire:
+- ✅ Consultation de la liste des résidences
+- ✅ Consultation des finances de sa résidence
+- ✅ Consultation des paiements (tous les paiements de la résidence)
+- ✅ Accès aux assemblées générales
+- ✅ Consultation des documents
+
+---
+
 ## 🏠 Comptes Résidents
 
 Utilisez ces comptes pour tester les fonctionnalités résidents.
@@ -195,14 +251,16 @@ curl http://localhost:5000/api/admin/residences \
 
 L'auto-initialisation crée automatiquement:
 
-- ✅ 4 comptes utilisateurs (1 superadmin + 3 résidents)
+- ✅ 6 comptes utilisateurs (1 superadmin + 2 admins syndic + 1 propriétaire + 2 résidents)
 - ✅ 1 résidence (Résidence Les Jardins)
-- ✅ 5 unités (A101, A102, A201, B101, B102)
+- ✅ 5 unités (A101, A102, A201, A202, B101)
 - ✅ 1 appel de fonds avec répartition automatique
 - ✅ 2 paiements validés
 - ✅ 2 demandes de maintenance avec logs
 - ✅ 2 actualités publiées
-- ✅ Base de données PostgreSQL avec 18 tables
+- ✅ Base de données PostgreSQL avec 19 tables
+- ✅ Interface de validation des paiements avec notes (pour bureau syndic)
+- ✅ Statistiques et filtres des paiements
 
 ---
 
