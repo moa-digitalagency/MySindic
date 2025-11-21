@@ -42,13 +42,20 @@ def dashboard():
             author_id=current_user.id
         ).order_by(MaintenanceRequest.created_at.desc()).limit(5).all()
         
-        # Actualités de la résidence (filtrées par residence_id) - TOUTES les actualités
+        # Actualités de la résidence (filtrées par residence_id et role)
         news = []
         if current_user.residence_id:
-            news = News.query.filter_by(
+            query = News.query.filter_by(
                 residence_id=current_user.residence_id,
                 is_published=True
-            ).order_by(News.is_pinned.desc(), News.published_at.desc()).all()
+            )
+            
+            # SÉCURITÉ: Les résidents simples ne voient que le fil d'actualité (feed)
+            # Les propriétaires, admins et superadmins voient tout (feed + announcements)
+            if current_user.role == 'resident':
+                query = query.filter_by(news_type='feed')
+            
+            news = query.order_by(News.is_pinned.desc(), News.published_at.desc()).all()
         
         # Solde du compte (vérifié unit_id ownership)
         balance = None
@@ -122,6 +129,10 @@ def get_news_detail(news_id):
         if news.residence_id != current_user.residence_id:
             return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
         
+        # SÉCURITÉ: Les résidents simples ne peuvent pas accéder aux announcements
+        if current_user.role == 'resident' and news.news_type == 'announcement':
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        
         return jsonify({'success': True, 'news': news.to_dict()}), 200
         
     except Exception as e:
@@ -131,8 +142,13 @@ def get_news_detail(news_id):
 @resident_bp.route('/news', methods=['POST'])
 @login_required
 def create_news():
-    """Permet aux résidents de publier une actualité"""
+    """Permet aux propriétaires de publier une actualité (RÉSIDENTS BLOQUÉS)"""
     try:
+        # SÉCURITÉ: Seuls les propriétaires, admins et superadmins peuvent créer des actualités
+        # Les résidents simples (role='resident') sont bloqués
+        if current_user.role == 'resident':
+            return jsonify({'success': False, 'error': 'Accès non autorisé. Seuls les propriétaires peuvent publier des actualités.'}), 403
+        
         if not current_user.residence_id:
             return jsonify({'success': False, 'error': 'Vous devez être associé à une résidence'}), 400
         
