@@ -32,6 +32,9 @@ www.myoneart.com
             <button onclick="switchTab('payments')" id="tab-payments" class="tab-button tab-button-inactive">
                 Paiements
             </button>
+            <button onclick="switchTab('registry')" id="tab-registry" class="tab-button tab-button-inactive">
+                Registre des Paiements
+            </button>
         </div>
 
         <div id="tab-content-charges" class="card mt-4">
@@ -42,6 +45,70 @@ www.myoneart.com
                 </select>
             </div>
             <div id="charges-list" class="overflow-x-auto">
+                <div class="flex justify-center py-8">
+                    <div class="loading-spinner border-indigo-600"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-content-registry" class="card mt-4 hidden">
+            <!-- Statistiques du registre -->
+            <div id="registry-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border-2 border-blue-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-blue-800">Total Unités</p>
+                            <p id="reg-stat-total" class="text-2xl font-bold text-blue-900">-</p>
+                        </div>
+                        <div class="h-12 w-12 bg-blue-200 rounded-full flex items-center justify-center">
+                            🏢
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border-2 border-green-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-green-800">À jour</p>
+                            <p id="reg-stat-paid" class="text-2xl font-bold text-green-900">-</p>
+                        </div>
+                        <div class="h-12 w-12 bg-green-200 rounded-full flex items-center justify-center">
+                            ✓
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 border-2 border-red-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-red-800">En retard</p>
+                            <p id="reg-stat-pending" class="text-2xl font-bold text-red-900">-</p>
+                        </div>
+                        <div class="h-12 w-12 bg-red-200 rounded-full flex items-center justify-center">
+                            ⚠️
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 border-2 border-orange-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-orange-800">Impayés</p>
+                            <p id="reg-stat-outstanding" class="text-2xl font-bold text-orange-900">-</p>
+                        </div>
+                        <div class="h-12 w-12 bg-orange-200 rounded-full flex items-center justify-center">
+                            💸
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtre par résidence -->
+            <div class="mb-4">
+                <label class="label-field">Filtrer par résidence</label>
+                <select id="filter-registry-residence" class="input-field" onchange="loadPaymentRegistry()">
+                    <option value="">Toutes les résidences</option>
+                </select>
+            </div>
+            
+            <div id="registry-list" class="overflow-x-auto">
                 <div class="flex justify-center py-8">
                     <div class="loading-spinner border-indigo-600"></div>
                 </div>
@@ -265,12 +332,16 @@ async function loadResidences() {
             const filterSelect = document.getElementById('filter-residence');
             const chargeSelect = document.getElementById('charge-residence');
             const paymentResidenceSelect = document.getElementById('filter-payment-residence');
+            const registryResidenceSelect = document.getElementById('filter-registry-residence');
             
             residences.forEach(r => {
                 filterSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
                 chargeSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
                 if (paymentResidenceSelect) {
                     paymentResidenceSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+                }
+                if (registryResidenceSelect) {
+                    registryResidenceSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`;
                 }
             });
         }
@@ -390,53 +461,267 @@ function displayPayments(paymentsList) {
         return;
     }
     
+    const pendingPayments = paymentsList.filter(p => p.status === 'pending');
+    const validatedPayments = paymentsList.filter(p => p.status === 'validated');
+    const rejectedPayments = paymentsList.filter(p => p.status === 'rejected');
+    
+    const renderPaymentRow = (p) => `
+        <tr class="${p.status === 'pending' ? 'bg-yellow-50 hover:bg-yellow-100' : p.status === 'validated' ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'} transition-colors">
+            <td>
+                <div class="font-medium">${ShabakaSyndic.formatDate(p.payment_date)}</div>
+                <div class="text-xs text-gray-500">${p.created_at ? 'Déclaré: ' + ShabakaSyndic.formatDate(p.created_at) : ''}</div>
+            </td>
+            <td class="text-sm">${p.residence_name || '-'}</td>
+            <td>
+                <div class="font-medium text-indigo-600">${p.unit_number || '-'}</div>
+                ${p.building ? `<div class="text-xs text-gray-500">Bât. ${p.building}</div>` : ''}
+            </td>
+            <td>
+                <div class="font-medium">${p.user_name || '-'}</div>
+                ${p.user_email ? `<div class="text-xs text-gray-500">${p.user_email}</div>` : ''}
+            </td>
+            <td class="font-bold text-lg ${p.status === 'validated' ? 'text-green-600' : p.status === 'pending' ? 'text-yellow-600' : 'text-gray-500'}">
+                ${ShabakaSyndic.formatCurrency(p.amount)}
+            </td>
+            <td>
+                <span class="badge badge-info">${p.payment_method}</span>
+                ${p.reference ? `<div class="text-xs font-mono text-gray-600 mt-1">${p.reference}</div>` : ''}
+            </td>
+            <td class="text-center">
+                ${p.proof_document ? 
+                    `<a href="${p.proof_document}" target="_blank" class="inline-flex items-center px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md text-sm font-medium transition-colors">
+                        📄 Voir
+                    </a>` : 
+                    '<span class="text-gray-400">-</span>'
+                }
+            </td>
+            <td>
+                ${p.admin_notes ? 
+                    `<div class="text-sm text-gray-700 italic">
+                        "${p.admin_notes.length > 50 ? p.admin_notes.substring(0, 50) + '...' : p.admin_notes}"
+                    </div>` : 
+                    '<span class="text-gray-400">-</span>'
+                }
+            </td>
+            <td class="text-center">
+                ${p.status === 'pending' ? 
+                    `<button onclick='openValidatePaymentModal(${JSON.stringify(p).replace(/'/g, "&apos;")})' 
+                        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105">
+                        ✓ Valider
+                    </button>` :
+                    p.status === 'validated' ? 
+                    '<span class="text-green-600 font-semibold">✓ Validé</span>' :
+                    '<span class="text-red-600 font-semibold">✗ Rejeté</span>'
+                }
+            </td>
+        </tr>
+    `;
+    
+    let html = '';
+    
+    if (pendingPayments.length > 0) {
+        html += `
+            <div class="mb-6">
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-3 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-yellow-800 flex items-center gap-2">
+                        ⏳ Paiements en attente de validation (${pendingPayments.length})
+                    </h3>
+                    <p class="text-sm text-yellow-700 mt-1">Ces paiements nécessitent votre validation</p>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Résidence</th>
+                            <th>Lot</th>
+                            <th>Utilisateur</th>
+                            <th>Montant</th>
+                            <th>Méthode/Réf</th>
+                            <th>Justificatif</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pendingPayments.map(renderPaymentRow).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    if (validatedPayments.length > 0) {
+        html += `
+            <div class="mb-6">
+                <div class="bg-green-100 border-l-4 border-green-500 p-4 mb-3 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-green-800 flex items-center gap-2">
+                        ✓ Paiements validés (${validatedPayments.length})
+                    </h3>
+                    <p class="text-sm text-green-700 mt-1">Total validé: ${ShabakaSyndic.formatCurrency(validatedPayments.reduce((sum, p) => sum + (p.amount || 0), 0))}</p>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Résidence</th>
+                            <th>Lot</th>
+                            <th>Utilisateur</th>
+                            <th>Montant</th>
+                            <th>Méthode/Réf</th>
+                            <th>Justificatif</th>
+                            <th>Notes Admin</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${validatedPayments.map(renderPaymentRow).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    if (rejectedPayments.length > 0) {
+        html += `
+            <div class="mb-6">
+                <div class="bg-red-100 border-l-4 border-red-500 p-4 mb-3 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-red-800 flex items-center gap-2">
+                        ✗ Paiements rejetés (${rejectedPayments.length})
+                    </h3>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Résidence</th>
+                            <th>Lot</th>
+                            <th>Utilisateur</th>
+                            <th>Montant</th>
+                            <th>Méthode/Réf</th>
+                            <th>Justificatif</th>
+                            <th>Notes Admin</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rejectedPayments.map(renderPaymentRow).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+async function loadPaymentRegistry() {
+    try {
+        const residenceFilter = document.getElementById('filter-registry-residence')?.value || '';
+        
+        let url = '/api/admin/payment-registry';
+        if (residenceFilter) url += `?residence_id=${residenceFilter}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            updateRegistryStats(data.summary);
+            displayPaymentRegistry(data.registry);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        ShabakaSyndic.showToast('Erreur lors du chargement du registre', 'error');
+    }
+}
+
+function updateRegistryStats(summary) {
+    document.getElementById('reg-stat-total').textContent = summary.total_units || 0;
+    document.getElementById('reg-stat-paid').textContent = summary.units_paid || 0;
+    document.getElementById('reg-stat-pending').textContent = summary.units_pending || 0;
+    document.getElementById('reg-stat-outstanding').textContent = ShabakaSyndic.formatCurrency(summary.total_outstanding || 0);
+}
+
+function displayPaymentRegistry(registry) {
+    const container = document.getElementById('registry-list');
+    
+    if (!registry || registry.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <div class="text-gray-400 text-6xl mb-4">🏢</div>
+                <p class="text-gray-500 text-lg">Aucune unité trouvée</p>
+                <p class="text-gray-400 text-sm mt-2">Essayez de sélectionner une autre résidence</p>
+            </div>
+        `;
+        return;
+    }
+    
     container.innerHTML = `
         <table class="table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Résidence</th>
                     <th>Lot</th>
-                    <th>Utilisateur</th>
-                    <th>Montant</th>
-                    <th>Méthode</th>
-                    <th>Référence</th>
-                    <th>Justificatif</th>
+                    <th>Résidence</th>
+                    <th>Propriétaire</th>
+                    <th>Contact</th>
+                    <th>Charges</th>
+                    <th>Payé</th>
+                    <th>En Attente</th>
+                    <th>Solde Actuel</th>
+                    <th>Solde Projeté</th>
                     <th>Statut</th>
-                    <th>Actions</th>
+                    <th>Dernier Paiement</th>
                 </tr>
             </thead>
             <tbody>
-                ${paymentsList.map(p => `
-                    <tr class="${p.status === 'pending' ? 'bg-yellow-50' : ''}">
-                        <td>${ShabakaSyndic.formatDate(p.payment_date)}</td>
-                        <td class="text-sm">${p.residence_name || '-'}</td>
-                        <td class="font-medium">${p.unit_number || '-'}</td>
-                        <td class="text-sm">${p.user_name || '-'}</td>
-                        <td class="font-semibold text-green-600">${ShabakaSyndic.formatCurrency(p.amount)}</td>
-                        <td><span class="badge badge-info">${p.payment_method}</span></td>
-                        <td class="text-sm font-mono">${p.reference || '-'}</td>
+                ${registry.map(r => {
+                    const rowClass = r.balance < 0 ? 'bg-red-50 hover:bg-red-100' : 'bg-green-50 hover:bg-green-100';
+                    return `
+                    <tr class="${rowClass} transition-colors">
+                        <td class="font-semibold text-indigo-600">${r.unit_number}</td>
+                        <td class="text-sm">${r.residence_name}</td>
                         <td>
-                            ${p.proof_document ? `<a href="${p.proof_document}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm">📄 Voir</a>` : '-'}
+                            <div class="font-medium">${r.owner_name}</div>
+                            ${r.building ? `<div class="text-xs text-gray-500">Bât. ${r.building}${r.floor ? ', Ét. ' + r.floor : ''}</div>` : ''}
+                        </td>
+                        <td class="text-sm">
+                            ${r.owner_email ? `<div class="text-xs">📧 ${r.owner_email}</div>` : ''}
+                            ${r.owner_phone ? `<div class="text-xs">📱 ${r.owner_phone}</div>` : ''}
+                            ${!r.owner_email && !r.owner_phone ? '<span class="text-gray-400">-</span>' : ''}
+                        </td>
+                        <td class="font-semibold text-gray-900">${ShabakaSyndic.formatCurrency(r.total_charges)}</td>
+                        <td class="font-semibold text-green-600">${ShabakaSyndic.formatCurrency(r.total_paid)}</td>
+                        <td class="font-semibold text-yellow-600">
+                            ${r.pending_amount > 0 ? ShabakaSyndic.formatCurrency(r.pending_amount) : '-'}
+                        </td>
+                        <td class="font-bold ${r.balance >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${r.balance >= 0 ? '+' : ''}${ShabakaSyndic.formatCurrency(r.balance)}
+                        </td>
+                        <td class="font-bold ${r.projected_balance >= 0 ? 'text-green-600' : 'text-orange-600'}">
+                            ${r.projected_balance >= 0 ? '+' : ''}${ShabakaSyndic.formatCurrency(r.projected_balance)}
+                            ${r.pending_amount > 0 ? '<div class="text-xs text-gray-500 font-normal">(avec paiements en attente)</div>' : ''}
                         </td>
                         <td>
-                            <span class="badge ${p.status === 'validated' ? 'badge-success' : p.status === 'pending' ? 'badge-warning' : 'badge-danger'}">
-                                ${p.status === 'pending' ? '⏳ En attente' : p.status === 'validated' ? '✓ Validé' : 'Rejeté'}
-                            </span>
-                            ${p.admin_notes ? `<div class="text-xs text-gray-500 mt-1">Note: ${p.admin_notes.substring(0, 40)}...</div>` : ''}
+                            <div class="flex flex-col gap-1">
+                                <span class="badge ${r.status === 'À jour' ? 'badge-success' : 'badge-danger'}">
+                                    ${r.status === 'À jour' ? '✓ À jour' : '⚠️ En retard'}
+                                </span>
+                                ${r.pending_payments > 0 ? `<span class="badge badge-warning text-xs">${r.pending_payments} en attente</span>` : ''}
+                            </div>
                         </td>
-                        <td>
-                            ${p.status === 'pending' ? 
-                                `<button onclick='openValidatePaymentModal(${JSON.stringify(p).replace(/'/g, "&apos;")})' style="padding: 0.375rem 0.75rem; border: 2px solid #10b981; background: rgba(16, 185, 129, 0.05); color: #10b981; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.1)'" onmouseout="this.style.background='rgba(16, 185, 129, 0.05)'">Valider</button>` :
-                                `<span class="text-gray-400 text-sm">-</span>`
-                            }
+                        <td class="text-sm">
+                            ${r.last_payment_date ? `
+                                <div class="font-medium">${ShabakaSyndic.formatDate(r.last_payment_date)}</div>
+                                <div class="text-green-600 font-semibold">${ShabakaSyndic.formatCurrency(r.last_payment_amount)}</div>
+                            ` : '<span class="text-gray-400">Aucun paiement</span>'}
                         </td>
                     </tr>
-                `).join('')}
+                `}).join('')}
             </tbody>
         </table>
     `;
 }
+
+let registryLoaded = false;
 
 function switchTab(tab) {
     document.querySelectorAll('.tab-button').forEach(btn => {
@@ -449,9 +734,15 @@ function switchTab(tab) {
     
     document.getElementById('tab-content-charges').classList.toggle('hidden', tab !== 'charges');
     document.getElementById('tab-content-payments').classList.toggle('hidden', tab !== 'payments');
+    document.getElementById('tab-content-registry').classList.toggle('hidden', tab !== 'registry');
     
     if (tab === 'payments' && payments.length === 0) {
         loadPayments();
+    }
+    
+    if (tab === 'registry' && !registryLoaded) {
+        loadPaymentRegistry();
+        registryLoaded = true;
     }
 }
 

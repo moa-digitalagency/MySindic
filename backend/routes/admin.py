@@ -587,6 +587,163 @@ def get_charge_payment_status(charge_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/payment-registry', methods=['GET'])
+@login_required
+def get_payment_registry():
+    """Récupère le registre des paiements par unité avec le statut de chaque propriétaire"""
+    try:
+        from backend.models.charge import ChargeDistribution
+        from sqlalchemy.orm import joinedload
+        from sqlalchemy import func, and_, case
+        from decimal import Decimal
+        
+        residence_id = request.args.get('residence_id', type=int)
+        
+        query = Unit.query.options(joinedload(Unit.residence))
+        
+        if current_user.is_superadmin():
+            if residence_id:
+                query = query.filter_by(residence_id=residence_id)
+            query = query.order_by(Unit.residence_id, Unit.unit_number)
+        elif current_user.is_admin():
+            assignments = ResidenceAdmin.query.filter_by(user_id=current_user.id).all()
+            residence_ids = [a.residence_id for a in assignments]
+            if not residence_ids:
+                return jsonify({'success': True, 'registry': [], 'summary': {
+                    'total_units': 0, 'units_paid': 0, 'units_pending': 0, 'total_outstanding': 0
+                }}), 200
+            if residence_id:
+                if residence_id not in residence_ids:
+                    return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+                query = query.filter_by(residence_id=residence_id)
+            else:
+                query = query.filter(Unit.residence_id.in_(residence_ids))
+            query = query.order_by(Unit.residence_id, Unit.unit_number)
+        elif current_user.is_owner():
+            if not current_user.residence_id:
+                return jsonify({'success': True, 'registry': [], 'summary': {
+                    'total_units': 0, 'units_paid': 0, 'units_pending': 0, 'total_outstanding': 0
+                }}), 200
+            if residence_id and residence_id != current_user.residence_id:
+                return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+            query = query.filter_by(residence_id=current_user.residence_id)
+            query = query.order_by(Unit.unit_number)
+        else:
+            return jsonify({'success': False, 'error': 'Accès non autorisé'}), 403
+        
+        units = query.all()
+        if not units:
+            return jsonify({'success': True, 'registry': [], 'summary': {
+                'total_units': 0, 'units_paid': 0, 'units_pending': 0, 'total_outstanding': 0
+            }}), 200
+        
+        unit_ids = [u.id for u in units]
+        
+        charges_by_unit = db.session.query(
+            ChargeDistribution.unit_id,
+            func.sum(ChargeDistribution.amount).label('total')
+        ).join(
+            Charge, ChargeDistribution.charge_id == Charge.id
+        ).filter(
+            ChargeDistribution.unit_id.in_(unit_ids),
+            Charge.status == 'published'
+        ).group_by(ChargeDistribution.unit_id).all()
+        
+        charges_map = {row.unit_id: row.total for row in charges_by_unit}
+        
+        paid_by_unit = db.session.query(
+            Payment.unit_id,
+            func.sum(Payment.amount).label('total')
+        ).filter(
+            Payment.unit_id.in_(unit_ids),
+            Payment.status == 'validated'
+        ).group_by(Payment.unit_id).all()
+        
+        paid_map = {row.unit_id: row.total for row in paid_by_unit}
+        
+        pending_by_unit = db.session.query(
+            Payment.unit_id,
+            func.sum(Payment.amount).label('total'),
+            func.count(Payment.id).label('count')
+        ).filter(
+            Payment.unit_id.in_(unit_ids),
+            Payment.status == 'pending'
+        ).group_by(Payment.unit_id).all()
+        
+        pending_map = {row.unit_id: {'amount': row.total, 'count': row.count} for row in pending_by_unit}
+        
+        last_payment_subquery = db.session.query(
+            Payment.unit_id,
+            func.max(Payment.payment_date).label('max_date')
+        ).filter(
+            Payment.unit_id.in_(unit_ids),
+            Payment.status == 'validated'
+        ).group_by(Payment.unit_id).subquery()
+        
+        last_payments = db.session.query(Payment).join(
+            last_payment_subquery,
+            and_(
+                Payment.unit_id == last_payment_subquery.c.unit_id,
+                Payment.payment_date == last_payment_subquery.c.max_date
+            )
+        ).filter(Payment.status == 'validated').all()
+        
+        last_payment_map = {p.unit_id: p for p in last_payments}
+        
+        registry = []
+        for unit in units:
+            total_charges_dec = Decimal(str(charges_map.get(unit.id, 0)))
+            total_paid_dec = Decimal(str(paid_map.get(unit.id, 0)))
+            pending_info = pending_map.get(unit.id, {'amount': 0, 'count': 0})
+            pending_amount_dec = Decimal(str(pending_info['amount']))
+            
+            balance = total_paid_dec - total_charges_dec
+            projected_balance = balance + pending_amount_dec
+            
+            last_payment = last_payment_map.get(unit.id)
+            
+            registry.append({
+                'unit_id': unit.id,
+                'unit_number': unit.unit_number,
+                'building': unit.building,
+                'floor': unit.floor,
+                'owner_name': unit.owner_name or 'Non renseigné',
+                'owner_email': unit.owner_email,
+                'owner_phone': unit.owner_phone,
+                'residence_id': unit.residence_id,
+                'residence_name': unit.residence.name if unit.residence else 'N/A',
+                'total_charges': float(total_charges_dec),
+                'total_paid': float(total_paid_dec),
+                'balance': float(balance),
+                'pending_amount': float(pending_amount_dec),
+                'projected_balance': float(projected_balance),
+                'status': 'À jour' if balance >= 0 else 'En retard',
+                'projected_status': 'À jour' if projected_balance >= 0 else 'En retard',
+                'pending_payments': pending_info['count'],
+                'last_payment_date': last_payment.payment_date.isoformat() if last_payment else None,
+                'last_payment_amount': float(last_payment.amount) if last_payment else 0
+            })
+        
+        units_up_to_date = len([r for r in registry if r['balance'] >= 0])
+        units_pending = len([r for r in registry if r['balance'] < 0])
+        total_outstanding = sum([abs(r['balance']) for r in registry if r['balance'] < 0])
+        
+        return jsonify({
+            'success': True,
+            'registry': registry,
+            'summary': {
+                'total_units': len(registry),
+                'units_paid': units_up_to_date,
+                'units_pending': units_pending,
+                'total_outstanding': total_outstanding
+            }
+        }), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ==================== ACTUALITÉS ====================
 
 @admin_bp.route('/news', methods=['GET'])
