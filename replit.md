@@ -56,3 +56,26 @@ Password hashing (Werkzeug), secure session management (Flask-Login), SQL inject
 -   **Flask-Mail:** For email notifications. Requires SMTP server configuration (`MAIL_SERVER`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`).
 -   **Tailwind CSS (CDN):** For styling the frontend.
 -   **Feather Icons:** For UI iconography.
+
+## Documentation
+
+The `docs/` folder contains comprehensive documentation:
+
+| Document | Description |
+|----------|-------------|
+| [README.md](docs/README.md) | Overview and quick start guide |
+| [GUIDE_UTILISATEUR.md](docs/GUIDE_UTILISATEUR.md) | User manual for all roles |
+| [GUIDE_COMMERCIAL.md](docs/GUIDE_COMMERCIAL.md) | Commercial presentation and features |
+| [ARCHITECTURE_TECHNIQUE.md](docs/ARCHITECTURE_TECHNIQUE.md) | Technical architecture and code structure |
+| [API_REFERENCE.md](docs/API_REFERENCE.md) | Complete REST API documentation |
+| [INSTALLATION.md](docs/INSTALLATION.md) | Installation and deployment guide |
+| [SECURITE.md](docs/SECURITE.md) | Security measures and best practices |
+
+## Demo Accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | admin@mysindic.ma | Admin123! |
+| Syndic Admin | admin.syndic@mysindic.ma | Admin123! |
+| Owner | owner@mysindic.ma | Owner123! |
+| Resident | resident@mysindic.ma | Resident123! |
