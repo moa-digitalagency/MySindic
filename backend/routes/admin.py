@@ -61,8 +61,12 @@ def dashboard():
             pending_maintenance = MaintenanceRequest.query.filter_by(status='pending').count()
             
             # Statistiques financières
-            unpaid_distributions = ChargeDistribution.query.filter_by(is_paid=False).all()
-            total_unpaid = sum(float(d.amount) for d in unpaid_distributions)
+            # Optimisation: Utilisation de SUM() en base de données
+            total_unpaid = db.session.query(db.func.sum(ChargeDistribution.amount))\
+                .filter_by(is_paid=False).scalar() or 0
+
+            # Conversion en float pour la compatibilité JSON
+            total_unpaid = float(total_unpaid) if total_unpaid else 0.0
             
             return jsonify({
                 'success': True,
@@ -122,15 +126,15 @@ def dashboard():
             ).count()
             
             # Statistiques financières pour ces résidences
-            units_in_residences = Unit.query.filter(Unit.residence_id.in_(residence_ids)).all()
-            unit_ids = [u.id for u in units_in_residences]
+            # Optimisation: Utilisation de SUM() en base de données avec jointure
+            total_unpaid = db.session.query(db.func.sum(ChargeDistribution.amount))\
+                .join(Unit)\
+                .filter(Unit.residence_id.in_(residence_ids))\
+                .filter(ChargeDistribution.is_paid == False)\
+                .scalar() or 0
             
-            unpaid_distributions = ChargeDistribution.query.filter(
-                ChargeDistribution.unit_id.in_(unit_ids),
-                ChargeDistribution.is_paid == False
-            ).all() if unit_ids else []
-            
-            total_unpaid = sum(float(d.amount) for d in unpaid_distributions)
+            # Conversion en float pour la compatibilité JSON
+            total_unpaid = float(total_unpaid) if total_unpaid else 0.0
             
             return jsonify({
                 'success': True,
